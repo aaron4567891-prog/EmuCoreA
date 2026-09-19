@@ -1977,7 +1977,7 @@
     <string name="settings_frame_limit">Frame limit</string>
     <string name="settings_frame_limit_desc">Caps emulation to the console\'s refresh rate. Turn off to run as fast as the device allows.</string>
     <string name="settings_target_fps">Target frame rate</string>
-    <string name="settings_target_fps_desc">Overrides the emulated refresh rate. Auto follows the console region.</string>
+    <string name="settings_target_fps_desc">Auto uses the frame rate reported by PPSSPP. Manual values set the emulation rate; a game may render fewer frames.</string>
     <string name="settings_vertical_refresh_ntsc">NTSC refresh rate</string>
     <string name="settings_vertical_refresh_pal">PAL refresh rate</string>
     <string name="settings_help_vertical_refresh">Overrides the emulated vertical refresh rate for this region. Adjust it slightly if NTSC audio crackles or PAL video stutters; the default follows the console standard.</string>
@@ -2054,4 +2054,24 @@
     <string name="settings_network_tab">Network</string>
     <string name="emulation_fast_forward">Fast forward</string>
     <string name="emulation_rewind">Rewind</string>
+    <string name="psp_memstick_title">PSP Memory Stick</string>
+    <string name="psp_memstick_note">PPSSPP stores game saves in PSP/SAVEDATA. Capacity is virtual; no card image is created. The selected size applies when you next launch a game.</string>
+    <string name="psp_memstick_backup">Back up saves</string>
+    <string name="psp_memstick_restore">Restore saves</string>
+    <string name="psp_memstick_saves">Saved games</string>
+    <string name="psp_memstick_empty">No PSP saves yet.</string>
+    <string name="psp_memstick_backup_success">PSP saves backed up.</string>
+    <string name="psp_memstick_backup_failure">Could not back up PSP saves.</string>
+    <string name="psp_memstick_restore_success">PSP saves restored. Existing files were kept.</string>
+    <string name="psp_memstick_restore_failure">Could not restore PSP saves.</string>
+    <string name="psp_memstick_create_title">Create Memory Stick</string>
+    <string name="psp_memstick_create_action">Create card</string>
+    <string name="psp_memstick_change_action">Change capacity</string>
+    <string name="psp_memstick_create_body">Choose a virtual Memory Stick capacity. PPSSPP stores saves as files, so creating a card does not allocate a disk image.</string>
+    <string name="psp_memstick_capacity">Capacity</string>
+    <string name="psp_memstick_capacity_value">Capacity: %1$s</string>
+    <string name="psp_memstick_saves_count">Saved games: %1$d</string>
+    <string name="psp_memstick_empty_card">No Memory Stick yet</string>
+    <string name="psp_memstick_create_success">Memory Stick is ready.</string>
+    <string name="psp_memstick_create_failure">Could not create Memory Stick.</string>
 </resources>

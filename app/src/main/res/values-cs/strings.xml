@@ -1969,7 +1969,7 @@
     <string name="settings_frame_limit">Limit snímků</string>
     <string name="settings_frame_limit_desc">Omezuje emulaci na obnovovací frekvenci konzole. Vypnutím poběží tak rychle, jak zařízení dovolí.</string>
     <string name="settings_target_fps">Cílová frekvence snímků</string>
-    <string name="settings_target_fps_desc">Nahrazuje emulovanou obnovovací frekvenci. Auto se řídí regionem konzole.</string>
+    <string name="settings_target_fps_desc">Automaticky se použije snímková frekvence hlášená PPSSPP. Ruční hodnota určuje rychlost emulace; hra může vykreslovat méně snímků.</string>
     <string name="settings_vertical_refresh_ntsc">Obnovovací frekvence NTSC</string>
     <string name="settings_vertical_refresh_pal">Obnovovací frekvence PAL</string>
     <string name="settings_help_vertical_refresh">Přepisuje emulovanou vertikální obnovovací frekvenci pro tento region. Mírně ji upravte, pokud zvuk NTSC praská nebo se obraz PAL trhá; výchozí hodnota odpovídá standardu konzole.</string>
@@ -2052,4 +2052,24 @@
     <string name="settings_network_tab">Síť</string>
     <string name="emulation_fast_forward">Rychlý posun vpřed</string>
     <string name="emulation_rewind">Přetáčení zpět</string>
+    <string name="psp_memstick_title">Paměťová karta PSP</string>
+    <string name="psp_memstick_note">PPSSPP ukládá pozice her do PSP/SAVEDATA. Kapacita je virtuální; obraz karty se nevytváří. Zvolená velikost se použije při dalším spuštění hry.</string>
+    <string name="psp_memstick_backup">Zálohovat pozice</string>
+    <string name="psp_memstick_restore">Obnovit pozice</string>
+    <string name="psp_memstick_saves">Uložené hry</string>
+    <string name="psp_memstick_empty">Zatím nejsou žádné pozice PSP.</string>
+    <string name="psp_memstick_backup_success">Pozice PSP byly zálohovány.</string>
+    <string name="psp_memstick_backup_failure">Pozice PSP se nepodařilo zálohovat.</string>
+    <string name="psp_memstick_restore_success">Pozice PSP byly obnoveny. Stávající soubory zůstaly zachovány.</string>
+    <string name="psp_memstick_restore_failure">Pozice PSP se nepodařilo obnovit.</string>
+    <string name="psp_memstick_create_title">Vytvořit Memory Stick</string>
+    <string name="psp_memstick_create_action">Vytvořit kartu</string>
+    <string name="psp_memstick_change_action">Změnit kapacitu</string>
+    <string name="psp_memstick_create_body">Vyberte kapacitu virtuální karty Memory Stick. PPSSPP ukládá hry do souborů, takže nevytváří obraz disku.</string>
+    <string name="psp_memstick_capacity">Kapacita</string>
+    <string name="psp_memstick_capacity_value">Kapacita: %1$s</string>
+    <string name="psp_memstick_saves_count">Uložené hry: %1$d</string>
+    <string name="psp_memstick_empty_card">Zatím žádná karta Memory Stick</string>
+    <string name="psp_memstick_create_success">Karta Memory Stick je připravena.</string>
+    <string name="psp_memstick_create_failure">Kartu Memory Stick se nepodařilo vytvořit.</string>
 </resources>

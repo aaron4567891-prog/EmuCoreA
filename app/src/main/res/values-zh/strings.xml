@@ -1949,7 +1949,7 @@
     <string name="settings_frame_limit">幀率限制</string>
     <string name="settings_frame_limit_desc">將模擬限制在主機的刷新率。關閉後以裝置允許的最高速度運行。</string>
     <string name="settings_target_fps">目標幀率</string>
-    <string name="settings_target_fps_desc">覆寫模擬的刷新率。自動會跟隨主機地區。</string>
+    <string name="settings_target_fps_desc">自動使用 PPSSPP 回報的影格率。手動數值設定模擬速度；遊戲實際顯示的影格可能較少。</string>
     <string name="settings_vertical_refresh_ntsc">NTSC 刷新率</string>
     <string name="settings_vertical_refresh_pal">PAL 刷新率</string>
     <string name="settings_help_vertical_refresh">覆盖该地区的模拟垂直刷新率。如果 NTSC 音频出现爆音或 PAL 视频卡顿，可稍作调整；默认值遵循主机标准。</string>
@@ -2032,4 +2032,24 @@
     <string name="settings_network_tab">網路</string>
     <string name="emulation_fast_forward">快进</string>
     <string name="emulation_rewind">快退</string>
+    <string name="psp_memstick_title">PSP 記憶棒</string>
+    <string name="psp_memstick_note">PPSSPP 將遊戲存檔儲存在 PSP/SAVEDATA。容量為虛擬值，不會建立記憶卡映像檔。選擇的容量會在下次啟動遊戲時套用。</string>
+    <string name="psp_memstick_backup">備份存檔</string>
+    <string name="psp_memstick_restore">還原存檔</string>
+    <string name="psp_memstick_saves">已儲存的遊戲</string>
+    <string name="psp_memstick_empty">目前沒有 PSP 存檔。</string>
+    <string name="psp_memstick_backup_success">PSP 存檔已備份。</string>
+    <string name="psp_memstick_backup_failure">無法備份 PSP 存檔。</string>
+    <string name="psp_memstick_restore_success">PSP 存檔已還原，現有檔案已保留。</string>
+    <string name="psp_memstick_restore_failure">無法還原 PSP 存檔。</string>
+    <string name="psp_memstick_create_title">建立 Memory Stick</string>
+    <string name="psp_memstick_create_action">建立記憶卡</string>
+    <string name="psp_memstick_change_action">變更容量</string>
+    <string name="psp_memstick_create_body">選擇虛擬 Memory Stick 容量。PPSSPP 將遊戲存檔儲存為檔案，不會建立磁碟映像。</string>
+    <string name="psp_memstick_capacity">容量</string>
+    <string name="psp_memstick_capacity_value">容量：%1$s</string>
+    <string name="psp_memstick_saves_count">遊戲存檔：%1$d</string>
+    <string name="psp_memstick_empty_card">尚未建立 Memory Stick</string>
+    <string name="psp_memstick_create_success">Memory Stick 已準備就緒。</string>
+    <string name="psp_memstick_create_failure">無法建立 Memory Stick。</string>
 </resources>

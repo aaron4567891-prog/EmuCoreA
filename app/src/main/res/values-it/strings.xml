@@ -1948,7 +1948,7 @@
     <string name="settings_frame_limit">Limite fotogrammi</string>
     <string name="settings_frame_limit_desc">Limita l\'emulazione alla frequenza di aggiornamento della console. Disattivalo per andare il più veloce possibile.</string>
     <string name="settings_target_fps">Frequenza fotogrammi target</string>
-    <string name="settings_target_fps_desc">Sostituisce la frequenza di aggiornamento emulata. Auto segue la regione della console.</string>
+    <string name="settings_target_fps_desc">Auto usa la frequenza dei fotogrammi indicata da PPSSPP. Un valore manuale imposta la velocità di emulazione; il gioco può mostrare meno fotogrammi.</string>
     <string name="settings_vertical_refresh_ntsc">Frequenza di aggiornamento NTSC</string>
     <string name="settings_vertical_refresh_pal">Frequenza di aggiornamento PAL</string>
     <string name="settings_help_vertical_refresh">Sostituisce la frequenza di aggiornamento verticale emulata per questa regione. Regolala leggermente se l\'audio NTSC gracchia o il video PAL scatta; il valore predefinito segue lo standard della console.</string>
@@ -2031,4 +2031,24 @@
     <string name="settings_network_tab">Rete</string>
     <string name="emulation_fast_forward">Avanzamento rapido</string>
     <string name="emulation_rewind">Riavvolgi</string>
+    <string name="psp_memstick_title">Memory Stick PSP</string>
+    <string name="psp_memstick_note">PPSSPP salva i dati di gioco in PSP/SAVEDATA. La capacità è virtuale; non viene creata un’immagine della scheda. La dimensione scelta si applica al prossimo avvio del gioco.</string>
+    <string name="psp_memstick_backup">Esegui backup dei salvataggi</string>
+    <string name="psp_memstick_restore">Ripristina i salvataggi</string>
+    <string name="psp_memstick_saves">Giochi salvati</string>
+    <string name="psp_memstick_empty">Nessun salvataggio PSP.</string>
+    <string name="psp_memstick_backup_success">Salvataggi PSP copiati.</string>
+    <string name="psp_memstick_backup_failure">Impossibile copiare i salvataggi PSP.</string>
+    <string name="psp_memstick_restore_success">Salvataggi PSP ripristinati. I file esistenti sono stati conservati.</string>
+    <string name="psp_memstick_restore_failure">Impossibile ripristinare i salvataggi PSP.</string>
+    <string name="psp_memstick_create_title">Crea Memory Stick</string>
+    <string name="psp_memstick_create_action">Crea scheda</string>
+    <string name="psp_memstick_change_action">Cambia capacità</string>
+    <string name="psp_memstick_create_body">Scegli la capacità del Memory Stick virtuale. PPSSPP salva i dati in file, senza creare un’immagine disco.</string>
+    <string name="psp_memstick_capacity">Capacità</string>
+    <string name="psp_memstick_capacity_value">Capacità: %1$s</string>
+    <string name="psp_memstick_saves_count">Salvataggi: %1$d</string>
+    <string name="psp_memstick_empty_card">Nessun Memory Stick</string>
+    <string name="psp_memstick_create_success">Memory Stick pronto.</string>
+    <string name="psp_memstick_create_failure">Impossibile creare il Memory Stick.</string>
 </resources>

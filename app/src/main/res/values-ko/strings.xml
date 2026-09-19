@@ -1947,7 +1947,7 @@
     <string name="settings_frame_limit">프레임 제한</string>
     <string name="settings_frame_limit_desc">에뮬레이션을 콘솔의 주사율로 제한합니다. 끄면 기기가 허용하는 만큼 빠르게 실행됩니다.</string>
     <string name="settings_target_fps">목표 프레임 속도</string>
-    <string name="settings_target_fps_desc">에뮬레이션 주사율을 재정의합니다. 자동은 콘솔 지역을 따릅니다.</string>
+    <string name="settings_target_fps_desc">자동은 PPSSPP가 보고한 프레임 속도를 사용합니다. 수동 값은 에뮬레이션 속도를 정하며, 게임은 더 적은 프레임을 표시할 수 있습니다.</string>
     <string name="settings_vertical_refresh_ntsc">NTSC 주사율</string>
     <string name="settings_vertical_refresh_pal">PAL 주사율</string>
     <string name="settings_help_vertical_refresh">이 지역의 에뮬레이션된 수직 주사율을 재정의합니다. NTSC 오디오가 지직거리거나 PAL 영상이 끊기면 조금 조정하세요. 기본값은 콘솔 표준을 따릅니다.</string>
@@ -2030,4 +2030,24 @@
     <string name="settings_network_tab">네트워크</string>
     <string name="emulation_fast_forward">빨리 감기</string>
     <string name="emulation_rewind">되감기</string>
+    <string name="psp_memstick_title">PSP 메모리 스틱</string>
+    <string name="psp_memstick_note">PPSSPP는 게임 저장 데이터를 PSP/SAVEDATA에 저장합니다. 용량은 가상 값이며 카드 이미지 파일은 만들지 않습니다. 선택한 크기는 다음 게임 실행부터 적용됩니다.</string>
+    <string name="psp_memstick_backup">저장 데이터 백업</string>
+    <string name="psp_memstick_restore">저장 데이터 복원</string>
+    <string name="psp_memstick_saves">저장된 게임</string>
+    <string name="psp_memstick_empty">아직 PSP 저장 데이터가 없습니다.</string>
+    <string name="psp_memstick_backup_success">PSP 저장 데이터를 백업했습니다.</string>
+    <string name="psp_memstick_backup_failure">PSP 저장 데이터를 백업하지 못했습니다.</string>
+    <string name="psp_memstick_restore_success">PSP 저장 데이터를 복원했습니다. 기존 파일은 유지했습니다.</string>
+    <string name="psp_memstick_restore_failure">PSP 저장 데이터를 복원하지 못했습니다.</string>
+    <string name="psp_memstick_create_title">Memory Stick 만들기</string>
+    <string name="psp_memstick_create_action">카드 만들기</string>
+    <string name="psp_memstick_change_action">용량 변경</string>
+    <string name="psp_memstick_create_body">가상 Memory Stick 용량을 선택하세요. PPSSPP는 저장 데이터를 파일로 보관하며 디스크 이미지를 만들지 않습니다.</string>
+    <string name="psp_memstick_capacity">용량</string>
+    <string name="psp_memstick_capacity_value">용량: %1$s</string>
+    <string name="psp_memstick_saves_count">저장된 게임: %1$d</string>
+    <string name="psp_memstick_empty_card">Memory Stick이 아직 없습니다</string>
+    <string name="psp_memstick_create_success">Memory Stick이 준비되었습니다.</string>
+    <string name="psp_memstick_create_failure">Memory Stick을 만들지 못했습니다.</string>
 </resources>

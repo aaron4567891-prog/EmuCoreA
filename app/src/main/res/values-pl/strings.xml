@@ -1969,7 +1969,7 @@
     <string name="settings_frame_limit">Limit klatek</string>
     <string name="settings_frame_limit_desc">Ogranicza emulację do częstotliwości odświeżania konsoli. Wyłącz, aby działać tak szybko, jak pozwala urządzenie.</string>
     <string name="settings_target_fps">Docelowa liczba klatek</string>
-    <string name="settings_target_fps_desc">Zastępuje emulowaną częstotliwość odświeżania. Auto podąża za regionem konsoli.</string>
+    <string name="settings_target_fps_desc">Auto używa liczby klatek zgłaszanej przez PPSSPP. Wartość ręczna ustala tempo emulacji; gra może wyświetlać mniej klatek.</string>
     <string name="settings_vertical_refresh_ntsc">Częstotliwość odświeżania NTSC</string>
     <string name="settings_vertical_refresh_pal">Częstotliwość odświeżania PAL</string>
     <string name="settings_help_vertical_refresh">Zastępuje emulowaną pionową częstotliwość odświeżania dla tego regionu. Dostosuj nieznacznie, jeśli dźwięk NTSC trzeszczy lub obraz PAL przycina; domyślna wartość odpowiada standardowi konsoli.</string>
@@ -2052,4 +2052,24 @@
     <string name="settings_network_tab">Sieć</string>
     <string name="emulation_fast_forward">Szybkie przewijanie</string>
     <string name="emulation_rewind">Przewijanie wstecz</string>
+    <string name="psp_memstick_title">Memory Stick PSP</string>
+    <string name="psp_memstick_note">PPSSPP zapisuje dane gier w PSP/SAVEDATA. Pojemność jest wirtualna; obraz karty nie jest tworzony. Wybrany rozmiar zacznie działać po ponownym uruchomieniu gry.</string>
+    <string name="psp_memstick_backup">Utwórz kopię zapisów</string>
+    <string name="psp_memstick_restore">Przywróć zapisy</string>
+    <string name="psp_memstick_saves">Zapisane gry</string>
+    <string name="psp_memstick_empty">Nie ma jeszcze zapisów PSP.</string>
+    <string name="psp_memstick_backup_success">Zapisy PSP skopiowano.</string>
+    <string name="psp_memstick_backup_failure">Nie udało się skopiować zapisów PSP.</string>
+    <string name="psp_memstick_restore_success">Zapisy PSP przywrócono. Istniejące pliki zachowano.</string>
+    <string name="psp_memstick_restore_failure">Nie udało się przywrócić zapisów PSP.</string>
+    <string name="psp_memstick_create_title">Utwórz Memory Stick</string>
+    <string name="psp_memstick_create_action">Utwórz kartę</string>
+    <string name="psp_memstick_change_action">Zmień pojemność</string>
+    <string name="psp_memstick_create_body">Wybierz pojemność wirtualnej karty Memory Stick. PPSSPP zapisuje stany gier w plikach, bez tworzenia obrazu dysku.</string>
+    <string name="psp_memstick_capacity">Pojemność</string>
+    <string name="psp_memstick_capacity_value">Pojemność: %1$s</string>
+    <string name="psp_memstick_saves_count">Zapisane gry: %1$d</string>
+    <string name="psp_memstick_empty_card">Brak karty Memory Stick</string>
+    <string name="psp_memstick_create_success">Karta Memory Stick jest gotowa.</string>
+    <string name="psp_memstick_create_failure">Nie udało się utworzyć karty Memory Stick.</string>
 </resources>

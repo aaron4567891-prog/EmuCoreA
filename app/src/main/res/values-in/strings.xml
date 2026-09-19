@@ -1962,7 +1962,7 @@
     <string name="settings_frame_limit">Batas bingkai</string>
     <string name="settings_frame_limit_desc">Membatasi emulasi ke laju penyegaran konsol. Matikan agar berjalan secepat perangkat.</string>
     <string name="settings_target_fps">Laju bingkai target</string>
-    <string name="settings_target_fps_desc">Mengganti laju penyegaran emulasi. Otomatis mengikuti wilayah konsol.</string>
+    <string name="settings_target_fps_desc">Otomatis memakai laju bingkai yang dilaporkan PPSSPP. Nilai manual mengatur kecepatan emulasi; game dapat menampilkan lebih sedikit bingkai.</string>
     <string name="settings_vertical_refresh_ntsc">Laju penyegaran NTSC</string>
     <string name="settings_vertical_refresh_pal">Laju penyegaran PAL</string>
     <string name="settings_help_vertical_refresh">Mengganti laju penyegaran vertikal yang diemulasi untuk wilayah ini. Sesuaikan sedikit jika audio NTSC berderak atau video PAL tersendat; nilai bawaan mengikuti standar konsol.</string>
@@ -2045,4 +2045,24 @@
     <string name="settings_network_tab">Jaringan</string>
     <string name="emulation_fast_forward">Maju cepat</string>
     <string name="emulation_rewind">Putar balik</string>
+    <string name="psp_memstick_title">Memory Stick PSP</string>
+    <string name="psp_memstick_note">PPSSPP menyimpan data permainan di PSP/SAVEDATA. Kapasitas bersifat virtual; berkas citra kartu tidak dibuat. Ukuran yang dipilih berlaku saat permainan berikutnya dijalankan.</string>
+    <string name="psp_memstick_backup">Cadangkan data simpan</string>
+    <string name="psp_memstick_restore">Pulihkan data simpan</string>
+    <string name="psp_memstick_saves">Permainan tersimpan</string>
+    <string name="psp_memstick_empty">Belum ada data simpan PSP.</string>
+    <string name="psp_memstick_backup_success">Data simpan PSP dicadangkan.</string>
+    <string name="psp_memstick_backup_failure">Data simpan PSP gagal dicadangkan.</string>
+    <string name="psp_memstick_restore_success">Data simpan PSP dipulihkan. Berkas yang ada tetap dipertahankan.</string>
+    <string name="psp_memstick_restore_failure">Data simpan PSP gagal dipulihkan.</string>
+    <string name="psp_memstick_create_title">Buat Memory Stick</string>
+    <string name="psp_memstick_create_action">Buat kartu</string>
+    <string name="psp_memstick_change_action">Ubah kapasitas</string>
+    <string name="psp_memstick_create_body">Pilih kapasitas Memory Stick virtual. PPSSPP menyimpan data permainan sebagai berkas tanpa membuat citra disk.</string>
+    <string name="psp_memstick_capacity">Kapasitas</string>
+    <string name="psp_memstick_capacity_value">Kapasitas: %1$s</string>
+    <string name="psp_memstick_saves_count">Permainan tersimpan: %1$d</string>
+    <string name="psp_memstick_empty_card">Belum ada Memory Stick</string>
+    <string name="psp_memstick_create_success">Memory Stick siap.</string>
+    <string name="psp_memstick_create_failure">Memory Stick tidak dapat dibuat.</string>
 </resources>

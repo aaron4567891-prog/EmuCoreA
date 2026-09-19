@@ -115,6 +115,11 @@ namespace Libretro
    static retro_input_state_t input_state_cb;
    static retro_rumble_interface rumble_interface{};
    static retro_log_printf_t log_cb;
+#ifndef NDEBUG
+   // A renderer change restarts this libretro session in the same process.
+   // Keep the handle so retro_deinit can detach the previous callback.
+   static int retro_log_handle = -1;
+#endif
 
    bool g_pendingBoot = false;
    std::string g_bootErrorString;
@@ -1198,7 +1203,8 @@ void retro_init(void)
       // The external callback is only useful while diagnosing a debug build.
       // Release keeps the log manager's outputs disabled, avoiding message
       // formatting and logcat traffic on the emulation thread.
-      g_logManager.AddExternalLogCallback(&RetroLogCallback, (void *)log_cb);
+      if (retro_log_handle < 0)
+         retro_log_handle = g_logManager.AddExternalLogCallback(&RetroLogCallback, (void *)log_cb);
 #endif
    }
 
@@ -1317,6 +1323,10 @@ void retro_deinit(void)
    }
    rumble_interface = {};
    g_threadManager.Teardown();
+#ifndef NDEBUG
+   g_logManager.RemoveExternalLogCallback(retro_log_handle);
+   retro_log_handle = -1;
+#endif
    g_logManager.Shutdown();
    log_cb = NULL;
 
@@ -1372,6 +1382,10 @@ namespace Libretro {
 
    static std::thread emuThread;
    static void EmuFrame() {
+      // The standalone PPSSPP UI processes queued rewind operations and
+      // captures periodic rewind snapshots here. The libretro frame loop
+      // must do the same or CanRewind() remains false forever.
+      SaveState::Process();
       ctx->SetRenderTarget();
       Draw::DrawContext *draw = ctx->GetDrawContext();
       if (draw) {

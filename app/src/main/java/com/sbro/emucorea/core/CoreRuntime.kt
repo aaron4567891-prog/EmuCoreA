@@ -730,6 +730,11 @@ internal object CoreRuntime {
         }
     }
 
+    fun hasAttachedSurface(value: Surface, width: Int, height: Int): Boolean =
+        sessionLock.withLock {
+            session != 0L && surface === value && surfaceWidth == width && surfaceHeight == height
+        }
+
     fun detachSurface() {
         sessionLock.withLock {
             if (session != 0L && bridge.setSurface(session, null, activeCoreRenderer) != 0)
@@ -933,10 +938,11 @@ internal object CoreRuntime {
                             if (remainingNanos > FRAME_PACING_SPIN_NANOS) Thread.sleep(1)
                         }
                         val afterNanos = System.nanoTime()
-                        frameDeadlineNanos += framePeriodNanos
-                        if (frameDeadlineNanos < afterNanos - framePeriodNanos * 4) {
-                            frameDeadlineNanos = afterNanos + framePeriodNanos
-                        }
+                        // Schedule from this frame's actual start. Carrying an
+                        // expired deadline forward lets several frames run back
+                        // to back after a slow Vulkan present or UI pause, which
+                        // makes the measured rate jump above the selected cap.
+                        frameDeadlineNanos = afterNanos + framePeriodNanos
                     }
                 } else {
                     frameDeadlineNanos = 0L
@@ -1017,6 +1023,11 @@ internal object CoreRuntime {
                     }
                     publishPerformanceMetrics(fps, metricsFrames, metricsFrameTotalNanos,
                         output.stats(), cpuLoad)
+                    if (com.sbro.emucorea.BuildConfig.DEBUG) {
+                        Log.d(TAG, "pacing fps=%.1f core=%.1fms queue=%d high=%d".format(
+                            Locale.US, fps, metricsFrameTotalNanos / metricsFrames / 1_000_000.0,
+                            output.bufferedFrames(), output.pacingHighWaterFrames()))
+                    }
                     metricsStartNanos = now
                     metricsStartCpuMs = cpuNowMs
                     metricsFrames = 0

@@ -1963,7 +1963,7 @@
     <string name="settings_frame_limit">محدودیت فریم</string>
     <string name="settings_frame_limit_desc">شبیه‌سازی را به نرخ نوسازی کنسول محدود می‌کند. برای اجرا با بیشترین سرعت دستگاه، آن را خاموش کنید.</string>
     <string name="settings_target_fps">نرخ فریم هدف</string>
-    <string name="settings_target_fps_desc">نرخ نوسازی شبیه‌سازی‌شده را بازنویسی می‌کند. حالت خودکار از منطقه کنسول پیروی می‌کند.</string>
+    <string name="settings_target_fps_desc">حالت خودکار از نرخ فریم گزارش‌شده توسط PPSSPP استفاده می‌کند. مقدار دستی سرعت شبیه‌سازی را تعیین می‌کند؛ بازی ممکن است فریم‌های کمتری نمایش دهد.</string>
     <string name="settings_vertical_refresh_ntsc">نرخ تازه‌سازی NTSC</string>
     <string name="settings_vertical_refresh_pal">نرخ تازه‌سازی PAL</string>
     <string name="settings_help_vertical_refresh">نرخ تازه‌سازی عمودی شبیه‌سازی‌شده را برای این منطقه بازنویسی می‌کند. اگر صدای NTSC خش می‌اندازد یا تصویر PAL تکه‌تکه می‌شود، آن را کمی تنظیم کنید؛ مقدار پیش‌فرض از استاندارد کنسول پیروی می‌کند.</string>
@@ -2046,4 +2046,24 @@
     <string name="settings_network_tab">شبکه</string>
     <string name="emulation_fast_forward">جلو بردن سریع</string>
     <string name="emulation_rewind">بازگرداندن</string>
+    <string name="psp_memstick_title">مموری استیک PSP</string>
+    <string name="psp_memstick_note">PPSSPP داده‌های ذخیرهٔ بازی را در PSP/SAVEDATA نگه می‌دارد. ظرفیت مجازی است و تصویر کارت ساخته نمی‌شود. اندازهٔ انتخاب‌شده از اجرای بعدی بازی اعمال می‌شود.</string>
+    <string name="psp_memstick_backup">پشتیبان‌گیری از ذخیره‌ها</string>
+    <string name="psp_memstick_restore">بازیابی ذخیره‌ها</string>
+    <string name="psp_memstick_saves">بازی‌های ذخیره‌شده</string>
+    <string name="psp_memstick_empty">هنوز ذخیرهٔ PSP وجود ندارد.</string>
+    <string name="psp_memstick_backup_success">از ذخیره‌های PSP پشتیبان گرفته شد.</string>
+    <string name="psp_memstick_backup_failure">پشتیبان‌گیری از ذخیره‌های PSP انجام نشد.</string>
+    <string name="psp_memstick_restore_success">ذخیره‌های PSP بازیابی شدند. فایل‌های موجود حفظ شدند.</string>
+    <string name="psp_memstick_restore_failure">بازیابی ذخیره‌های PSP انجام نشد.</string>
+    <string name="psp_memstick_create_title">ایجاد Memory Stick</string>
+    <string name="psp_memstick_create_action">ایجاد کارت</string>
+    <string name="psp_memstick_change_action">تغییر ظرفیت</string>
+    <string name="psp_memstick_create_body">ظرفیت Memory Stick مجازی را انتخاب کنید. PPSSPP ذخیره‌ها را به‌صورت فایل نگه می‌دارد و تصویر دیسک نمی‌سازد.</string>
+    <string name="psp_memstick_capacity">ظرفیت</string>
+    <string name="psp_memstick_capacity_value">ظرفیت: %1$s</string>
+    <string name="psp_memstick_saves_count">بازی‌های ذخیره‌شده: %1$d</string>
+    <string name="psp_memstick_empty_card">هنوز Memory Stick وجود ندارد</string>
+    <string name="psp_memstick_create_success">Memory Stick آماده است.</string>
+    <string name="psp_memstick_create_failure">ایجاد Memory Stick ممکن نشد.</string>
 </resources>

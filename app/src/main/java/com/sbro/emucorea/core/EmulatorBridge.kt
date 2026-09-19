@@ -1528,6 +1528,10 @@ object EmulatorBridge {
             Log.w(TAG, "rebindSurface: skipped (valid=${surface.isValid} w=$width h=$height)")
             return
         }
+        // The new renderer session already binds this very surface before
+        // loading the game. Rebinding it again on menu resume destroys and
+        // recreates Vulkan's swapchain after the first emulated frame.
+        if (NativeApp.hasAttachedSurface(surface, width, height)) return
         Log.i(TAG, "rebindSurface: width=$width height=$height")
         NativeApp.logCrashBreadcrumb("rebindSurface width=$width height=$height")
         try {

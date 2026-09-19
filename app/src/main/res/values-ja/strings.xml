@@ -1947,7 +1947,7 @@
     <string name="settings_frame_limit">フレーム制限</string>
     <string name="settings_frame_limit_desc">エミュレーションを本体のリフレッシュレートに制限します。オフにするとデバイスの性能に応じて高速に動作します。</string>
     <string name="settings_target_fps">目標フレームレート</string>
-    <string name="settings_target_fps_desc">エミュレートするリフレッシュレートを上書きします。自動は本体の地域に従います。</string>
+    <string name="settings_target_fps_desc">自動ではPPSSPPが報告するフレームレートを使用します。手動の値はエミュレーション速度を設定しますが、ゲームの描画枚数は少ない場合があります。</string>
     <string name="settings_vertical_refresh_ntsc">NTSC リフレッシュレート</string>
     <string name="settings_vertical_refresh_pal">PAL リフレッシュレート</string>
     <string name="settings_help_vertical_refresh">この地域のエミュレートされた垂直リフレッシュレートを上書きします。NTSC の音声が割れる、または PAL の映像が途切れる場合に少し調整してください。既定値はコンソール標準に従います。</string>
@@ -2030,4 +2030,24 @@
     <string name="settings_network_tab">ネットワーク</string>
     <string name="emulation_fast_forward">早送り</string>
     <string name="emulation_rewind">巻き戻し</string>
+    <string name="psp_memstick_title">PSP メモリースティック</string>
+    <string name="psp_memstick_note">PPSSPP はゲームのセーブデータを PSP/SAVEDATA に保存します。容量は仮想的なもので、カードイメージは作成しません。選択した容量は次回のゲーム起動時に適用されます。</string>
+    <string name="psp_memstick_backup">セーブデータをバックアップ</string>
+    <string name="psp_memstick_restore">セーブデータを復元</string>
+    <string name="psp_memstick_saves">セーブ済みゲーム</string>
+    <string name="psp_memstick_empty">PSP のセーブデータはまだありません。</string>
+    <string name="psp_memstick_backup_success">PSP のセーブデータをバックアップしました。</string>
+    <string name="psp_memstick_backup_failure">PSP のセーブデータをバックアップできませんでした。</string>
+    <string name="psp_memstick_restore_success">PSP のセーブデータを復元しました。既存のファイルは保持しました。</string>
+    <string name="psp_memstick_restore_failure">PSP のセーブデータを復元できませんでした。</string>
+    <string name="psp_memstick_create_title">Memory Stick を作成</string>
+    <string name="psp_memstick_create_action">カードを作成</string>
+    <string name="psp_memstick_change_action">容量を変更</string>
+    <string name="psp_memstick_create_body">仮想 Memory Stick の容量を選択します。PPSSPP はセーブデータをファイルとして保存し、ディスクイメージは作成しません。</string>
+    <string name="psp_memstick_capacity">容量</string>
+    <string name="psp_memstick_capacity_value">容量: %1$s</string>
+    <string name="psp_memstick_saves_count">セーブデータ: %1$d</string>
+    <string name="psp_memstick_empty_card">Memory Stick はまだありません</string>
+    <string name="psp_memstick_create_success">Memory Stick の準備ができました。</string>
+    <string name="psp_memstick_create_failure">Memory Stick を作成できませんでした。</string>
 </resources>

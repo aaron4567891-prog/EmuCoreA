@@ -953,6 +953,25 @@ private fun GameSettingsTabContent(
             GameSettingsManagerTab.Runtime -> {
                 EditorSection(title = stringResource(R.string.game_settings_manager_section_runtime)) {
                     ToggleRow(
+                        title = stringResource(R.string.settings_frame_limit),
+                        checked = draft.frameLimitEnabled,
+                        onCheckedChange = { onDraftChange(draft.copy(frameLimitEnabled = it)) },
+                        helpText = stringResource(R.string.settings_frame_limit_desc),
+                        onResetToDefault = { onDraftChange(draft.copy(frameLimitEnabled = defaultProfile.frameLimitEnabled)) }
+                    )
+                    SelectionRow(
+                        title = stringResource(R.string.settings_target_fps),
+                        options = listOf(
+                            0 to stringResource(R.string.settings_aspect_ratio_auto),
+                            50 to "50 Hz",
+                            60 to "60 Hz"
+                        ),
+                        selectedValue = draft.targetFps,
+                        onSelected = { onDraftChange(draft.copy(targetFps = it)) },
+                        helpText = stringResource(R.string.settings_target_fps_desc),
+                        onResetToDefault = { onDraftChange(draft.copy(targetFps = defaultProfile.targetFps)) }
+                    )
+                    ToggleRow(
                         title = stringResource(R.string.settings_show_fps),
                         checked = draft.showFps,
                         onCheckedChange = { onDraftChange(draft.copy(showFps = it)) },

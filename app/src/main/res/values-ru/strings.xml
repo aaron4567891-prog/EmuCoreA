@@ -1952,7 +1952,7 @@
     <string name="settings_frame_limit">Ограничение кадров</string>
     <string name="settings_frame_limit_desc">Ограничивает эмуляцию частотой обновления консоли. Отключите, чтобы работать так быстро, как позволяет устройство.</string>
     <string name="settings_target_fps">Целевая частота кадров</string>
-    <string name="settings_target_fps_desc">Переопределяет частоту обновления эмуляции. «Авто» соответствует региону консоли.</string>
+    <string name="settings_target_fps_desc">«Авто» использует частоту кадров, сообщаемую PPSSPP. Ручное значение задаёт темп эмуляции; игра может выводить меньше кадров.</string>
     <string name="settings_vertical_refresh_ntsc">Частота обновления NTSC</string>
     <string name="settings_vertical_refresh_pal">Частота обновления PAL</string>
     <string name="settings_help_vertical_refresh">Переопределяет эмулируемую вертикальную частоту обновления для этого региона. Слегка скорректируйте, если звук в NTSC-играх трещит или видео PAL дёргается; значение по умолчанию соответствует стандарту консоли.</string>
@@ -2035,4 +2035,24 @@
     <string name="settings_network_tab">Сеть</string>
     <string name="emulation_fast_forward">Перемотка вперёд</string>
     <string name="emulation_rewind">Перемотка назад</string>
+    <string name="psp_memstick_title">Карта памяти PSP</string>
+    <string name="psp_memstick_note">PPSSPP хранит сохранения игр в PSP/SAVEDATA. Объём виртуальный: образ карты не создаётся. Выбранный размер применяется при следующем запуске игры.</string>
+    <string name="psp_memstick_backup">Резервная копия сохранений</string>
+    <string name="psp_memstick_restore">Восстановить сохранения</string>
+    <string name="psp_memstick_saves">Сохранения игр</string>
+    <string name="psp_memstick_empty">Сохранений PSP пока нет.</string>
+    <string name="psp_memstick_backup_success">Сохранения PSP скопированы.</string>
+    <string name="psp_memstick_backup_failure">Не удалось скопировать сохранения PSP.</string>
+    <string name="psp_memstick_restore_success">Сохранения PSP восстановлены. Существующие файлы сохранены.</string>
+    <string name="psp_memstick_restore_failure">Не удалось восстановить сохранения PSP.</string>
+    <string name="psp_memstick_create_title">Создать Memory Stick</string>
+    <string name="psp_memstick_create_action">Создать карту</string>
+    <string name="psp_memstick_change_action">Изменить объём</string>
+    <string name="psp_memstick_create_body">Выберите объём виртуальной карты памяти. PPSSPP хранит сохранения в файлах, поэтому образ диска не создаётся.</string>
+    <string name="psp_memstick_capacity">Объём</string>
+    <string name="psp_memstick_capacity_value">Объём: %1$s</string>
+    <string name="psp_memstick_saves_count">Сохранений игр: %1$d</string>
+    <string name="psp_memstick_empty_card">Карта памяти ещё не создана</string>
+    <string name="psp_memstick_create_success">Карта памяти готова.</string>
+    <string name="psp_memstick_create_failure">Не удалось создать карту памяти.</string>
 </resources>

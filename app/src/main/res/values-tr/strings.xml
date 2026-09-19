@@ -1948,7 +1948,7 @@
     <string name="settings_frame_limit">Kare sınırı</string>
     <string name="settings_frame_limit_desc">Emülasyonu konsolun yenileme hızıyla sınırlar. Cihazın izin verdiği kadar hızlı çalışması için kapatın.</string>
     <string name="settings_target_fps">Hedef kare hızı</string>
-    <string name="settings_target_fps_desc">Emüle edilen yenileme hızını geçersiz kılar. Otomatik, konsol bölgesini izler.</string>
+    <string name="settings_target_fps_desc">Otomatik, PPSSPP tarafından bildirilen kare hızını kullanır. Elle seçilen değer emülasyon hızını belirler; oyun daha az kare gösterebilir.</string>
     <string name="settings_vertical_refresh_ntsc">NTSC yenileme hızı</string>
     <string name="settings_vertical_refresh_pal">PAL yenileme hızı</string>
     <string name="settings_help_vertical_refresh">Bu bölge için emüle edilen dikey yenileme hızını geçersiz kılar. NTSC sesi çıtırdıyorsa veya PAL görüntüsü takılıyorsa hafifçe ayarlayın; varsayılan değer konsol standardını izler.</string>
@@ -2031,4 +2031,24 @@
     <string name="settings_network_tab">Ağ</string>
     <string name="emulation_fast_forward">Hızlı ileri sar</string>
     <string name="emulation_rewind">Geri sar</string>
+    <string name="psp_memstick_title">PSP Memory Stick</string>
+    <string name="psp_memstick_note">PPSSPP oyun kayıtlarını PSP/SAVEDATA içinde saklar. Kapasite sanaldır; kart görüntüsü oluşturulmaz. Seçilen boyut oyunun sonraki açılışında uygulanır.</string>
+    <string name="psp_memstick_backup">Kayıtları yedekle</string>
+    <string name="psp_memstick_restore">Kayıtları geri yükle</string>
+    <string name="psp_memstick_saves">Kayıtlı oyunlar</string>
+    <string name="psp_memstick_empty">Henüz PSP kaydı yok.</string>
+    <string name="psp_memstick_backup_success">PSP kayıtları yedeklendi.</string>
+    <string name="psp_memstick_backup_failure">PSP kayıtları yedeklenemedi.</string>
+    <string name="psp_memstick_restore_success">PSP kayıtları geri yüklendi. Mevcut dosyalar korundu.</string>
+    <string name="psp_memstick_restore_failure">PSP kayıtları geri yüklenemedi.</string>
+    <string name="psp_memstick_create_title">Memory Stick oluştur</string>
+    <string name="psp_memstick_create_action">Kart oluştur</string>
+    <string name="psp_memstick_change_action">Kapasiteyi değiştir</string>
+    <string name="psp_memstick_create_body">Sanal Memory Stick kapasitesini seçin. PPSSPP kayıtları dosya olarak saklar; disk görüntüsü oluşturulmaz.</string>
+    <string name="psp_memstick_capacity">Kapasite</string>
+    <string name="psp_memstick_capacity_value">Kapasite: %1$s</string>
+    <string name="psp_memstick_saves_count">Kayıtlı oyun: %1$d</string>
+    <string name="psp_memstick_empty_card">Henüz Memory Stick yok</string>
+    <string name="psp_memstick_create_success">Memory Stick hazır.</string>
+    <string name="psp_memstick_create_failure">Memory Stick oluşturulamadı.</string>
 </resources>

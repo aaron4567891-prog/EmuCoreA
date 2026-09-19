@@ -303,6 +303,8 @@ object NativeApp {
         runCatching { CoreRuntime.bridge.achievementsPollEventsJson() }.getOrNull().orEmpty()
     @JvmStatic fun onNativeSurfaceCreated() = Unit
     @JvmStatic fun onNativeSurfaceChanged(surface: Surface, width: Int, height: Int) = CoreRuntime.attachSurface(surface, width, height)
+    @JvmStatic fun hasAttachedSurface(surface: Surface, width: Int, height: Int): Boolean =
+        CoreRuntime.hasAttachedSurface(surface, width, height)
     @JvmStatic fun onNativeSurfaceDestroyed() = CoreRuntime.detachSurface()
     @JvmStatic fun runVMThread(path: String): Boolean {
         currentGamePath = path

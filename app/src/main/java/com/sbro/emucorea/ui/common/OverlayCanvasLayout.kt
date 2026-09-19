@@ -216,11 +216,7 @@ fun buildOverlayCanvasLayout(
         leftStickSize
     }
     val primaryExtent = maxOf(dpadClusterExtent, actionClusterExtent, leftStickSize)
-    val centerBaseY = (if (isLandscape) {
-        minOf(canvasHeight * 0.86f, contentBottom - centerH)
-    } else {
-        contentBottom - centerH
-    }) + centerAdjustment.second
+    val centerBaseY = contentBottom - centerH + centerAdjustment.second
     val primaryTop = centerBaseY - sectionGap - primaryExtent
 
     fun buttonSpec(
@@ -256,7 +252,7 @@ fun buildOverlayCanvasLayout(
 
     val shoulderStackHeight = shoulderH
     val shoulderRowBaseY = if (isLandscape) {
-        maxOf(edgePadTop, minOf(canvasHeight * 0.34f, contentBottom - shoulderStackHeight))
+        maxOf(edgePadTop, primaryTop - sectionGap - shoulderStackHeight)
     } else {
         edgePadTop
     }
@@ -294,18 +290,12 @@ fun buildOverlayCanvasLayout(
     } else {
         OverlayPrimaryControlGapPortrait
     }) * responsiveScale
-    val leftStickRowStart = if (isLandscape && extraDpadLayout.visible) {
-        edgePadStart + (extraDpadSize - leftStickPanelWidth) / 2f
-    } else if (extraDpadLayout.visible) {
+    val leftStickRowStart = if (extraDpadLayout.visible) {
         edgePadStart + extraDpadSize + primaryControlGap
     } else {
         edgePadStart
     }
-    val leftStickBaseY = if (isLandscape) {
-        minOf(canvasHeight * 0.72f, contentBottom - leftStickSize)
-    } else {
-        primaryTop + leftStickBase
-    }
+    val leftStickBaseY = primaryTop + leftStickBase
     val leftStick = OverlayCanvasStickSpec(
         id = "left_stick",
         size = leftStickSize,
@@ -320,11 +310,7 @@ fun buildOverlayCanvasLayout(
 
     val showDpad = !leftStickLayout.visible && !extraDpadLayout.visible
     val dpadClusterLeft = edgePadStart + dpadAdjustment.first
-    val dpadClusterTop = (if (isLandscape) {
-        minOf(canvasHeight * 0.43f, leftStickBaseY - sectionGap - dpadClusterExtent)
-    } else {
-        primaryTop + (primaryExtent - dpadClusterExtent) / 2f
-    }) + dpadAdjustment.second
+    val dpadClusterTop = primaryTop + (primaryExtent - dpadClusterExtent) / 2f + dpadAdjustment.second
     val dpadButtons = listOf(
         buttonSpec(
             id = "dpad_up",
@@ -364,11 +350,7 @@ fun buildOverlayCanvasLayout(
         )
     )
 
-    val extraDpadBaseY = if (isLandscape) {
-        dpadClusterTop - dpadAdjustment.second
-    } else {
-        primaryTop + (primaryExtent - extraDpadSize) / 2f
-    }
+    val extraDpadBaseY = primaryTop + (primaryExtent - extraDpadSize) / 2f
     val dpadCluster = OverlayCanvasDpadClusterSpec(
         id = "dpad_cluster",
         size = extraDpadSize,
@@ -381,11 +363,7 @@ fun buildOverlayCanvasLayout(
     )
 
     val actionClusterLeft = canvasWidth - edgePadEnd - actionClusterExtent + actionAdjustment.first
-    val actionClusterTop = (if (isLandscape) {
-        minOf(canvasHeight * 0.68f, contentBottom - actionClusterExtent)
-    } else {
-        primaryTop + (primaryExtent - actionClusterExtent) / 2f
-    }) + actionAdjustment.second
+    val actionClusterTop = primaryTop + (primaryExtent - actionClusterExtent) / 2f + actionAdjustment.second
     val actionButtons = listOf(
         buttonSpec(
             id = "triangle",

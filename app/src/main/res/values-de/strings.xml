@@ -1950,7 +1950,7 @@
     <string name="settings_frame_limit">Bildratenlimit</string>
     <string name="settings_frame_limit_desc">Begrenzt die Emulation auf die Bildwiederholrate der Konsole. Ausschalten, um so schnell wie das Gerät läuft.</string>
     <string name="settings_target_fps">Ziel-Bildrate</string>
-    <string name="settings_target_fps_desc">Überschreibt die emulierte Bildwiederholrate. Automatisch folgt der Konsolenregion.</string>
+    <string name="settings_target_fps_desc">Automatisch verwendet die von PPSSPP gemeldete Bildrate. Ein manueller Wert bestimmt das Emulationstempo; ein Spiel kann weniger Bilder darstellen.</string>
     <string name="settings_vertical_refresh_ntsc">NTSC-Bildwiederholrate</string>
     <string name="settings_vertical_refresh_pal">PAL-Bildwiederholrate</string>
     <string name="settings_help_vertical_refresh">Überschreibt die emulierte vertikale Bildwiederholrate für diese Region. Passe sie leicht an, wenn NTSC-Audio knackt oder PAL-Video ruckelt; der Standardwert entspricht der Konsolennorm.</string>
@@ -2033,4 +2033,24 @@
     <string name="settings_network_tab">Netzwerk</string>
     <string name="emulation_fast_forward">Schnellvorlauf</string>
     <string name="emulation_rewind">Zurückspulen</string>
+    <string name="psp_memstick_title">PSP Memory Stick</string>
+    <string name="psp_memstick_note">PPSSPP speichert Spielstände in PSP/SAVEDATA. Die Kapazität ist virtuell; es wird kein Kartenabbild erstellt. Die gewählte Größe gilt ab dem nächsten Spielstart.</string>
+    <string name="psp_memstick_backup">Spielstände sichern</string>
+    <string name="psp_memstick_restore">Spielstände wiederherstellen</string>
+    <string name="psp_memstick_saves">Spielstände</string>
+    <string name="psp_memstick_empty">Noch keine PSP-Spielstände.</string>
+    <string name="psp_memstick_backup_success">PSP-Spielstände gesichert.</string>
+    <string name="psp_memstick_backup_failure">PSP-Spielstände konnten nicht gesichert werden.</string>
+    <string name="psp_memstick_restore_success">PSP-Spielstände wiederhergestellt. Vorhandene Dateien wurden beibehalten.</string>
+    <string name="psp_memstick_restore_failure">PSP-Spielstände konnten nicht wiederhergestellt werden.</string>
+    <string name="psp_memstick_create_title">Memory Stick erstellen</string>
+    <string name="psp_memstick_create_action">Karte erstellen</string>
+    <string name="psp_memstick_change_action">Kapazität ändern</string>
+    <string name="psp_memstick_create_body">Wähle die Kapazität des virtuellen Memory Sticks. PPSSPP speichert Spielstände als Dateien; es wird kein Datenträgerabbild angelegt.</string>
+    <string name="psp_memstick_capacity">Kapazität</string>
+    <string name="psp_memstick_capacity_value">Kapazität: %1$s</string>
+    <string name="psp_memstick_saves_count">Spielstände: %1$d</string>
+    <string name="psp_memstick_empty_card">Noch kein Memory Stick</string>
+    <string name="psp_memstick_create_success">Memory Stick ist bereit.</string>
+    <string name="psp_memstick_create_failure">Memory Stick konnte nicht erstellt werden.</string>
 </resources>

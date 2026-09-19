@@ -3544,11 +3544,25 @@ private fun EmulationSidebarMenu(
                             title = stringResource(R.string.settings_frame_limit),
                             checked = uiState.frameLimitEnabled,
                             onCheckedChange = { onSetFrameLimit() },
+                            helpText = stringResource(R.string.settings_frame_limit_desc),
                             onResetToDefault = {
                                 if (uiState.frameLimitEnabled != globalDefaults.frameLimitEnabled) {
                                     onSetFrameLimit()
                                 }
                             }
+                        )
+
+                        LiveSelectionRow(
+                            title = stringResource(R.string.settings_target_fps),
+                            options = listOf(
+                                LiveSelectionOption(0, stringResource(R.string.settings_aspect_ratio_auto)),
+                                LiveSelectionOption(50, "50 Hz"),
+                                LiveSelectionOption(60, "60 Hz")
+                            ),
+                            currentValue = uiState.targetFps,
+                            onValueChange = onSetTargetFps,
+                            helpText = stringResource(R.string.settings_target_fps_desc),
+                            onResetToDefault = { onSetTargetFps(globalDefaults.targetFps) }
                         )
 
                         LiveSelectionRow(

@@ -1956,7 +1956,7 @@
     <string name="settings_frame_limit">حد الإطارات</string>
     <string name="settings_frame_limit_desc">يحد من المحاكاة بمعدل تحديث وحدة التحكم. أوقفه للتشغيل بأقصى سرعة يسمح بها الجهاز.</string>
     <string name="settings_target_fps">معدل الإطارات المستهدف</string>
-    <string name="settings_target_fps_desc">يتجاوز معدل التحديث المحاكى. يتبع الوضع التلقائي منطقة الجهاز.</string>
+    <string name="settings_target_fps_desc">يستخدم الوضع التلقائي معدل الإطارات الذي يبلّغ عنه PPSSPP. تحدد القيمة اليدوية سرعة المحاكاة؛ وقد تعرض اللعبة إطارات أقل.</string>
     <string name="settings_vertical_refresh_ntsc">معدل تحديث NTSC</string>
     <string name="settings_vertical_refresh_pal">معدل تحديث PAL</string>
     <string name="settings_help_vertical_refresh">يتجاوز معدل التحديث الرأسي المحاكى لهذه المنطقة. اضبطه قليلاً إذا كان صوت NTSC يطقطق أو فيديو PAL يتقطع؛ القيمة الافتراضية تتبع معيار الجهاز.</string>
@@ -2039,4 +2039,24 @@
     <string name="settings_network_tab">الشبكة</string>
     <string name="emulation_fast_forward">تقديم سريع</string>
     <string name="emulation_rewind">إرجاع</string>
+    <string name="psp_memstick_title">ذاكرة PSP</string>
+    <string name="psp_memstick_note">يحفظ PPSSPP ملفات الألعاب في PSP/SAVEDATA. السعة افتراضية ولا تُنشأ صورة لبطاقة الذاكرة. يُطبَّق الحجم المختار عند تشغيل اللعبة التالية.</string>
+    <string name="psp_memstick_backup">نسخ ملفات الحفظ احتياطيًا</string>
+    <string name="psp_memstick_restore">استعادة ملفات الحفظ</string>
+    <string name="psp_memstick_saves">الألعاب المحفوظة</string>
+    <string name="psp_memstick_empty">لا توجد ملفات حفظ PSP بعد.</string>
+    <string name="psp_memstick_backup_success">تم نسخ ملفات حفظ PSP احتياطيًا.</string>
+    <string name="psp_memstick_backup_failure">تعذر نسخ ملفات حفظ PSP احتياطيًا.</string>
+    <string name="psp_memstick_restore_success">تمت استعادة ملفات حفظ PSP مع الاحتفاظ بالملفات الموجودة.</string>
+    <string name="psp_memstick_restore_failure">تعذرت استعادة ملفات حفظ PSP.</string>
+    <string name="psp_memstick_create_title">إنشاء Memory Stick</string>
+    <string name="psp_memstick_create_action">إنشاء البطاقة</string>
+    <string name="psp_memstick_change_action">تغيير السعة</string>
+    <string name="psp_memstick_create_body">اختر سعة بطاقة Memory Stick الافتراضية. يحفظ PPSSPP بيانات الألعاب كملفات دون إنشاء صورة قرص.</string>
+    <string name="psp_memstick_capacity">السعة</string>
+    <string name="psp_memstick_capacity_value">السعة: %1$s</string>
+    <string name="psp_memstick_saves_count">الألعاب المحفوظة: %1$d</string>
+    <string name="psp_memstick_empty_card">لا توجد بطاقة Memory Stick بعد</string>
+    <string name="psp_memstick_create_success">بطاقة Memory Stick جاهزة.</string>
+    <string name="psp_memstick_create_failure">تعذر إنشاء بطاقة Memory Stick.</string>
 </resources>

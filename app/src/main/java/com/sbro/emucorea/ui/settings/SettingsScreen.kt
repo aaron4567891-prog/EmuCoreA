@@ -2000,7 +2000,20 @@ private fun SettingsContent(
                             subtitle = stringResource(R.string.settings_frame_limit_desc),
                             checked = uiState.frameLimitEnabled,
                             onCheckedChange = viewModel::setFrameLimitEnabled,
+                            helpText = stringResource(R.string.settings_frame_limit_desc),
                             onResetToDefault = { viewModel.setFrameLimitEnabled(defaults.frameLimitEnabled) }
+                        )
+                        ChoiceSection(
+                            title = stringResource(R.string.settings_target_fps),
+                            options = listOf(
+                                0 to stringResource(R.string.settings_aspect_ratio_auto),
+                                50 to "50 Hz",
+                                60 to "60 Hz"
+                            ),
+                            selectedValue = uiState.targetFps,
+                            onSelect = viewModel::setTargetFps,
+                            helpText = stringResource(R.string.settings_target_fps_desc),
+                            onResetToDefault = { viewModel.setTargetFps(defaults.targetFps) }
                         )
                         ChoiceSection(
                             title = stringResource(R.string.settings_fps_overlay_mode),

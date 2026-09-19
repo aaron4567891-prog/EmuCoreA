@@ -1948,7 +1948,7 @@
     <string name="settings_frame_limit">फ़्रेम सीमा</string>
     <string name="settings_frame_limit_desc">एमुलेशन को कंसोल की रिफ्रेश दर तक सीमित करता है। डिवाइस की अधिकतम गति से चलाने के लिए इसे बंद करें।</string>
     <string name="settings_target_fps">लक्ष्य फ़्रेम दर</string>
-    <string name="settings_target_fps_desc">एमुलेटेड रिफ्रेश दर को ओवरराइड करता है। ऑटो कंसोल क्षेत्र का अनुसरण करता है।</string>
+    <string name="settings_target_fps_desc">ऑटो PPSSPP द्वारा बताई गई फ़्रेम दर का उपयोग करता है। मैन्युअल मान एमुलेशन की गति तय करता है; गेम कम फ़्रेम दिखा सकता है।</string>
     <string name="settings_vertical_refresh_ntsc">NTSC रिफ्रेश दर</string>
     <string name="settings_vertical_refresh_pal">PAL रिफ्रेश दर</string>
     <string name="settings_help_vertical_refresh">इस क्षेत्र के लिए एम्युलेटेड वर्टिकल रिफ्रेश दर को बदलता है। अगर NTSC ऑडियो में चटकनी आती है या PAL वीडियो अटकता है तो इसे हल्का समायोजित करें; डिफ़ॉल्ट मान कंसोल मानक के अनुसार है।</string>
@@ -2031,4 +2031,24 @@
     <string name="settings_network_tab">नेटवर्क</string>
     <string name="emulation_fast_forward">तेज़ आगे</string>
     <string name="emulation_rewind">पीछे करें</string>
+    <string name="psp_memstick_title">PSP मेमोरी स्टिक</string>
+    <string name="psp_memstick_note">PPSSPP गेम सेव PSP/SAVEDATA में रखता है। क्षमता आभासी है; कार्ड इमेज नहीं बनाई जाती। चुना गया आकार अगली बार गेम शुरू होने पर लागू होगा।</string>
+    <string name="psp_memstick_backup">सेव का बैकअप लें</string>
+    <string name="psp_memstick_restore">सेव पुनर्स्थापित करें</string>
+    <string name="psp_memstick_saves">सहेजे गए गेम</string>
+    <string name="psp_memstick_empty">अभी कोई PSP सेव नहीं है।</string>
+    <string name="psp_memstick_backup_success">PSP सेव का बैकअप बन गया।</string>
+    <string name="psp_memstick_backup_failure">PSP सेव का बैकअप नहीं बन सका।</string>
+    <string name="psp_memstick_restore_success">PSP सेव पुनर्स्थापित हो गए। मौजूदा फ़ाइलें सुरक्षित रहीं।</string>
+    <string name="psp_memstick_restore_failure">PSP सेव पुनर्स्थापित नहीं हो सके।</string>
+    <string name="psp_memstick_create_title">Memory Stick बनाएँ</string>
+    <string name="psp_memstick_create_action">कार्ड बनाएँ</string>
+    <string name="psp_memstick_change_action">क्षमता बदलें</string>
+    <string name="psp_memstick_create_body">वर्चुअल Memory Stick की क्षमता चुनें। PPSSPP सेव को फ़ाइलों में रखता है; डिस्क इमेज नहीं बनती।</string>
+    <string name="psp_memstick_capacity">क्षमता</string>
+    <string name="psp_memstick_capacity_value">क्षमता: %1$s</string>
+    <string name="psp_memstick_saves_count">सेव किए गए गेम: %1$d</string>
+    <string name="psp_memstick_empty_card">अभी Memory Stick नहीं है</string>
+    <string name="psp_memstick_create_success">Memory Stick तैयार है।</string>
+    <string name="psp_memstick_create_failure">Memory Stick नहीं बन सकी।</string>
 </resources>
