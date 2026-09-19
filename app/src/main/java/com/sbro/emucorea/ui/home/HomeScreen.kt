@@ -198,7 +198,7 @@ fun HomeScreen(
     val horizontalInset = ScreenHorizontalPadding
     val sectionTopSpacing = 2.dp
     val sectionInnerSpacing = 4.dp
-    val baseCellSize = if (isLandscape) 160.dp else 170.dp
+    val baseCellSize = if (isLandscape) 94.dp else 102.dp
     val minCellSize = baseCellSize * uiState.homeGridScale
     val columnsCount = calculateHomeGridColumnCount(
         screenWidthDp = windowMetrics.widthDp,
@@ -1253,7 +1253,7 @@ private fun RecentGameCard(
 
     Box(
         modifier = modifier
-            .width((if (compact) 160.dp else 176.dp) * coverScale)
+            .width((if (compact) 98.dp else 108.dp) * coverScale)
     ) {
         Surface(
             modifier = focusModifier
@@ -1286,14 +1286,14 @@ private fun RecentGameCard(
                             modifier = Modifier.fillMaxSize(),
                             title = game.title,
                             titleMaxLines = if (compact) 3 else 4,
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Fit
                         )
                     } else {
                         GameCoverArt(
                             coverPath = game.coverArtPath,
                             fallbackTitle = game.title,
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Fit
                         )
                     }
                 }
@@ -1401,14 +1401,14 @@ private fun GameCard(
                         modifier = Modifier.fillMaxSize(),
                         title = game.title,
                         titleMaxLines = 4,
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Fit
                     )
                 } else {
                     GameCoverArt(
                         coverPath = game.coverArtPath,
                         fallbackTitle = game.title,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Fit
                     )
                 }
             }
@@ -1517,7 +1517,7 @@ private fun GameListCard(
                         coverPath = game.coverArtPath,
                         fallbackTitle = game.title,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillHeight
+                        contentScale = ContentScale.Fit
                     )
                 }
             }

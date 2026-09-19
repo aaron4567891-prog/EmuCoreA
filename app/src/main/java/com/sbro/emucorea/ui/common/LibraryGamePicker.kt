@@ -3,6 +3,7 @@ package com.sbro.emucorea.ui.common
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -116,9 +117,9 @@ fun LibraryGamePicker(
                         GameCoverArt(
                             coverPath = game.coverArtPath,
                             fallbackTitle = game.title,
-                            contentScale = ContentScale.Crop,
+                            contentScale = ContentScale.Fit,
                             modifier = Modifier
-                                .size(82.dp)
+                                .width(56.dp).aspectRatio(GameCoverAspectRatio)
                                 .clip(neonShape(12.dp))
                         )
                         Spacer(Modifier.width(12.dp))

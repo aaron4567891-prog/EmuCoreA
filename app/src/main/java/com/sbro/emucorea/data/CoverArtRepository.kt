@@ -40,7 +40,7 @@ class CoverArtRepository(context: Context) {
     private val remoteImageCacheDirectory = File(this.context.cacheDir, "remote-image-cache")
 
     private val cacheDirectory by lazy {
-        coverCacheDirectory.apply {
+        File(coverCacheDirectory, "igdb-psp-v13").apply {
             if (!exists()) mkdirs()
             Log.d(TAG, "Cover cache directory created: $absolutePath")
         }
@@ -59,6 +59,16 @@ class CoverArtRepository(context: Context) {
     fun isMissingManagedCover(path: String?): Boolean =
         isManagedCoverCachePath(path) && !path.isNullOrBlank() && !isUsableCoverFile(File(path))
 
+    fun hasIndexedCover(serial: String?, title: String?): Boolean =
+        com.sbro.emucorea.data.psp.PspCoverIndexRepository(context).find(serial, title) != null
+
+    /** Never flash an embedded icon or a previous style before the selected artwork loads. */
+    fun displayCoverPath(serial: String?, title: String?, candidate: String?): String? {
+        if (candidate != null && !isManagedCoverCachePath(candidate)) return candidate
+        if (hasIndexedCover(serial, title)) return findCachedCoverPath(serial)
+        return candidate
+    }
+
     fun findCachedCoverPath(
         serial: String?,
         styleOverride: Int? = null,
@@ -75,6 +85,7 @@ class CoverArtRepository(context: Context) {
         }
         val preferredFiles = if (style == AppPreferences.COVER_ART_STYLE_3D) {
             listOf(
+                File(cacheDirectory, "${normalizedSerial}_3d.webp"),
                 File(cacheDirectory, "${normalizedSerial}_3d.png"),
                 File(cacheDirectory, "${normalizedSerial}_3d.jpg")
             )
@@ -159,7 +170,7 @@ class CoverArtRepository(context: Context) {
         coverBaseUrl: String?,
         title: String?
     ): String? {
-        val targetExtension = if (style == AppPreferences.COVER_ART_STYLE_3D) "png" else "jpg"
+        val targetExtension = if (style == AppPreferences.COVER_ART_STYLE_3D) "webp" else "jpg"
 
         Log.d(TAG, "========== COVER DOWNLOAD START ==========")
         Log.d(TAG, "Original serial: $originalSerial")
@@ -191,9 +202,12 @@ class CoverArtRepository(context: Context) {
                 if (result != null) break
             }
         } else {
-            val catalogUrl = catalogCoverUrl(originalSerial, title)
-            if (catalogUrl != null) {
-                result = downloadFromUrl(catalogUrl, coverFile, missFile, "IGDB PSP catalog")
+            val cover = com.sbro.emucorea.data.psp.PspCoverIndexRepository(context).find(originalSerial, title, style == AppPreferences.COVER_ART_STYLE_3D)
+            if (cover != null) {
+                result = downloadFromUrl(cover.url, coverFile, missFile, "EmuCoreA PSP covers", cover.sha256)
+                if (result == null && style != AppPreferences.COVER_ART_STYLE_3D) {
+                    result = downloadFromUrl(cover.sourceUrl, coverFile, missFile, "IGDB PSP catalog")
+                }
             }
         }
 
@@ -204,29 +218,24 @@ class CoverArtRepository(context: Context) {
 
     fun buildPublicCoverUrl(
         serial: String?,
-        styleOverride: Int? = AppPreferences.COVER_ART_STYLE_DEFAULT,
+        styleOverride: Int? = null,
         title: String? = null
     ): String? {
         val normalizedSerial = normalizeSerial(serial)
-        val baseUrl = resolveCoverBaseUrl(resolveCoverArtStyle(styleOverride))
-        if (baseUrl != null && normalizedSerial != null) return "$baseUrl/$normalizedSerial.jpg"
-        return catalogCoverUrl(serial, title)
-    }
-
-    private fun catalogCoverUrl(serial: String?, title: String?): String? {
-        val catalog = com.sbro.emucorea.data.ps1.Ps1CatalogRepository(context)
-        return try {
-            catalog.findBestMatchId(serial, title)?.let(catalog::getDetails)?.coverUrl
-        } finally {
-            catalog.close()
-        }
+        val style = resolveCoverArtStyle(styleOverride)
+        if (style == AppPreferences.COVER_ART_STYLE_DISABLED) return null
+        val baseUrl = resolveCoverBaseUrl(style)
+        if (baseUrl != null && normalizedSerial != null) return "$baseUrl/$normalizedSerial.${if (style == AppPreferences.COVER_ART_STYLE_3D) "png" else "jpg"}"
+        return com.sbro.emucorea.data.psp.PspCoverIndexRepository(context)
+            .find(serial, title, style == AppPreferences.COVER_ART_STYLE_3D)?.url
     }
 
     private fun downloadFromUrl(
         urlString: String,
         coverFile: File,
         missFile: File,
-        sourceName: String
+        sourceName: String,
+        expectedSha256: String? = null
     ): String? {
         if (isUsableCoverFile(coverFile)) {
             return coverFile.absolutePath
@@ -262,7 +271,7 @@ class CoverArtRepository(context: Context) {
             Log.d(TAG, "$sourceName: Content length: $contentLength bytes")
 
             // Chunked HTTP responses legitimately report -1. Only an explicitly empty body is invalid.
-            if (contentLength == 0) {
+            if (contentLength == 0 || contentLength > 16 * 1024 * 1024) {
                 Log.w(TAG, "$sourceName: Invalid content length")
                 return null
             }
@@ -271,11 +280,32 @@ class CoverArtRepository(context: Context) {
             try {
                 connection.inputStream.use { input ->
                     tempFile.outputStream().use { output ->
-                        val copied = input.copyTo(output)
+                        var copied = 0L
+                        val buffer = ByteArray(8192)
+                        while (true) {
+                            val count = input.read(buffer)
+                            if (count < 0) break
+                            copied += count
+                            require(copied <= 16 * 1024 * 1024) { "Cover exceeds size limit" }
+                            output.write(buffer, 0, count)
+                        }
                         Log.d(TAG, "$sourceName: Copied $copied bytes")
                     }
                 }
 
+                if (expectedSha256 != null) {
+                    val digest = java.security.MessageDigest.getInstance("SHA-256")
+                    tempFile.inputStream().use { input ->
+                        val buffer = ByteArray(8192)
+                        while (true) {
+                            val count = input.read(buffer)
+                            if (count < 0) break
+                            digest.update(buffer, 0, count)
+                        }
+                    }
+                    val actual = digest.digest().joinToString("") { "%02x".format(it) }
+                    if (actual != expectedSha256) return null
+                }
                 if (!isUsableCoverFile(tempFile)) {
                     Log.w(TAG, "$sourceName: Downloaded file is not a valid image")
                     return null

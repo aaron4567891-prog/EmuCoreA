@@ -160,7 +160,7 @@ data class SettingsUiState(
     val emulatorDataPath: String? = null,
     val sdCardDataPath: String? = null,
     val coverDownloadBaseUrl: String? = null,
-    val coverArtStyle: Int = AppPreferences.COVER_ART_STYLE_DEFAULT,
+    val coverArtStyle: Int = AppPreferences.COVER_ART_STYLE_3D,
     val biosValid: Boolean = false,
     val setupComplete: Boolean = false,
     val appVersion: String = BuildConfig.VERSION_NAME,
@@ -2466,9 +2466,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setCoverArtStyle(style: Int) {
         viewModelScope.launch {
-            preferences.setCoverArtStyle(style)
-            CoverArtRepository(getApplication()).clearCache()
+            // Flat and 3D covers have separate cache files. Keep both so a style
+            // change cannot delete files while HomeViewModel starts loading them.
             clearCoverImageMemoryCache()
+            preferences.setCoverArtStyle(style)
         }
     }
 

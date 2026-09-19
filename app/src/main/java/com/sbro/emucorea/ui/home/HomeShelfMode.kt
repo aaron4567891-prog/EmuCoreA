@@ -153,7 +153,7 @@ internal fun HomeShelfMode(
         val coverPromptHeightAllowance = if (isCoverArtDisabled) 58.dp else 0.dp
         val reservedHeight = (if (isLandscape) 124.dp else 164.dp) + coverPromptHeightAllowance
         val maxCardWidthFromHeight =
-            (maxHeight - topInset - bottomInset - reservedHeight).coerceAtLeast(210.dp)
+            ((maxHeight - topInset - bottomInset - reservedHeight).coerceAtLeast(210.dp)) * GameCoverAspectRatio
         val cardWidth = (if (isLandscape) baseCardWidth * 0.84f else baseCardWidth)
             .coerceAtMost(maxCardWidthFromHeight)
         val horizontalPadding = ((maxWidth - cardWidth) / 2).coerceAtLeast(0.dp)

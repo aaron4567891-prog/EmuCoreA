@@ -13,7 +13,6 @@ import com.sbro.emucorea.core.SetupValidator
 import com.sbro.emucorea.core.PspGameMetadataReader
 import com.sbro.emucorea.data.psp.PspTitleIndexRepository
 import java.io.File
-import java.io.Reader
 
 data class GameItem(
     val title: String,
@@ -30,34 +29,10 @@ class GameRepository {
     companion object {
         private const val TAG = "GameRepository"
         // Keep the library honest with what the bundled PPSSPP core mounts.
-        private val SUPPORTED_EXTENSIONS = setOf("iso", "cso", "chd", "pbp", "elf", "prx")
         private val COVER_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp")
         private val COVER_DIRECTORY_NAMES = setOf("covers", "cover", "art", "artwork", "boxart", "box art")
         private const val MAX_DOCUMENT_SCAN_DEPTH = 32
         private const val MAX_DOCUMENT_SCAN_ENTRIES = 20_000
-        private const val MAX_CUE_TEXT_CHARS = 256 * 1024
-        private val CUE_FILE_DIRECTIVE = Regex(
-            pattern = """^\s*FILE\s+(?:\"([^\"]+)\"|(\S+))\s+\S+""",
-            option = RegexOption.IGNORE_CASE
-        )
-
-        /**
-         * Returns normalized paths from CUE FILE directives. A CUE is the
-         * launchable disc descriptor; its BIN files are tracks, not separate
-         * library titles.
-         */
-        internal fun cueReferencedFiles(cueText: String): Set<String> =
-            cueText.lineSequence()
-                .mapNotNull { line ->
-                    val match = CUE_FILE_DIRECTIVE.find(line) ?: return@mapNotNull null
-                    (match.groups[1]?.value ?: match.groups[2]?.value)
-                        ?.trim()
-                        ?.replace('\\', '/')
-                        ?.replace(Regex("/+"), "/")
-                        ?.takeIf(String::isNotBlank)
-                }
-                .toSet()
-
         internal fun libraryIdentity(path: String): String {
             if (!path.startsWith("content://")) {
                 return runCatching { File(path).canonicalPath }
@@ -149,27 +124,25 @@ class GameRepository {
         serial: String? = null,
         title: String? = null
     ): String? {
-        return if (path.startsWith("content://")) {
+        val candidate = if (path.startsWith("content://")) {
             runCatching { findDocumentCover(path, context, serial, title) }
                 .onFailure { error -> Log.w(TAG, "Unable to find cover for document URI: $path", error) }
                 .getOrNull()
         } else {
             findLocalCover(path, context, serial, title)
         }
+        return CoverArtRepository(context).displayCoverPath(serial, title, candidate)
     }
 
     fun downloadCoverForGame(game: GameItem, context: Context): String? {
-        PspGameMetadataReader.extractIcon0(context, game.path)?.let { return it }
-        if (!game.coverArtPath.isNullOrBlank()) {
-            val coverFile = File(game.coverArtPath)
-            if (coverFile.exists()) {
-                return game.coverArtPath
-            }
-        }
-
+        CustomGameCoverRepository(context).findCustomCoverPath(game.path)?.let { return it }
+        // A loose homebrew ELF has no retail identity; do not guess its artwork from a short filename.
         val serial = game.serial?.takeIf(String::isNotBlank)
-            ?: PspTitleIndexRepository(context).serialForTitle(game.title)
-        return CoverArtRepository(context).downloadCover(serial, title = game.title)
+        val covers = CoverArtRepository(context)
+        val downloaded = if (serial != null) covers.downloadCover(serial, title = game.title) else null
+        if (covers.hasIndexedCover(serial, game.title)) return downloaded
+        return downloaded
+            ?: game.coverArtPath?.takeIf { File(it).isFile }
             ?: PspGameMetadataReader.extractIcon0(context, game.path)
     }
 
@@ -178,13 +151,10 @@ class GameRepository {
         context: Context,
         cachedGamesByPath: Map<String, GameItem>,
         shouldAbort: () -> Boolean,
-        preferEnglishTitles: Boolean = false,
-        inheritedCueTracks: Set<String> = emptySet()
+        preferEnglishTitles: Boolean = false
     ): List<GameItem> {
         val items = mutableListOf<GameItem>()
         val children = dir.listFiles().orEmpty()
-        val cueIndex = buildLocalCueIndex(children)
-        val cueTrackPaths = inheritedCueTracks + cueIndex.trackIdentities
         val coverCandidates = buildLocalCoverCandidates(children)
         val coverRepository = CoverArtRepository(context)
         val customCoverRepository = CustomGameCoverRepository(context)
@@ -200,15 +170,14 @@ class GameRepository {
                             context,
                             cachedGamesByPath,
                             shouldAbort,
-                            preferEnglishTitles,
-                            cueTrackPaths
+                            preferEnglishTitles
                         )
                     )
                 }
 
-                file.isFile && file.extension.lowercase() in SUPPORTED_EXTENSIONS &&
-                    libraryIdentity(file.absolutePath) !in cueTrackPaths -> {
-                    val entrySize = cueIndex.sizeByCue[libraryIdentity(file.absolutePath)] ?: file.length()
+                file.isFile && com.sbro.emucorea.core.PspGameFormats.isSupportedName(file.name) -> {
+                    if (file.extension.equals("zip", true) && PspGameMetadataReader.read(context, file.absolutePath) == null) return@forEach
+                    val entrySize = file.length()
                     val cachedGame = cachedGamesByPath[file.absolutePath]
                     val canReuseCachedMetadata = cachedGame != null &&
                         cachedGame.fileSize == entrySize &&
@@ -218,20 +187,14 @@ class GameRepository {
                     val metadata = if (canReuseCachedMetadata) {
                         com.sbro.emucorea.core.GameMetadata(cachedGame.title, cachedGame.serial)
                     } else {
-                        val sourcePath = cueIndex.metadataSourceByCue[
-                            libraryIdentity(file.absolutePath)
-                        ] ?: file.absolutePath
+                        val sourcePath = file.absolutePath
                         val sourceMetadata = EmulatorBridge.getGameMetadata(
                             sourcePath,
                             readDiscMetadata = false
                         )
                         val pspMetadata = PspGameMetadataReader.read(context, sourcePath)
                         sourceMetadata.copy(
-                            title = if (sourcePath == file.absolutePath) {
-                                pspMetadata?.title ?: sourceMetadata.title
-                            } else {
-                                EmulatorBridge.cleanGameDisplayTitle(null, file.name)
-                            },
+                            title = pspMetadata?.title ?: sourceMetadata.title,
                             serial = pspMetadata?.serial ?: sourceMetadata.serial
                         )
                     }
@@ -241,7 +204,6 @@ class GameRepository {
 
                     val cleanTitle = EmulatorBridge.cleanGameDisplayTitle(metadata.title, file.name)
                     val serial = metadata.serial
-                        ?: titleIndex.serialForTitle(cleanTitle, regionHintForName(file.name))
                     val title = if (preferEnglishTitles) {
                         titleIndex.titleForSerial(serial) ?: cleanTitle
                     } else {
@@ -254,8 +216,8 @@ class GameRepository {
                         fileSize = entrySize,
                         lastModified = file.lastModified(),
                         coverArtPath = customCoverRepository.findCustomCoverPath(file.absolutePath)
-                            ?: PspGameMetadataReader.extractIcon0(context, file.absolutePath)
                             ?: coverRepository.findCachedCoverPath(serial)
+                            ?: PspGameMetadataReader.extractIcon0(context, file.absolutePath)
                             ?: cachedGame?.coverArtPath?.takeIf { File(it).exists() }
                             ?: coverCandidates[normalizeBaseName(file.nameWithoutExtension)]?.absolutePath
                             ?: coverCandidates[normalizeBaseName(cleanGameName(title))]?.absolutePath,
@@ -275,16 +237,13 @@ class GameRepository {
         shouldAbort: () -> Boolean,
         preferEnglishTitles: Boolean = false,
         depth: Int,
-        budget: DocumentScanBudget,
-        inheritedCueTracks: Set<String> = emptySet()
+        budget: DocumentScanBudget
     ): List<GameItem> {
         if (depth > MAX_DOCUMENT_SCAN_DEPTH || !budget.tryEnterDirectory(docFile.uri.toString())) {
             return emptyList()
         }
         val items = mutableListOf<GameItem>()
         val children = runCatching { docFile.listFiles() }.getOrDefault(emptyArray())
-        val cueIndex = buildDocumentCueIndex(docFile, children, context)
-        val cueTrackIdentities = inheritedCueTracks + cueIndex.trackIdentities
         val coverCandidates = buildDocumentCoverCandidates(children)
         val coverRepository = CoverArtRepository(context)
         val customCoverRepository = CustomGameCoverRepository(context)
@@ -306,17 +265,16 @@ class GameRepository {
                                 shouldAbort,
                                 preferEnglishTitles,
                                 depth + 1,
-                                budget,
-                                inheritedCueTracks = cueTrackIdentities
+                                budget
                             )
                         )
                     }
                 }
                 SetupValidator.DocumentEntryKind.GAME_FILE -> {
                     val uriPath = file.uri.toString()
-                    if (libraryIdentity(uriPath) in cueTrackIdentities) continue
                     val fileSize = runCatching { file.length() }.getOrDefault(0L)
-                    val entrySize = cueIndex.sizeByCue[libraryIdentity(uriPath)] ?: fileSize
+                    if (name.endsWith(".zip", true) && PspGameMetadataReader.read(context, uriPath) == null) continue
+                    val entrySize = fileSize
                     val lastModified = runCatching { file.lastModified() }.getOrDefault(0L)
 
                     val cachedGame = cachedGamesByPath[uriPath]
@@ -328,20 +286,14 @@ class GameRepository {
                     val metadata = if (canReuseCachedMetadata) {
                         com.sbro.emucorea.core.GameMetadata(cachedGame.title, cachedGame.serial)
                     } else {
-                        val sourcePath = cueIndex.metadataSourceByCue[
-                            libraryIdentity(uriPath)
-                        ] ?: uriPath
+                        val sourcePath = uriPath
                         val sourceMetadata = EmulatorBridge.getGameMetadata(
                             sourcePath,
                             readDiscMetadata = false
                         )
                         val pspMetadata = PspGameMetadataReader.read(context, sourcePath)
                         sourceMetadata.copy(
-                            title = if (sourcePath == uriPath) {
-                                pspMetadata?.title ?: sourceMetadata.title
-                            } else {
-                                EmulatorBridge.cleanGameDisplayTitle(null, name)
-                            },
+                            title = pspMetadata?.title ?: sourceMetadata.title,
                             serial = pspMetadata?.serial ?: sourceMetadata.serial
                         )
                     }
@@ -352,7 +304,6 @@ class GameRepository {
 
                     val cleanTitle = cleanScannedTitle(metadata.title, name)
                     val serial = metadata.serial
-                        ?: titleIndex.serialForTitle(cleanTitle, regionHintForName(name))
                     val title = if (preferEnglishTitles) {
                         titleIndex.titleForSerial(serial) ?: cleanTitle
                     } else {
@@ -365,8 +316,8 @@ class GameRepository {
                         fileSize = entrySize,
                         lastModified = lastModified,
                         coverArtPath = customCoverRepository.findCustomCoverPath(uriPath)
-                            ?: PspGameMetadataReader.extractIcon0(context, uriPath)
                             ?: coverRepository.findCachedCoverUri(serial)
+                            ?: PspGameMetadataReader.extractIcon0(context, uriPath)
                             ?: cachedGame?.coverArtPath
                             ?: coverCandidates[normalizeBaseName(name.substringBeforeLast('.'))]?.uri?.toString()
                             ?: coverCandidates[normalizeBaseName(cleanGameName(title))]?.uri?.toString(),
@@ -380,118 +331,6 @@ class GameRepository {
         return items
     }
 
-    private data class CueIndex(
-        val trackIdentities: Set<String>,
-        val metadataSourceByCue: Map<String, String>,
-        // Total size of the files a cue sheet references, so the library shows
-        // the disc image size instead of the few bytes of the cue itself.
-        val sizeByCue: Map<String, Long>
-    )
-
-    private fun buildLocalCueIndex(children: Array<out File>): CueIndex {
-        val trackIdentities = LinkedHashSet<String>()
-        val metadataSourceByCue = HashMap<String, String>()
-        val sizeByCue = HashMap<String, Long>()
-        children.asSequence()
-            .filter { it.isFile && it.extension.equals("cue", ignoreCase = true) }
-            .forEach { cue ->
-                val text = runCatching {
-                    cue.inputStream().bufferedReader().use(::readLimitedCueText)
-                }.getOrDefault("")
-                val tracks = cueReferencedFiles(text).map { reference ->
-                    File(cue.parentFile, reference)
-                }
-                tracks.forEach { track ->
-                    trackIdentities += libraryIdentity(track.absolutePath)
-                }
-                tracks.firstOrNull { it.isFile }?.let { metadataTrack ->
-                    metadataSourceByCue[libraryIdentity(cue.absolutePath)] =
-                        metadataTrack.absolutePath
-                }
-                val trackBytes = tracks.filter { it.isFile }.sumOf { it.length() }
-                if (trackBytes > 0L) {
-                    sizeByCue[libraryIdentity(cue.absolutePath)] = trackBytes
-                }
-            }
-        return CueIndex(trackIdentities, metadataSourceByCue, sizeByCue)
-    }
-
-    private fun buildDocumentCueIndex(
-        directory: DocumentFile,
-        children: Array<DocumentFile>,
-        context: Context
-    ): CueIndex {
-        val trackIdentities = LinkedHashSet<String>()
-        val metadataSourceByCue = HashMap<String, String>()
-        val sizeByCue = HashMap<String, Long>()
-        children.asSequence()
-            .filter { document ->
-                documentDisplayName(context, document)
-                    .substringAfterLast('.', "")
-                    .equals("cue", ignoreCase = true)
-            }
-            .forEach { cue ->
-                val text = runCatching {
-                    context.contentResolver.openInputStream(cue.uri)
-                        ?.bufferedReader()
-                        ?.use(::readLimitedCueText)
-                        .orEmpty()
-                }.getOrDefault("")
-                val tracks = cueReferencedFiles(text).mapNotNull { reference ->
-                    resolveDocumentReference(directory, reference, context)
-                }
-                tracks.forEach { track ->
-                    trackIdentities += libraryIdentity(track.uri.toString())
-                }
-                tracks.firstOrNull()?.let { metadataTrack ->
-                    metadataSourceByCue[libraryIdentity(cue.uri.toString())] =
-                        metadataTrack.uri.toString()
-                }
-                val trackBytes = tracks.sumOf { runCatching { it.length() }.getOrDefault(0L) }
-                if (trackBytes > 0L) {
-                    sizeByCue[libraryIdentity(cue.uri.toString())] = trackBytes
-                }
-            }
-        return CueIndex(trackIdentities, metadataSourceByCue, sizeByCue)
-    }
-
-    private fun resolveDocumentReference(
-        directory: DocumentFile,
-        reference: String,
-        context: Context
-    ): DocumentFile? {
-        var current = directory
-        val segments = reference.replace('\\', '/').split('/')
-            .filter { it.isNotBlank() && it != "." }
-        if (segments.isEmpty() || segments.any { it == ".." }) return null
-        for ((index, segment) in segments.withIndex()) {
-            val child = runCatching { current.listFiles() }
-                .getOrDefault(emptyArray())
-                .firstOrNull {
-                    documentDisplayName(context, it).equals(segment, ignoreCase = true)
-                } ?: return null
-            if (index == segments.lastIndex) return child.takeIf { it.isFile }
-            if (!child.isDirectory) return null
-            current = child
-        }
-        return null
-    }
-
-    private fun readLimitedCueText(reader: Reader): String {
-        val result = StringBuilder()
-        val buffer = CharArray(4096)
-        while (result.length < MAX_CUE_TEXT_CHARS) {
-            val count = reader.read(
-                buffer,
-                0,
-                minOf(buffer.size, MAX_CUE_TEXT_CHARS - result.length)
-            )
-            if (count <= 0) break
-            result.append(buffer, 0, count)
-        }
-        return result.toString()
-    }
-
     private fun findLocalCover(path: String, context: Context, serial: String?, title: String?): String? {
         val file = File(path)
         val parent = file.parentFile ?: return null
@@ -499,16 +338,16 @@ class GameRepository {
         val titleKey = normalizeBaseName(cleanGameName(title ?: EmulatorBridge.getGameTitle(path)))
         val coverCandidates = buildLocalCoverCandidates(parent.listFiles().orEmpty())
         return CustomGameCoverRepository(context).findCustomCoverPath(path)
-            ?: PspGameMetadataReader.extractIcon0(context, path)
             ?: CoverArtRepository(context).findCachedCoverPath(serial)
+            ?: PspGameMetadataReader.extractIcon0(context, path)
             ?: coverCandidates[baseName]?.absolutePath
             ?: coverCandidates[titleKey]?.absolutePath
     }
 
     private fun findDocumentCover(path: String, context: Context, serial: String?, title: String?): String? {
         CustomGameCoverRepository(context).findCustomCoverPath(path)?.let { return it }
-        PspGameMetadataReader.extractIcon0(context, path)?.let { return it }
         CoverArtRepository(context).findCachedCoverUri(serial)?.let { return it }
+        PspGameMetadataReader.extractIcon0(context, path)?.let { return it }
 
         val uri = path.toUri()
         val document = DocumentFile.fromSingleUri(context, uri) ?: return null
@@ -565,17 +404,6 @@ class GameRepository {
         return value.substringBeforeLast('.')
             .replace(Regex("""\s+"""), " ")
             .trim()
-    }
-
-    /** Region hint parsed from a dump filename, used to disambiguate serials. */
-    private fun regionHintForName(name: String): Char? {
-        val lower = name.lowercase()
-        return when {
-            "usa" in lower || "(u)" in lower || "ntsc-u" in lower || "us " in lower -> 'U'
-            "europe" in lower || "(e)" in lower || "ntsc-e" in lower || "eur" in lower || "pal " in lower -> 'E'
-            "japan" in lower || "(j)" in lower || "ntsc-j" in lower || "jpn" in lower -> 'J'
-            else -> null
-        }
     }
 
     private fun cleanScannedTitle(rawTitle: String, displayName: String): String {

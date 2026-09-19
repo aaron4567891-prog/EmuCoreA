@@ -1787,12 +1787,13 @@ private fun SettingsContent(
                         ChoiceSection(
                             title = stringResource(R.string.settings_cover_art_style),
                             options = listOf(
+                                AppPreferences.COVER_ART_STYLE_3D to stringResource(R.string.settings_cover_art_style_3d),
                                 AppPreferences.COVER_ART_STYLE_DISABLED to stringResource(R.string.settings_cover_art_style_off),
                                 AppPreferences.COVER_ART_STYLE_DEFAULT to stringResource(R.string.settings_cover_art_style_flat)
                             ),
                             selectedValue = uiState.coverArtStyle,
                             onSelect = viewModel::setCoverArtStyle,
-                              onResetToDefault = { viewModel.setCoverArtStyle(AppPreferences.COVER_ART_STYLE_DEFAULT) }
+                              onResetToDefault = { viewModel.setCoverArtStyle(AppPreferences.COVER_ART_STYLE_3D) }
                         )
                         SettingsItem(
                             icon = Icons.Rounded.Link,

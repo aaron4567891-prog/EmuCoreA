@@ -108,7 +108,7 @@ data class SettingsSnapshot(
     val gamePaths: List<String> = emptyList(),
     val emulatorDataPath: String? = null,
     val coverDownloadBaseUrl: String? = null,
-    val coverArtStyle: Int = AppPreferences.COVER_ART_STYLE_DEFAULT,
+    val coverArtStyle: Int = AppPreferences.COVER_ART_STYLE_3D,
     val setupComplete: Boolean = false,
     val enableFastBoot: Boolean = true,
     val eeCycleRate: Int = PerformanceProfiles.safeConfig.eeCycleRate,
@@ -485,7 +485,8 @@ class AppPreferences(private val context: Context) {
         private val GAME_PATHS = stringPreferencesKey("game_paths")
         private val EMULATOR_DATA_PATH = stringPreferencesKey("emulator_data_path")
         private val COVER_DOWNLOAD_BASE_URL = stringPreferencesKey("cover_download_base_url")
-        private val COVER_ART_STYLE = intPreferencesKey("cover_art_style")
+        private val LEGACY_COVER_ART_STYLE = intPreferencesKey("cover_art_style")
+        private val COVER_ART_STYLE = intPreferencesKey("psp_cover_art_style_v2")
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
         private val PERFORMANCE_PROFILE = intPreferencesKey("performance_profile")
         private val GPU_HARDWARE_PROFILE = intPreferencesKey("gpu_hardware_profile")
@@ -1460,12 +1461,17 @@ class AppPreferences(private val context: Context) {
         }
     }
 
+    private fun readCoverArtStyle(prefs: Preferences): Int = when (prefs[COVER_ART_STYLE]) {
+        COVER_ART_STYLE_DISABLED -> COVER_ART_STYLE_DISABLED
+        COVER_ART_STYLE_DEFAULT -> COVER_ART_STYLE_DEFAULT
+        COVER_ART_STYLE_3D -> COVER_ART_STYLE_3D
+        // Migrate old automatic artwork to PSP 3D once, preserving disabled artwork.
+        else -> if (prefs[LEGACY_COVER_ART_STYLE] == COVER_ART_STYLE_DISABLED)
+            COVER_ART_STYLE_DISABLED else COVER_ART_STYLE_3D
+    }
+
     val coverArtStyle: Flow<Int> = context.dataStore.data.map { prefs ->
-        when (prefs[COVER_ART_STYLE]) {
-            COVER_ART_STYLE_DISABLED -> COVER_ART_STYLE_DISABLED
-            COVER_ART_STYLE_3D -> COVER_ART_STYLE_3D
-            else -> COVER_ART_STYLE_DEFAULT
-        }
+        readCoverArtStyle(prefs)
     }
 
     suspend fun setCoverArtStyle(style: Int) {
@@ -1481,11 +1487,7 @@ class AppPreferences(private val context: Context) {
     fun getCoverArtStyleSync(): Int {
         return kotlinx.coroutines.runBlocking {
             context.dataStore.data.map { prefs ->
-                when (prefs[COVER_ART_STYLE]) {
-                    COVER_ART_STYLE_DISABLED -> COVER_ART_STYLE_DISABLED
-                    COVER_ART_STYLE_3D -> COVER_ART_STYLE_3D
-                    else -> COVER_ART_STYLE_DEFAULT
-                }
+                readCoverArtStyle(prefs)
             }.first()
         }
     }
@@ -1630,11 +1632,7 @@ class AppPreferences(private val context: Context) {
                 gamePaths = readGamePaths(prefs),
                 emulatorDataPath = prefs[EMULATOR_DATA_PATH],
                 coverDownloadBaseUrl = prefs[COVER_DOWNLOAD_BASE_URL],
-                coverArtStyle = when (prefs[COVER_ART_STYLE]) {
-                    COVER_ART_STYLE_DISABLED -> COVER_ART_STYLE_DISABLED
-                    COVER_ART_STYLE_3D -> COVER_ART_STYLE_3D
-                    else -> COVER_ART_STYLE_DEFAULT
-                },
+                coverArtStyle = readCoverArtStyle(prefs),
                 setupComplete = prefs[ONBOARDING_COMPLETED] ?: false,
                 enableFastBoot = prefs[ENABLE_FAST_BOOT] ?: true,
                 eeCycleRate = prefs[EE_CYCLE_RATE] ?: profileConfig.eeCycleRate,
@@ -3913,7 +3911,7 @@ class AppPreferences(private val context: Context) {
             put("gamePaths", JSONArray(readGamePaths(prefs)))
             put("emulatorDataPath", prefs[EMULATOR_DATA_PATH])
             put("coverDownloadBaseUrl", prefs[COVER_DOWNLOAD_BASE_URL])
-            put("coverArtStyle", prefs[COVER_ART_STYLE] ?: COVER_ART_STYLE_DEFAULT)
+            put("coverArtStyle", readCoverArtStyle(prefs))
             put("onboardingCompleted", prefs[ONBOARDING_COMPLETED] ?: false)
             put("languageTag", prefs[LANGUAGE_TAG])
             put("aspectRatio", normalizeAspectRatioPreference(prefs[ASPECT_RATIO]))
@@ -4273,7 +4271,7 @@ class AppPreferences(private val context: Context) {
             json.optString("coverDownloadBaseUrl").takeIf { it.isNotBlank() }?.let {
                 prefs[COVER_DOWNLOAD_BASE_URL] = it.trim().trimEnd('/')
             } ?: prefs.remove(COVER_DOWNLOAD_BASE_URL)
-            prefs[COVER_ART_STYLE] = when (json.optInt("coverArtStyle", COVER_ART_STYLE_DEFAULT)) {
+            prefs[COVER_ART_STYLE] = when (json.optInt("coverArtStyle", COVER_ART_STYLE_3D)) {
                 COVER_ART_STYLE_DISABLED -> COVER_ART_STYLE_DISABLED
                 COVER_ART_STYLE_3D -> COVER_ART_STYLE_3D
                 else -> COVER_ART_STYLE_DEFAULT

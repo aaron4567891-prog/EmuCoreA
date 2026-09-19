@@ -114,6 +114,7 @@ open class MainActivity : ComponentActivity() {
         setContent {
             val customFontRepository = remember { CustomFontRepository(applicationContext) }
             val themeMode by preferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            val coverStyle by preferences.coverArtStyle.collectAsState(initial = preferences.getCoverArtStyleSync())
             val customTheme by preferences.customTheme.collectAsState(initial = CustomThemeConfig.Default)
             val fontChoice by preferences.appFontChoice.collectAsState(initial = AppFontChoice.SYSTEM)
             val appFontScale by preferences.appFontScale.collectAsState(initial = 1f)
@@ -142,7 +143,9 @@ open class MainActivity : ComponentActivity() {
             }
 
             CompositionLocalProvider(
-                LocalTvUiEnvironment provides tvUiEnvironment
+                LocalTvUiEnvironment provides tvUiEnvironment,
+                com.sbro.emucorea.ui.common.LocalGameCoverAspectRatio provides
+                    if (coverStyle == AppPreferences.COVER_ART_STYLE_DEFAULT) 3f / 4f else 2f / 3f
             ) {
                 EmuCoreATheme(
                     themeMode = themeMode,

@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -688,7 +689,7 @@ private fun GamePickerCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Surface(
-                modifier = Modifier.size(64.dp),
+                modifier = Modifier.width(48.dp).aspectRatio(com.sbro.emucorea.ui.common.GameCoverAspectRatio),
                 shape = neonShape(16.dp),
                 color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.26f)
             ) {
@@ -698,7 +699,7 @@ private fun GamePickerCard(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(neonShape(16.dp)),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit
                 )
             }
             Column(

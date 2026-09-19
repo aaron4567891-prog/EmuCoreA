@@ -106,7 +106,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var coverArtStyleInitialized = false
     private var coverBaseUrlInitialized = false
     private var coverCacheRevisionInitialized = false
-    private var currentCoverArtStyle = AppPreferences.COVER_ART_STYLE_DEFAULT
+    private var currentCoverArtStyle = AppPreferences.COVER_ART_STYLE_3D
     private var currentCoverDownloadBaseUrl: String? = null
     private val scanMutex = Mutex()
     private var deferredLibraryScan: DeferredLibraryScan? = null
@@ -606,6 +606,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun publishVisibleGames() {
+        val covers = CoverArtRepository(getApplication())
+        allGames = allGames.map { game ->
+            val selected = covers.displayCoverPath(game.serial, game.title, game.coverArtPath)
+            if (selected == game.coverArtPath) game else game.copy(coverArtPath = selected)
+        }
         val state = _uiState.value
         val query = normalizeSearchToken(state.searchQuery)
         val filtered = allGames.filter { game ->
@@ -690,7 +695,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             removedStalePaths = true
                             game.copy(coverArtPath = null)
                         }
-                        hasSerial && resolvedCoverPath != game.coverArtPath &&
+                        hasSerial && resolvedCoverPath != null && resolvedCoverPath != game.coverArtPath &&
                             coverRepository.isManagedCoverCachePath(game.coverArtPath) -> {
                             removedStalePaths = true
                             game.copy(coverArtPath = resolvedCoverPath)
@@ -700,7 +705,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             if (removedStalePaths) publishVisibleGames()
-            val gamesToProcess = allGames.filter { it.coverArtPath == null || it.coverArtPath.startsWith("http") }
+            val gamesToProcess = allGames.filter {
+                it.coverArtPath == null || it.coverArtPath.startsWith("http") ||
+                    (coverRepository.isManagedCoverCachePath(it.coverArtPath) &&
+                        !it.coverArtPath.contains("/igdb-psp-v13/"))
+            }
             if (gamesToProcess.isEmpty()) {
                 if (removedStalePaths) {
                     currentLibraryRoot?.let { rootPath ->

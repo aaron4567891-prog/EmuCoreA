@@ -38,7 +38,6 @@ import com.sbro.emucorea.data.DisplayCrop
 import com.sbro.emucorea.data.OverlayControlLayout
 import com.sbro.emucorea.data.CheatRepository
 import com.sbro.emucorea.data.GameRepository
-import com.sbro.emucorea.data.psp.PspTitleIndexRepository
 import com.sbro.emucorea.data.OverlayLayoutSnapshot
 import com.sbro.emucorea.data.PerGameSettings
 import com.sbro.emucorea.data.PerGameSettingsRepository
@@ -1675,7 +1674,7 @@ class EmulationViewModel(application: Application) : AndroidViewModel(applicatio
                     val metadata = EmulatorBridge.getGameMetadata(safePath)
                     currentGameTitle = EmulatorBridge.cleanGameDisplayTitle(metadata.title, safePath)
                     currentGameSerial = metadata.serial?.takeIf { it.isNotBlank() }
-                        ?: resolveSerialFromTitle(currentGameTitle, safePath).orEmpty()
+                        ?.let(::formatDiscSerial).orEmpty()
                     currentGameRegionLabel = resolveRegionLabel(currentGameSerial, safePath)
                     currentGameCoverArtPath = gameRepository.findCoverForGame(
                         path = safePath,
@@ -3918,13 +3917,6 @@ class EmulationViewModel(application: Application) : AndroidViewModel(applicatio
         currentGameCrc.takeIf { it.isNotBlank() }?.let(::add)
     }.joinToString("  /  ")
 
-    /** Recovers a serial from the title when the dump filename has none. */
-    private fun resolveSerialFromTitle(title: String, path: String): String? {
-        return PspTitleIndexRepository(getApplication())
-            .serialForTitle(title, filenameRegionHint(path))
-            ?.let(::formatDiscSerial)
-    }
-
     private fun formatDiscSerial(serial: String): String {
         val compact = serial.uppercase().replace(Regex("[^A-Z0-9]"), "")
         return if (compact.length >= 8) "${compact.take(4)}-${compact.substring(4)}" else serial
@@ -3943,12 +3935,6 @@ class EmulationViewModel(application: Application) : AndroidViewModel(applicatio
             "UCES", "ULES", "NPEH", "NPEG" -> "PAL"
             else -> null
         }
-    }
-
-    private fun filenameRegionHint(path: String?): Char? = when (filenameRegionLabel(path)) {
-        "NTSC" -> 'U'
-        "PAL" -> 'E'
-        else -> null
     }
 
     private fun filenameRegionLabel(path: String?): String? {

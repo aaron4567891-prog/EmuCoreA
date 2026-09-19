@@ -43,6 +43,7 @@ ehthumbs.db
 *.img
 
 # Native build artifacts (generated outside ignored build dirs)
+/EmuCoreA-release.apk
 CMakeUserPresets.json
 compile_commands.json
 

@@ -31,6 +31,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -2933,13 +2934,13 @@ private fun EmulationSidebarMenu(
                             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)),
                             modifier = Modifier
-                                .width(128.dp)
-                                .height(72.dp)
+                                .width(64.dp)
+                                .aspectRatio(com.sbro.emucorea.ui.common.GameCoverAspectRatio)
                         ) {
                             GameCoverArt(
                                 coverPath = uiState.currentGameCoverPath,
                                 fallbackTitle = menuTitle,
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.Fit,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }

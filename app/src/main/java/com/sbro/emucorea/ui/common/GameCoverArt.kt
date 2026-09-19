@@ -42,8 +42,10 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import com.sbro.emucorea.ui.theme.neon.neonShape
 
-/** PSP ICON0 cover artwork uses a 16:9 canvas. */
-const val GameCoverAspectRatio: Float = 16f / 9f
+/** Portrait box-art canvas; images retain their original proportions within it. */
+val LocalGameCoverAspectRatio = androidx.compose.runtime.staticCompositionLocalOf { 2f / 3f }
+val GameCoverAspectRatio: Float
+    @Composable get() = LocalGameCoverAspectRatio.current
 
 private val imageLoadingSemaphore = Semaphore(4)
 @Composable
@@ -104,21 +106,11 @@ fun GameCoverArt(
 
     val currentBitmap = bitmap
     if (currentBitmap != null) {
-        // PSP ICON0 files may contain a thin baked-in border. Trim only local
-        // library artwork; remote IGDB catalog covers keep their original crop.
-        val imageModifier = if (
-            contentScale == ContentScale.Crop &&
-            coverPath?.startsWith("http", ignoreCase = true) != true
-        ) {
-            modifier.graphicsLayer(scaleX = 1.04f, scaleY = 1.04f)
-        } else {
-            modifier
-        }
         Image(
             bitmap = currentBitmap.asImageBitmap(),
             contentDescription = fallbackTitle,
             contentScale = contentScale,
-            modifier = imageModifier
+            modifier = modifier
         )
     } else {
         Box(
@@ -170,8 +162,8 @@ private fun putCachedBitmap(path: String, bitmap: Bitmap) {
 private fun loadBitmap(context: android.content.Context, coverPath: String?): Bitmap? {
     if (coverPath.isNullOrBlank()) return null
 
-    val reqWidth = 400
-    val reqHeight = 600
+    val reqWidth = 720
+    val reqHeight = 1080
 
     return runCatching {
         fun openStream() = when {
@@ -217,7 +209,7 @@ private fun loadBitmap(context: android.content.Context, coverPath: String?): Bi
         val decodeOptions = BitmapFactory.Options().apply {
             this.inSampleSize = inSampleSize
             this.inJustDecodeBounds = false
-            this.inPreferredConfig = Bitmap.Config.RGB_565
+            this.inPreferredConfig = Bitmap.Config.ARGB_8888
         }
 
         openStream()?.use { stream ->
