@@ -6,6 +6,11 @@
 #include <vector>
 #include <cstdlib>
 #include <mutex>
+#if defined(__ANDROID__)
+#include <unistd.h>
+#include <sys/stat.h>
+#include <cerrno>
+#endif
 
 #include "Common/CPUDetect.h"
 #include "Common/Log.h"
@@ -39,6 +44,7 @@
 #include "Core/HW/Display.h"
 #include "Core/CwCheat.h"
 #include "Core/ELF/ParamSFO.h"
+#include "Core/ELF/PBPReader.h"
 #include "Core/Loaders.h"
 #include "Core/FileSystems/BlockDevices.h"
 #include "Core/FileSystems/ISOFileSystem.h"
@@ -1356,7 +1362,7 @@ void retro_get_system_info(struct retro_system_info *info)
    info->library_name     = "PPSSPP";
    info->library_version  = PPSSPP_GIT_VERSION;
    info->need_fullpath    = true;
-   info->valid_extensions = "elf|iso|cso|prx|pbp|chd";
+   info->valid_extensions = "elf|iso|cso|prx|pbp|chd|plf|zip|bin";
 }
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
@@ -1932,17 +1938,93 @@ void retro_cheat_reset(void) {
 
 }
 
+extern "C" __attribute__((visibility("default"))) const char *emucorea_boot_error() {
+    return g_bootErrorString.c_str();
+}
+
+// Bounded metadata access through the same containers used for booting. No global SFO state.
+static int ReadGameAsset(FileLoader *source, int asset, uint8_t *out, size_t capacity) {
+    if (!source) return 0;
+    if (!out || (asset != 0 && asset != 1) || capacity > 4 * 1024 * 1024) { delete source; return 0; }
+    std::string error;
+    IdentifiedFileType type;
+    std::unique_ptr<FileLoader> loader(ResolveFileLoaderTarget(source, &type, &error));
+    if (!loader || !loader->Exists()) return 0;
+    PBPReader pbp(loader.get());
+    if (pbp.IsValid()) {
+        const auto part = asset == 0 ? PBP_PARAM_SFO : PBP_ICON0_PNG;
+        if (pbp.GetSubFileSize(part) > capacity) return 0;
+        std::vector<u8> bytes;
+        if (!pbp.GetSubFile(part, &bytes) || bytes.empty() || bytes.size() > capacity) return 0;
+        memcpy(out, bytes.data(), bytes.size());
+        return (int)bytes.size();
+    }
+    if (type != IdentifiedFileType::PSP_ISO && type != IdentifiedFileType::PSP_ISO_NP) return 0;
+    std::shared_ptr<BlockDevice> blocks(ConstructBlockDevice(loader.get(), &error));
+    if (!blocks) return 0;
+    SequentialHandleAllocator allocator;
+    ISOFileSystem fs(&allocator, blocks);
+    int handle = fs.OpenFile(asset == 0 ? "PSP_GAME/PARAM.SFO" : "PSP_GAME/ICON0.PNG", FILEACCESS_READ);
+    if (handle < 0) return 0;
+    const auto size = fs.SeekFile(handle, 0, FILEMOVE_END);
+    fs.SeekFile(handle, 0, FILEMOVE_BEGIN);
+    const bool ok = size > 0 && size <= capacity && fs.ReadFile(handle, out, size) == size;
+    fs.CloseFile(handle);
+    return ok ? (int)size : 0;
+}
+
+extern "C" __attribute__((visibility("default"))) int emucorea_game_asset(const char *path, int asset, uint8_t *out, size_t capacity) {
+    return path ? ReadGameAsset(ConstructFileLoader(Path(path)), asset, out, capacity) : 0;
+}
+
+#if defined(__ANDROID__)
+// SAF grants access to the descriptor, not permission to reopen its /proc path.
+// pread keeps the caller's file position intact and supports concurrent readers.
+class AssetFdLoader final : public FileLoader {
+public:
+    explicit AssetFdLoader(int fd) : fd_(dup(fd)) {
+        struct stat st{};
+        if (fd_ >= 0 && fstat(fd_, &st) == 0 && S_ISREG(st.st_mode)) size_ = st.st_size;
+    }
+    ~AssetFdLoader() override { if (fd_ >= 0) close(fd_); }
+    bool Exists() override { return fd_ >= 0 && size_ > 0; }
+    bool IsDirectory() override { return false; }
+    s64 FileSize() override { return size_; }
+    Path GetPath() const override { return Path("saf-image"); }
+    size_t ReadAt(s64 pos, size_t bytes, size_t count, void *data, Flags flags = Flags::NONE) override {
+        if (pos < 0 || pos >= size_ || bytes == 0 || count > SIZE_MAX / bytes) return 0;
+        size_t requested = std::min<size_t>(bytes * count, size_ - pos);
+        size_t done = 0;
+        while (done < requested) {
+            ssize_t n = pread64(fd_, static_cast<uint8_t *>(data) + done, requested - done, pos + done);
+            if (n < 0 && errno == EINTR) continue;
+            if (n <= 0) break;
+            done += n;
+        }
+        return done / bytes;
+    }
+private:
+    int fd_;
+    s64 size_ = 0;
+};
+
+extern "C" __attribute__((visibility("default"))) int emucorea_game_asset_fd(int fd, int asset, uint8_t *out, size_t capacity) {
+    return fd >= 0 ? ReadGameAsset(new AssetFdLoader(fd), asset, out, capacity) : 0;
+}
+#endif
+
 // Use the same decompression and disc reader as emulation for achievement hashes.
 extern "C" __attribute__((visibility("default"))) bool emucorea_disc_achievement_hash(const char *path, char *hash) {
 	if (!path || !hash) {
 		return false;
 	}
 	hash[0] = '\0';
-	std::unique_ptr<FileLoader> loader(ConstructFileLoader(Path(path)));
+	std::string error;
+	IdentifiedFileType type;
+	std::unique_ptr<FileLoader> loader(ResolveFileLoaderTarget(ConstructFileLoader(Path(path)), &type, &error));
 	if (!loader || !loader->Exists()) {
 		return false;
 	}
-	std::string error;
 	std::shared_ptr<BlockDevice> blocks(ConstructBlockDevice(loader.get(), &error));
 	if (!blocks) {
 		return false;

@@ -167,6 +167,8 @@ class NativeCoreBridge {
     // Disc metadata read straight from the image (SYSTEM.CNF). The library
     // layer falls back to filename-derived titles when this returns null.
     // ---------------------------------------------------------------------
+    external fun readGameAsset(path: String, asset: Int): ByteArray?
+    external fun readGameAssetFd(fd: Int, asset: Int): ByteArray?
     external fun getDiscMetadata(path: String): String?
 
     external fun getDiscMetadataFd(fd: Int, offset: Long, size: Long): String?

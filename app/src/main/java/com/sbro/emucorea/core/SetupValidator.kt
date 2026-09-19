@@ -8,7 +8,7 @@ import androidx.documentfile.provider.DocumentFile
 import java.io.File
 
 object SetupValidator {
-    private val supportedDiscExtensions = setOf("iso", "cso", "chd", "pbp", "elf", "prx")
+    private val supportedDiscExtensions = PspGameFormats.extensions
     private val supportedGameExtensions = supportedDiscExtensions
     private const val MAX_GAME_READ_PROBE_FILES = 24
     private const val MAX_GAME_READ_PROBE_DIRECTORIES = 96
@@ -83,7 +83,7 @@ object SetupValidator {
         for (child in children) {
             if (child.isDirectory) {
                 findReadableLocalGame(context, child, budget)?.let { return it }
-            } else if (child.isFile && child.extension.lowercase() in supportedGameExtensions) {
+            } else if (child.isFile && PspGameFormats.isSupportedName(child.name)) {
                 if (!budget.tryCheckFile()) return null
                 if (isLaunchPathReadable(context, child.absolutePath)) return child.absolutePath
             }
@@ -123,14 +123,14 @@ object SetupValidator {
             return DocumentEntryKind.DIRECTORY
         }
         val extension = displayName.orEmpty().substringAfterLast('.', "").lowercase()
-        if (extension in supportedGameExtensions) {
+        if (PspGameFormats.isSupportedName(displayName.orEmpty())) {
             return DocumentEntryKind.GAME_FILE
         }
         return if (mimeType == null) DocumentEntryKind.UNKNOWN else DocumentEntryKind.OTHER
     }
 
     internal fun isSupportedDiscImageName(displayName: String?): Boolean =
-        displayName.orEmpty().substringAfterLast('.', "").lowercase() in supportedDiscExtensions
+        PspGameFormats.isSupportedName(displayName.orEmpty())
 
     private fun isLaunchPathReadable(context: Context, rawGamePath: String): Boolean {
         if (rawGamePath.startsWith("content://")) {

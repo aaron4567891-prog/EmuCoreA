@@ -415,7 +415,9 @@ object DocumentPathResolver {
         if (!targetDir.exists() && !targetDir.mkdirs()) return null
 
         val sourceSize = querySourceSize(context, uri)
-        val target = File(targetDir, "disc.$extension")
+        val targetName = if (displayName.equals("EBOOT.BIN", true)) "EBOOT.BIN"
+            else if (displayName.equals("BOOT.BIN", true)) "BOOT.BIN" else "disc.$extension"
+        val target = File(targetDir, targetName)
         if (target.isFile && sourceSize > 0 && target.length() == sourceSize) {
             return target.absolutePath
         }

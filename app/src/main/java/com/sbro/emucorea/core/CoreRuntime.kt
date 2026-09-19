@@ -1089,9 +1089,10 @@ internal object CoreRuntime {
     }
 
     private fun isSupportedDiscPath(path: String): Boolean {
-        val extension = path.substringAfterLast('.', "").lowercase()
-        return extension == "iso" || extension == "cso" || extension == "chd" ||
-            extension == "pbp" || extension == "elf" || extension == "prx"
+        val name = if (path.startsWith("content://")) {
+            context?.let { DocumentPathResolver.getDisplayName(it, path) } ?: return false
+        } else path
+        return PspGameFormats.isSupportedName(name)
     }
 
     private fun fitRect(containerWidth: Int, containerHeight: Int, contentWidth: Int, contentHeight: Int): Rect {

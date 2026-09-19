@@ -107,6 +107,9 @@ struct CoreApi {
     void (*unload_game)() = nullptr;
     bool (*rewind_step)() = nullptr;
     bool (*disc_achievement_hash)(const char*, char*) = nullptr;
+    int (*game_asset)(const char*, int, uint8_t*, size_t) = nullptr;
+    int (*game_asset_fd)(int, int, uint8_t*, size_t) = nullptr;
+    const char* (*boot_error)() = nullptr;
 };
 
 CoreApi g_core;
@@ -286,6 +289,9 @@ bool LoadCoreLocked() {
     g_core.get_system_av_info = reinterpret_cast<void (*)(retro_system_av_info*)>(resolve("retro_get_system_av_info"));
     g_core.get_memory_data = reinterpret_cast<void* (*)(unsigned)>(resolve("retro_get_memory_data"));
     g_core.disc_achievement_hash = reinterpret_cast<bool (*)(const char*, char*)>(resolve("emucorea_disc_achievement_hash"));
+    g_core.game_asset = reinterpret_cast<int (*)(const char*, int, uint8_t*, size_t)>(resolve("emucorea_game_asset"));
+    g_core.game_asset_fd = reinterpret_cast<int (*)(int, int, uint8_t*, size_t)>(resolve("emucorea_game_asset_fd"));
+    g_core.boot_error = reinterpret_cast<const char* (*)()>(resolve("emucorea_boot_error"));
     g_core.get_memory_size = reinterpret_cast<size_t (*)(unsigned)>(resolve("retro_get_memory_size"));
     g_core.set_controller_port_device = reinterpret_cast<void (*)(unsigned, unsigned)>(resolve("retro_set_controller_port_device"));
     g_core.reset = reinterpret_cast<void (*)()>(resolve("retro_reset"));
@@ -1244,7 +1250,13 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_reset(JNIEnv*, jobject, jlong handl
 }
 
 JNIEXPORT void JNICALL
-Java_com_sbro_emucorea_core_NativeCoreBridge_runFrame(JNIEnv*, jobject, jlong handle) {
+Java_com_sbro_emucorea_core_NativeCoreBridge_runFrame(JNIEnv* env, jobject, jlong handle) {
+    if (g_frontend.shutdown_requested.load()) {
+        const char* detail = g_core.boot_error ? g_core.boot_error() : nullptr;
+        env->ThrowNew(env->FindClass("java/lang/IllegalStateException"),
+                      detail && *detail ? detail : "PPSSPP requested shutdown");
+        return;
+    }
     if (handle == 0 || !g_frontend.core_initialized.load()) return;
     if (!EnsureHardwareContext()) return;
     if (g_frontend.time_control.load() == 2 && g_core.rewind_step != nullptr) {
@@ -1265,6 +1277,12 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_runFrame(JNIEnv*, jobject, jlong ha
         return;
     }
     if (g_core.run != nullptr) g_core.run();
+    if (g_frontend.shutdown_requested.load()) {
+        const char* detail = g_core.boot_error ? g_core.boot_error() : nullptr;
+        env->ThrowNew(env->FindClass("java/lang/IllegalStateException"),
+                      detail && *detail ? detail : "PPSSPP requested shutdown");
+        return;
+    }
     EmuCoreAAchievementsOnFrame();
 }
 
@@ -1654,9 +1672,33 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_hasDiscMedia(JNIEnv*, jobject, jlon
     return (handle != 0 && g_frontend.game_loaded.load()) ? JNI_TRUE : JNI_FALSE;
 }
 
+JNIEXPORT jbyteArray JNICALL
+Java_com_sbro_emucorea_core_NativeCoreBridge_readGameAsset(JNIEnv* env, jobject, jstring path, jint asset) {
+    std::lock_guard<std::mutex> lock(g_frontend.core_mutex);
+    if (!LoadCoreLocked() || !g_core.game_asset) return nullptr;
+    std::vector<uint8_t> bytes(4 * 1024 * 1024);
+    const int size = g_core.game_asset(ToString(env, path).c_str(), asset, bytes.data(), bytes.size());
+    if (size <= 0 || (size_t)size > bytes.size()) return nullptr;
+    jbyteArray result = env->NewByteArray(size);
+    if (result) env->SetByteArrayRegion(result, 0, size, reinterpret_cast<const jbyte*>(bytes.data()));
+    return result;
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_sbro_emucorea_core_NativeCoreBridge_getDiscMetadata(JNIEnv*, jobject, jstring) {
     return nullptr;
+}
+
+JNIEXPORT jbyteArray JNICALL
+Java_com_sbro_emucorea_core_NativeCoreBridge_readGameAssetFd(JNIEnv* env, jobject, jint fd, jint asset) {
+    std::lock_guard<std::mutex> lock(g_frontend.core_mutex);
+    if (!LoadCoreLocked() || !g_core.game_asset_fd) return nullptr;
+    std::vector<uint8_t> bytes(4 * 1024 * 1024);
+    const int size = g_core.game_asset_fd(fd, asset, bytes.data(), bytes.size());
+    if (size <= 0 || (size_t)size > bytes.size()) return nullptr;
+    jbyteArray result = env->NewByteArray(size);
+    if (result) env->SetByteArrayRegion(result, 0, size, reinterpret_cast<const jbyte*>(bytes.data()));
+    return result;
 }
 
 JNIEXPORT jstring JNICALL

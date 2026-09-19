@@ -758,7 +758,7 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_achievementsLoadGame(JNIEnv* env, j
   std::string extension = game_path.substr(game_path.find_last_of('.') + 1);
   for (char& ch : extension)
     ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-  if (extension == "iso" || extension == "cso" || extension == "chd")
+  if (extension == "iso" || extension == "cso" || extension == "chd" || extension == "zip")
   {
     char hash[33] = {};
     if (!EmuCoreADiscAchievementHash(game_path.c_str(), hash))

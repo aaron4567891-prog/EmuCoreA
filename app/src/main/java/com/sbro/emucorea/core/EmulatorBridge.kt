@@ -1096,6 +1096,16 @@ object EmulatorBridge {
         if (isVmActive) return inferredMetadata
         if (extension == "elf") return inferredMetadata
 
+        getContext()?.let { context ->
+            runCatching { PspGameMetadataReader.read(context, path) }.getOrNull()?.let { metadata ->
+                return GameMetadata(
+                    title = metadata.title?.let { normalizeNativeGameTitle(it, inferredMetadata.title) }
+                        ?: inferredMetadata.title,
+                    serial = metadata.serial ?: inferredMetadata.serial
+                )
+            }
+        }
+
         val preparedPath = prepareMetadataPathForNative(path) ?: return inferredMetadata
         Log.i(TAG, "getGameMetadata native lookup path=$path vmActive=$isVmActive ext=$extension")
         return try {
@@ -1187,7 +1197,7 @@ object EmulatorBridge {
 
     fun parseMetadataFromName(rawName: String): GameMetadata {
         val ext = rawName.substringAfterLast('.', "").lowercase()
-        val cleanName = if (ext in setOf("iso", "bin", "cue", "img", "mdf", "gz", "cso", "zso", "chd", "elf")) {
+        val cleanName = if (ext in setOf("iso", "bin", "cue", "img", "mdf", "gz", "cso", "zso", "chd", "elf", "pbp", "prx", "plf", "zip")) {
             rawName.substringBeforeLast('.').trim()
         } else {
             rawName.trim()

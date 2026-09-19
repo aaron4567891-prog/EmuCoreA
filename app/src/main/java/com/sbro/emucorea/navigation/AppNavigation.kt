@@ -1062,6 +1062,5 @@ fun AppNavigation(
 }
 
 private fun isSupportedGameImage(fileName: String): Boolean {
-    val extension = fileName.substringAfterLast('.', "").lowercase()
-        return extension in setOf("iso", "cso", "chd", "pbp", "elf", "prx")
+    return com.sbro.emucorea.core.PspGameFormats.isSupportedName(fileName)
 }
