@@ -1976,11 +1976,8 @@
     <string name="settings_frame_skip">Přeskakování snímků</string>
     <string name="settings_frame_skip_desc">Přeskakuje zobrazování vykreslených snímků pro snížení zátěže. Vyšší hodnoty jsou trhanější, ale rychlejší.</string>
     <string name="settings_display_crop">Ořez obrazu</string>
-    <string name="settings_display_crop_desc">Odstraňuje pixely z okrajů obrazu před škálováním. Zvyšujte hodnotu, dokud nežádoucí okraj nezmizí.</string>
-    <string name="settings_display_crop_left">Levý okraj</string>
-    <string name="settings_display_crop_top">Horní okraj</string>
-    <string name="settings_display_crop_right">Pravý okraj</string>
-    <string name="settings_display_crop_bottom">Dolní okraj</string>
+    <string name="settings_display_crop_desc">Ořízne stejný počet pixelů ze všech čtyř okrajů před změnou velikosti. Výběrem 0 ořez vypnete.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Širokoúhlé patche</string>
     <string name="settings_widescreen_patches_desc">Povolit širokoúhlé patche pro podporované hry</string>
     <string name="settings_help_widescreen_patches">Načte patche pro širokoúhlý formát, pokud je má aktuální hra k dispozici. To je obvykle lepší než roztahování obrazu, protože to mění logiku kamery a HUD hry, místo pouhého zkreslování konečného obrazu.</string>

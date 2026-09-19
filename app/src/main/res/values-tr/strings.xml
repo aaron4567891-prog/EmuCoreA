@@ -1955,11 +1955,8 @@
     <string name="settings_frame_skip">Kare atlama</string>
     <string name="settings_frame_skip_desc">Ana makine yükünü azaltmak için oluşturulan karelerin sunumunu atlar. Yüksek değerler daha takılır ama daha hızlıdır.</string>
     <string name="settings_display_crop">Görüntü kırpma</string>
-    <string name="settings_display_crop_desc">Ölçeklemeden önce görüntünün kenarlarından piksel keser. İstenmeyen kenarlık kaybolana kadar değeri artırın.</string>
-    <string name="settings_display_crop_left">Sol kenar</string>
-    <string name="settings_display_crop_top">Üst kenar</string>
-    <string name="settings_display_crop_right">Sağ kenar</string>
-    <string name="settings_display_crop_bottom">Alt kenar</string>
+    <string name="settings_display_crop_desc">Ölçeklemeden önce dört kenardan eşit sayıda piksel kırpar. Kırpmayı kapatmak için 0 seçin.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Geniş Ekran Yamaları</string>
     <string name="settings_widescreen_patches_desc">Desteklenen oyunlar için geniş ekran yamalarını etkinleştir</string>
     <string name="settings_help_widescreen_patches">Mevcut oyun için bir tane varsa geniş ekran yamalarını yükler. Bu genellikle görüntüyü uzatmaktan daha iyidir çünkü sadece nihai resmi bozmak yerine oyunun kamera ve HUD mantığını değiştirir.</string>

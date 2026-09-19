@@ -1976,11 +1976,8 @@
     <string name="settings_frame_skip">Pomijanie klatek</string>
     <string name="settings_frame_skip_desc">Pomija prezentację wyrenderowanych klatek, zmniejszając obciążenie. Wyższe wartości są mniej płynne, ale szybsze.</string>
     <string name="settings_display_crop">Przycinanie obrazu</string>
-    <string name="settings_display_crop_desc">Usuwa piksele z krawędzi obrazu przed skalowaniem. Zwiększaj wartość, aż niechciana ramka zniknie.</string>
-    <string name="settings_display_crop_left">Lewa krawędź</string>
-    <string name="settings_display_crop_top">Górna krawędź</string>
-    <string name="settings_display_crop_right">Prawa krawędź</string>
-    <string name="settings_display_crop_bottom">Dolna krawędź</string>
+    <string name="settings_display_crop_desc">Przycina taką samą liczbę pikseli ze wszystkich czterech krawędzi przed skalowaniem. Wybierz 0, aby wyłączyć przycinanie.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Patche panoramiczne (Widescreen)</string>
     <string name="settings_widescreen_patches_desc">Włącza oryginalne kody/patche poprawiające ekran w wybranych wspieranych grach z proporcjami dla nowszych telefonów/urządzeń 16:9 / szerokokątnymi.</string>
     <string name="settings_help_widescreen_patches">Wczytuje patche panoramiczne (widescreen), gdy są one dostępne dla danej gry. Jest to zwykle znacznie lepsze rozwiązanie niż rozciąganie obrazu, ponieważ zmienia logikę pracy kamery i HUD-a w grze, zamiast tylko zniekształcać końcowy obraz.</string>

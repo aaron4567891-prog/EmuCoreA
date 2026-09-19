@@ -1969,11 +1969,8 @@
     <string name="settings_frame_skip">Lewati bingkai</string>
     <string name="settings_frame_skip_desc">Melewati penyajian bingkai yang dirender untuk mengurangi beban. Nilai lebih tinggi lebih tersendat tapi cepat.</string>
     <string name="settings_display_crop">Pangkas tampilan</string>
-    <string name="settings_display_crop_desc">Memangkas piksel dari tepi gambar sebelum penskalaan. Tingkatkan nilai hingga tepi yang tidak diinginkan hilang.</string>
-    <string name="settings_display_crop_left">Tepi kiri</string>
-    <string name="settings_display_crop_top">Tepi atas</string>
-    <string name="settings_display_crop_right">Tepi kanan</string>
-    <string name="settings_display_crop_bottom">Tepi bawah</string>
+    <string name="settings_display_crop_desc">Memangkas jumlah piksel yang sama dari keempat tepi sebelum penskalaan. Pilih 0 untuk menonaktifkan pemangkasan.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Patch Layar Lebar</string>
     <string name="settings_widescreen_patches_desc">Aktifkan patch layar lebar untuk game yang didukung</string>
     <string name="settings_help_widescreen_patches">Memuat patch layar lebar ketika game yang saat ini dipilih memilikinya. Ini biasanya lebih baik daripada meregangkan (stretch) gambar karena itu mengubah logika kamera dan HUD game alih-alih hanya merusak atau menggeser gambar akhir.</string>

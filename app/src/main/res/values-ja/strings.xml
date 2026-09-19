@@ -1954,11 +1954,8 @@
     <string name="settings_frame_skip">フレームスキップ</string>
     <string name="settings_frame_skip_desc">レンダリング済みフレームの表示を間引き、負荷を軽減します。値が大きいほどカクつきますが高速です。</string>
     <string name="settings_display_crop">表示クロップ</string>
-    <string name="settings_display_crop_desc">拡大縮小の前に画像の端からピクセルを削除します。不要な枠が消えるまで値を増やしてください。</string>
-    <string name="settings_display_crop_left">左端</string>
-    <string name="settings_display_crop_top">上端</string>
-    <string name="settings_display_crop_right">右端</string>
-    <string name="settings_display_crop_bottom">下端</string>
+    <string name="settings_display_crop_desc">拡大縮小の前に上下左右の端を同じピクセル数だけ切り取ります。0を選択するとクロップを無効にします。</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">ワイドスクリーンパッチ</string>
     <string name="settings_widescreen_patches_desc">サポートされているゲームでワイドスクリーンパッチを有効にします</string>
     <string name="settings_help_widescreen_patches">現在のゲームで利用可能な場合にワイドスクリーンパッチをロードします。これは、最終的な画像を歪めるだけでなく、ゲームのカメラとHUDのロジックを変更するため、通常は画像を伸ばすよりも優れています。</string>

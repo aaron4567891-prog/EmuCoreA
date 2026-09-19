@@ -1984,11 +1984,8 @@
     <string name="settings_frame_skip">Frame skip</string>
     <string name="settings_frame_skip_desc">Skips presenting rendered frames to reduce host load. Higher values are choppier but faster.</string>
     <string name="settings_display_crop">Display crop</string>
-    <string name="settings_display_crop_desc">Trims pixels from the edges of the picture before scaling. Increase a value until the unwanted border disappears.</string>
-    <string name="settings_display_crop_left">Left edge</string>
-    <string name="settings_display_crop_top">Top edge</string>
-    <string name="settings_display_crop_right">Right edge</string>
-    <string name="settings_display_crop_bottom">Bottom edge</string>
+    <string name="settings_display_crop_desc">Trims the same number of pixels from all four edges before scaling. Select 0 to turn cropping off.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Widescreen Patches</string>
     <string name="settings_widescreen_patches_desc">Enable widescreen patches for supported games</string>
     <string name="settings_help_widescreen_patches">Loads widescreen patches when the current game has one available. This is usually better than stretching the image because it changes the game\'s camera and HUD logic instead of just distorting the final picture.</string>

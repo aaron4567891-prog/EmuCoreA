@@ -1957,11 +1957,8 @@
     <string name="settings_frame_skip">Salto de fotogramas</string>
     <string name="settings_frame_skip_desc">Omite la presentación de fotogramas renderizados para reducir la carga. Valores altos son más entrecortados pero rápidos.</string>
     <string name="settings_display_crop">Recorte de imagen</string>
-    <string name="settings_display_crop_desc">Elimina píxeles de los bordes de la imagen antes del escalado. Aumenta el valor hasta que desaparezca el borde no deseado.</string>
-    <string name="settings_display_crop_left">Borde izquierdo</string>
-    <string name="settings_display_crop_top">Borde superior</string>
-    <string name="settings_display_crop_right">Borde derecho</string>
-    <string name="settings_display_crop_bottom">Borde inferior</string>
+    <string name="settings_display_crop_desc">Recorta la misma cantidad de píxeles de los cuatro bordes antes del escalado. Selecciona 0 para desactivar el recorte.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Parches panorámicos</string>
     <string name="settings_widescreen_patches_desc">Habilitar parches panorámicos para juegos compatibles</string>
     <string name="settings_help_widescreen_patches">Carga parches panorámicos cuando el juego actual tiene uno disponible. Esto suele ser mejor que estirar la imagen porque cambia la cámara del juego y la lógica del HUD en lugar de limitarse a distorsionar la imagen final.</string>

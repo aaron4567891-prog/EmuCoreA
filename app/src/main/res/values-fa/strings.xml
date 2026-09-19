@@ -1970,11 +1970,8 @@
     <string name="settings_frame_skip">پرش فریم</string>
     <string name="settings_frame_skip_desc">نمایش فریم‌های رندرشده را برای کاهش بار میزبان رد می‌کند. مقادیر بالاتر تکه‌تکه‌تر اما سریع‌تر است.</string>
     <string name="settings_display_crop">برش تصویر</string>
-    <string name="settings_display_crop_desc">پیکسل‌ها را پیش از مقیاس‌بندی از لبه‌های تصویر حذف می‌کند. مقدار را افزایش دهید تا حاشیه ناخواسته ناپدید شود.</string>
-    <string name="settings_display_crop_left">لبه چپ</string>
-    <string name="settings_display_crop_top">لبه بالا</string>
-    <string name="settings_display_crop_right">لبه راست</string>
-    <string name="settings_display_crop_bottom">لبه پایین</string>
+    <string name="settings_display_crop_desc">پیش از تغییر اندازه، تعداد یکسانی پیکسل از هر چهار لبه برش می‌دهد. برای غیرفعال کردن برش، 0 را انتخاب کنید.</string>
+    <string name="settings_display_crop_pixels">%1$d پیکسل</string>
     <string name="settings_widescreen_patches">پچ‌های صفحه عریض</string>
     <string name="settings_widescreen_patches_desc">فعال کردن پچ‌های صفحه عریض برای بازی‌های پشتیبانی شده</string>
     <string name="settings_help_widescreen_patches">زمانی که بازی فعلی پچ عریض داشته باشد، آن را بارگذاری می‌کند.</string>

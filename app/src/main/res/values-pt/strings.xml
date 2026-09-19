@@ -1957,11 +1957,8 @@
     <string name="settings_frame_skip">Salto de quadros</string>
     <string name="settings_frame_skip_desc">Pula a apresentação de quadros renderizados para reduzir a carga. Valores altos são mais travados, mas rápidos.</string>
     <string name="settings_display_crop">Recorte da imagem</string>
-    <string name="settings_display_crop_desc">Remove pixels das bordas da imagem antes da escala. Aumente o valor até a borda indesejada desaparecer.</string>
-    <string name="settings_display_crop_left">Borda esquerda</string>
-    <string name="settings_display_crop_top">Borda superior</string>
-    <string name="settings_display_crop_right">Borda direita</string>
-    <string name="settings_display_crop_bottom">Borda inferior</string>
+    <string name="settings_display_crop_desc">Recorta o mesmo número de pixels das quatro bordas antes do dimensionamento. Selecione 0 para desativar o recorte.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Patches Widescreen</string>
     <string name="settings_widescreen_patches_desc">Ativar patches widescreen para jogos compatíveis</string>
     <string name="settings_help_widescreen_patches">Carrega patches de tela panorâmica quando o jogo atual tiver um disponível. Isso costuma ser melhor do que esticar a imagem, pois altera a lógica da câmera e da interface (HUD) do jogo, em vez de simplesmente distorcer a imagem final.</string>

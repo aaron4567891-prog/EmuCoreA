@@ -909,6 +909,14 @@ private fun GameSettingsTabContent(
                             onDraftChange(draft.copy(aspectRatio = defaultProfile.aspectRatio))
                         }
                     )
+                    SelectionRow(
+                        title = stringResource(R.string.settings_display_crop),
+                        options = DisplayCrop.PRESET_PIXELS.map { it to stringResource(R.string.settings_display_crop_pixels, it) },
+                        selectedValue = draft.displayCrop.presetPixels,
+                        onSelected = { onDraftChange(draft.copy(displayCrop = DisplayCrop.uniform(it))) },
+                        helpText = stringResource(R.string.settings_display_crop_desc),
+                        onResetToDefault = { onDraftChange(draft.copy(displayCrop = defaultProfile.displayCrop)) }
+                    )
                     CoreOptionManagerRows(
                         options = PpssppCoreOptions.graphicsOptions(),
                         draft = draft,

@@ -1963,11 +1963,8 @@
     <string name="settings_frame_skip">تخطي الإطارات</string>
     <string name="settings_frame_skip_desc">يتخطى عرض الإطارات المعروضة لتقليل الحمل. القيم الأعلى أكثر تقطعًا لكن أسرع.</string>
     <string name="settings_display_crop">قص الصورة</string>
-    <string name="settings_display_crop_desc">يزيل البكسلات من حواف الصورة قبل التحجيم. زد القيمة حتى تختفي الحواف غير المرغوبة.</string>
-    <string name="settings_display_crop_left">الحافة اليسرى</string>
-    <string name="settings_display_crop_top">الحافة العلوية</string>
-    <string name="settings_display_crop_right">الحافة اليمنى</string>
-    <string name="settings_display_crop_bottom">الحافة السفلية</string>
+    <string name="settings_display_crop_desc">يقتطع العدد نفسه من البكسلات من الحواف الأربع قبل تغيير الحجم. اختر 0 لإيقاف الاقتصاص.</string>
+    <string name="settings_display_crop_pixels">%1$d بكسل</string>
     <string name="settings_widescreen_patches">تصحيحات الشاشة العريضة</string>
     <string name="settings_widescreen_patches_desc">تفعيل تصحيحات الشاشة العريضة للألعاب المدعومة</string>
     <string name="settings_help_widescreen_patches">يُحمِّل تصحيحات الشاشة العريضة عندما تكون للعبة الحالية تصحيح متاح. عادة ما يكون هذا أفضل من شد الصورة (Stretch) لأنه يغير منطق كاميرا اللعبة وواجهة المستخدم (HUD) بدلاً من مجرد تشويه الصورة النهائية.</string>

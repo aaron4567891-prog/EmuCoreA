@@ -1957,11 +1957,8 @@
     <string name="settings_frame_skip">Saut d\'images</string>
     <string name="settings_frame_skip_desc">Saute l\'affichage des images rendues pour réduire la charge. Des valeurs élevées saccadent mais accélèrent.</string>
     <string name="settings_display_crop">Rognage de l\'image</string>
-    <string name="settings_display_crop_desc">Coupe les pixels des bords de l\'image avant la mise à l\'échelle. Augmentez la valeur jusqu\'à faire disparaître la bordure indésirable.</string>
-    <string name="settings_display_crop_left">Bord gauche</string>
-    <string name="settings_display_crop_top">Bord supérieur</string>
-    <string name="settings_display_crop_right">Bord droit</string>
-    <string name="settings_display_crop_bottom">Bord inférieur</string>
+    <string name="settings_display_crop_desc">Rogne le même nombre de pixels sur les quatre bords avant la mise à l’échelle. Sélectionnez 0 pour désactiver le rognage.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Patchs écran large</string>
     <string name="settings_widescreen_patches_desc">Activer les patchs écran large pour les jeux pris en charge</string>
     <string name="settings_help_widescreen_patches">Charge des patchs écran large lorsque le jeu actuel en a un de disponible. C\'est généralement mieux que d\'étirer l\'image car cela modifie la caméra du jeu et la logique du HUD au lieu de simplement déformer l\'image finale.</string>

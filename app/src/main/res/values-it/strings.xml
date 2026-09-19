@@ -1955,11 +1955,8 @@
     <string name="settings_frame_skip">Salto fotogrammi</string>
     <string name="settings_frame_skip_desc">Salta la presentazione dei fotogrammi renderizzati per ridurre il carico. Valori alti sono più scattosi ma veloci.</string>
     <string name="settings_display_crop">Ritaglio immagine</string>
-    <string name="settings_display_crop_desc">Rimuove i pixel dai bordi dell\'immagine prima del ridimensionamento. Aumenta il valore finché il bordo indesiderato non scompare.</string>
-    <string name="settings_display_crop_left">Bordo sinistro</string>
-    <string name="settings_display_crop_top">Bordo superiore</string>
-    <string name="settings_display_crop_right">Bordo destro</string>
-    <string name="settings_display_crop_bottom">Bordo inferiore</string>
+    <string name="settings_display_crop_desc">Ritaglia lo stesso numero di pixel da tutti e quattro i bordi prima del ridimensionamento. Seleziona 0 per disattivare il ritaglio.</string>
+    <string name="settings_display_crop_pixels">%1$d px</string>
     <string name="settings_widescreen_patches">Patch widescreen</string>
     <string name="settings_widescreen_patches_desc">Abilita patch widescreen per i giochi supportati</string>
     <string name="settings_help_widescreen_patches">Carica le patch widescreen quando il gioco attuale ne ha una disponibile. Questo è solitamente meglio che allungare l\'immagine perché modifica la logica della telecamera e dell\'HUD del gioco invece di distorcere semplicemente l\'immagine finale.</string>

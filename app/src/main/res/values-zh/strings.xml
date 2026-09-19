@@ -1956,11 +1956,8 @@
     <string name="settings_frame_skip">跳幀</string>
     <string name="settings_frame_skip_desc">跳過已渲染畫面的顯示以降低主機負載。數值越高越不流暢但更快。</string>
     <string name="settings_display_crop">畫面裁切</string>
-    <string name="settings_display_crop_desc">在縮放前裁掉畫面邊緣的像素。提高數值直到多餘的邊框消失。</string>
-    <string name="settings_display_crop_left">左邊緣</string>
-    <string name="settings_display_crop_top">上邊緣</string>
-    <string name="settings_display_crop_right">右邊緣</string>
-    <string name="settings_display_crop_bottom">下邊緣</string>
+    <string name="settings_display_crop_desc">缩放前从四边裁剪相同数量的像素。选择 0 可关闭裁剪。</string>
+    <string name="settings_display_crop_pixels">%1$d 像素</string>
     <string name="settings_widescreen_patches">寬螢幕修補程式</string>
     <string name="settings_widescreen_patches_desc">為支援的遊戲啟用寬螢幕修補程式</string>
     <string name="settings_help_widescreen_patches">当当前游戏有可用的宽屏补丁时加载它们。这通常比拉伸图像更好，因为它改变了游戏的相机和 HUD 逻辑，而不仅仅是扭曲最终画面。</string>

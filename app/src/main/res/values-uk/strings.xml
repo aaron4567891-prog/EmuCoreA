@@ -1960,11 +1960,8 @@
     <string name="settings_frame_skip">Пропуск кадрів</string>
     <string name="settings_frame_skip_desc">Пропускає показ зрендерених кадрів, щоб зменшити навантаження. Більші значення — рваніше, але швидше.</string>
     <string name="settings_display_crop">Обрізання зображення</string>
-    <string name="settings_display_crop_desc">Прибирає пікселі з країв зображення перед масштабуванням. Збільшуйте значення, доки зайва рамка не зникне.</string>
-    <string name="settings_display_crop_left">Лівий край</string>
-    <string name="settings_display_crop_top">Верхній край</string>
-    <string name="settings_display_crop_right">Правий край</string>
-    <string name="settings_display_crop_bottom">Нижній край</string>
+    <string name="settings_display_crop_desc">Обрізає однакову кількість пікселів з усіх чотирьох країв перед масштабуванням. Виберіть 0, щоб вимкнути обрізання.</string>
+    <string name="settings_display_crop_pixels">%1$d пкс</string>
     <string name="settings_widescreen_patches">Широкоформатні патчі</string>
     <string name="settings_widescreen_patches_desc">Увімкнути широкоформатні патчі для підтримуваних ігор</string>
     <string name="settings_help_widescreen_patches">Завантажує широкоекранні патчі, коли вони доступні для поточної гри. Зазвичай це краще, ніж розтягувати зображення, тому що це змінює логіку камери та HUD гри, а не просто спотворює кінцеве зображення.</string>

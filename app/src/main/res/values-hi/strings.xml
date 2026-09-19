@@ -1955,11 +1955,8 @@
     <string name="settings_frame_skip">फ़्रेम स्किप</string>
     <string name="settings_frame_skip_desc">होस्ट लोड कम करने के लिए रेंडर किए गए फ़्रेम दिखाना छोड़ता है। बड़े मान अधिक झटकेदार पर तेज़ होते हैं।</string>
     <string name="settings_display_crop">डिस्प्ले क्रॉप</string>
-    <string name="settings_display_crop_desc">स्केलिंग से पहले छवि के किनारों से पिक्सेल हटाता है। अवांछित बॉर्डर गायब होने तक मान बढ़ाएँ।</string>
-    <string name="settings_display_crop_left">बायाँ किनारा</string>
-    <string name="settings_display_crop_top">ऊपरी किनारा</string>
-    <string name="settings_display_crop_right">दायाँ किनारा</string>
-    <string name="settings_display_crop_bottom">निचला किनारा</string>
+    <string name="settings_display_crop_desc">आकार बदलने से पहले चारों किनारों से समान संख्या में पिक्सेल काटता है। क्रॉप बंद करने के लिए 0 चुनें।</string>
+    <string name="settings_display_crop_pixels">%1$d पिक्सेल</string>
     <string name="settings_widescreen_patches">वाइडस्क्रीन पैच</string>
     <string name="settings_widescreen_patches_desc">समर्थित गेम्स के लिए वाइडस्क्रीन पैच सक्षम करें</string>
     <string name="settings_help_widescreen_patches">जब वर्तमान गेम में वाइडस्क्रीन पैच उपलब्ध हो तो वाइडस्क्रीन पैच लोड करता है। यह आमतौर पर छवि को खींचने से बेहतर होता है क्योंकि यह केवल अंतिम चित्र को विकृत करने के बजाय गेम के कैमरा और HUD लॉजिक को बदल देता है।</string>
