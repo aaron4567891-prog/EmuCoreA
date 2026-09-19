@@ -2030,8 +2030,8 @@
     <string name="formats_psp_homebrew_title">Цифровые игры и homebrew</string>
 <string name="formats_psp_homebrew_body">Также можно открыть пакеты PBP и исполняемые файлы PSP ELF или PRX.</string>
     <string name="settings_network_tab">Сеть</string>
-    <string name="emulation_fast_forward">Перемотка вперёд</string>
-    <string name="emulation_rewind">Перемотка назад</string>
+    <string name="emulation_fast_forward">Перемотка вперёд (удерживать)</string>
+    <string name="emulation_rewind">Перемотка назад (удерживать)</string>
     <string name="psp_memstick_title">Карта памяти PSP</string>
     <string name="psp_memstick_note">PPSSPP хранит сохранения игр в PSP/SAVEDATA. Объём виртуальный: образ карты не создаётся. Выбранный размер применяется при следующем запуске игры.</string>
     <string name="psp_memstick_backup">Резервная копия сохранений</string>

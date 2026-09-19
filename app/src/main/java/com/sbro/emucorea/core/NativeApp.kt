@@ -50,9 +50,7 @@ object NativeApp {
     private val analogDpadOptionCache = arrayOfNulls<Boolean>(2)
     private val padAnalogHalfAxes = Array(2) { IntArray(8) }
     private val timeControlHandler = Handler(Looper.getMainLooper())
-    private val timeControlPressed = Array(2) { BooleanArray(4) }
-    private val timeControlActive = Array(2) { BooleanArray(4) }
-    private val timeControlGeneration = Array(2) { IntArray(4) }
+    private val timeControlButtons = Array(2) { Array(4) { HoldButton() } }
     private val timeControlTapPulse = Array(2) { BooleanArray(2) }
     private var profilerActive = false
     private var hangTraceActive = false
@@ -153,13 +151,7 @@ object NativeApp {
     @JvmStatic fun queueGsDump(frames: Int) = Unit
     @JvmStatic @Synchronized fun setPadButton(padIndex: Int, index: Int, range: Int, pressed: Boolean) {
         if (padIndex !in 0..1) return
-        if (index == PAD_FAST_FORWARD || index == PAD_REWIND) {
-            val slot = if (index == PAD_FAST_FORWARD) 2 else 3
-            timeControlPressed[padIndex][slot] = pressed
-            updateTimeControl()
-            return
-        }
-        if (index == PAD_START || index == PAD_SELECT) {
+        if (index == PAD_START || index == PAD_SELECT || index == PAD_FAST_FORWARD || index == PAD_REWIND) {
             handleTimeControlHold(padIndex, index, pressed)
             return
         }
@@ -201,11 +193,7 @@ object NativeApp {
     @JvmStatic fun resetKeyStatus() { resetPadState(0); resetPadState(1) }
     @JvmStatic @Synchronized fun resetPadState(padIndex: Int) {
         if (padIndex !in 0..1) return
-        for (slot in 0..3) {
-            timeControlPressed[padIndex][slot] = false
-            timeControlActive[padIndex][slot] = false
-            timeControlGeneration[padIndex][slot]++
-        }
+        timeControlButtons[padIndex].forEach { it.reset() }
         timeControlTapPulse[padIndex].fill(false)
         updateTimeControl()
         padButtons[padIndex] = 0xFFFF
@@ -526,12 +514,17 @@ object NativeApp {
     }
 
     private fun handleTimeControlHold(padIndex: Int, index: Int, pressed: Boolean) {
-        val slot = if (index == PAD_START) 0 else 1
-        if (timeControlPressed[padIndex][slot] == pressed) return
-        timeControlPressed[padIndex][slot] = pressed
-        val generation = ++timeControlGeneration[padIndex][slot]
+        val slot = when (index) {
+            PAD_START -> 0
+            PAD_SELECT -> 1
+            PAD_FAST_FORWARD -> 2
+            else -> 3
+        }
+        val button = timeControlButtons[padIndex][slot]
+        if (button.pressed == pressed) return
         if (pressed) {
-            if (timeControlTapPulse[padIndex][slot]) {
+            val generation = button.press() ?: return
+            if (slot < 2 && timeControlTapPulse[padIndex][slot]) {
                 timeControlTapPulse[padIndex][slot] = false
                 val bit = pspButtonBit(index) ?: return
                 padButtons[padIndex] = padButtons[padIndex] or (1 shl bit)
@@ -539,18 +532,16 @@ object NativeApp {
             }
             timeControlHandler.postDelayed({
                 synchronized(this) {
-                    if (timeControlPressed[padIndex][slot] &&
-                        timeControlGeneration[padIndex][slot] == generation) {
-                        timeControlActive[padIndex][slot] = true
+                    if (button.activate(generation)) {
                         updateTimeControl()
                     }
                 }
             }, TIME_CONTROL_HOLD_MS)
         } else {
-            val wasActive = timeControlActive[padIndex][slot]
-            timeControlActive[padIndex][slot] = false
+            val wasTap = button.release()
+            val generation = button.generation
             updateTimeControl()
-            if (!wasActive) {
+            if (wasTap && slot < 2) {
                 // A tap still reaches PSP as a normal Start/Select press.
                 val bit = pspButtonBit(index) ?: return
                 timeControlTapPulse[padIndex][slot] = true
@@ -558,7 +549,7 @@ object NativeApp {
                 CoreRuntime.setPadButtons(padIndex, effectivePadButtons(padIndex))
                 timeControlHandler.postDelayed({
                     synchronized(this) {
-                        if (timeControlGeneration[padIndex][slot] == generation) {
+                        if (button.generation == generation) {
                             timeControlTapPulse[padIndex][slot] = false
                             padButtons[padIndex] = padButtons[padIndex] or (1 shl bit)
                             CoreRuntime.setPadButtons(padIndex, effectivePadButtons(padIndex))
@@ -571,10 +562,10 @@ object NativeApp {
 
     private fun updateTimeControl() {
         val rewind = (0..1).any { pad ->
-            timeControlActive[pad][1] || timeControlPressed[pad][3]
+            timeControlButtons[pad][1].active || timeControlButtons[pad][3].active
         }
         val fastForward = (0..1).any { pad ->
-            timeControlActive[pad][0] || timeControlPressed[pad][2]
+            timeControlButtons[pad][0].active || timeControlButtons[pad][2].active
         }
         CoreRuntime.setTimeControl(if (rewind) 2 else if (fastForward) 1 else 0)
     }

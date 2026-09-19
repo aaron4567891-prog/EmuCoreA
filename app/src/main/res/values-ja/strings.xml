@@ -2025,8 +2025,8 @@
     <string name="formats_psp_homebrew_title">ダウンロード版と自作ソフト</string>
 <string name="formats_psp_homebrew_body">PBP パッケージと PSP の ELF または PRX 実行ファイルも開けます。</string>
     <string name="settings_network_tab">ネットワーク</string>
-    <string name="emulation_fast_forward">早送り</string>
-    <string name="emulation_rewind">巻き戻し</string>
+    <string name="emulation_fast_forward">早送り（長押し）</string>
+    <string name="emulation_rewind">巻き戻し（長押し）</string>
     <string name="psp_memstick_title">PSP メモリースティック</string>
     <string name="psp_memstick_note">PPSSPP はゲームのセーブデータを PSP/SAVEDATA に保存します。容量は仮想的なもので、カードイメージは作成しません。選択した容量は次回のゲーム起動時に適用されます。</string>
     <string name="psp_memstick_backup">セーブデータをバックアップ</string>

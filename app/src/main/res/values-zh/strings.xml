@@ -2027,8 +2027,8 @@
     <string name="formats_psp_homebrew_title">数字游戏和自制程序</string>
 <string name="formats_psp_homebrew_body">还可以打开 PBP 包以及 PSP ELF 或 PRX 可执行文件。</string>
     <string name="settings_network_tab">網路</string>
-    <string name="emulation_fast_forward">快进</string>
-    <string name="emulation_rewind">快退</string>
+    <string name="emulation_fast_forward">快进（长按）</string>
+    <string name="emulation_rewind">倒带（长按）</string>
     <string name="psp_memstick_title">PSP 記憶棒</string>
     <string name="psp_memstick_note">PPSSPP 將遊戲存檔儲存在 PSP/SAVEDATA。容量為虛擬值，不會建立記憶卡映像檔。選擇的容量會在下次啟動遊戲時套用。</string>
     <string name="psp_memstick_backup">備份存檔</string>

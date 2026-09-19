@@ -2028,8 +2028,8 @@
     <string name="formats_psp_homebrew_title">Juegos digitales y homebrew</string>
 <string name="formats_psp_homebrew_body">También se pueden abrir paquetes PBP y ejecutables PSP ELF o PRX.</string>
     <string name="settings_network_tab">Red</string>
-    <string name="emulation_fast_forward">Avance rápido</string>
-    <string name="emulation_rewind">Rebobinar</string>
+    <string name="emulation_fast_forward">Avance rápido (mantener pulsado)</string>
+    <string name="emulation_rewind">Rebobinar (mantener pulsado)</string>
     <string name="psp_memstick_title">Memory Stick de PSP</string>
     <string name="psp_memstick_note">PPSSPP guarda las partidas en PSP/SAVEDATA. La capacidad es virtual; no se crea una imagen de tarjeta. El tamaño elegido se aplica al volver a iniciar un juego.</string>
     <string name="psp_memstick_backup">Copia de partidas</string>

@@ -2047,8 +2047,8 @@
     <string name="formats_psp_homebrew_title">Digitální hry a homebrew</string>
 <string name="formats_psp_homebrew_body">Lze otevřít balíčky PBP a spustitelné soubory PSP ELF nebo PRX.</string>
     <string name="settings_network_tab">Síť</string>
-    <string name="emulation_fast_forward">Rychlý posun vpřed</string>
-    <string name="emulation_rewind">Přetáčení zpět</string>
+    <string name="emulation_fast_forward">Rychlý posun vpřed (podržet)</string>
+    <string name="emulation_rewind">Přetočení zpět (podržet)</string>
     <string name="psp_memstick_title">Paměťová karta PSP</string>
     <string name="psp_memstick_note">PPSSPP ukládá pozice her do PSP/SAVEDATA. Kapacita je virtuální; obraz karty se nevytváří. Zvolená velikost se použije při dalším spuštění hry.</string>
     <string name="psp_memstick_backup">Zálohovat pozice</string>

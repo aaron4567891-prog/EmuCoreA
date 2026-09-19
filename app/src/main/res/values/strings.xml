@@ -2049,8 +2049,8 @@
     <string name="achievements_unavailable">RetroAchievements is not supported by this build.</string>
     <string name="shell_achievements">Achievements</string>
     <string name="settings_network_tab">Network</string>
-    <string name="emulation_fast_forward">Fast forward</string>
-    <string name="emulation_rewind">Rewind</string>
+    <string name="emulation_fast_forward">Fast forward (hold)</string>
+    <string name="emulation_rewind">Rewind (hold)</string>
     <string name="psp_memstick_title">PSP Memory Stick</string>
     <string name="psp_memstick_note">PPSSPP stores game saves in PSP/SAVEDATA. Capacity is virtual; no card image is created. The selected size applies when you next launch a game.</string>
     <string name="psp_memstick_backup">Back up saves</string>
