@@ -2052,4 +2052,6 @@
     <string name="psp_memstick_empty_card">Карта памяти ещё не создана</string>
     <string name="psp_memstick_create_success">Карта памяти готова.</string>
     <string name="psp_memstick_create_failure">Не удалось создать карту памяти.</string>
+    <string name="achievements_unsupported_image">RetroAchievements не распознаёт этот образ игры. Проверьте поддерживаемые хеши игры: может потребоваться другой регион или версия.</string>
+    <string name="achievements_library_error">Не удалось загрузить полный список игр с достижениями. Проверьте соединение и повторите попытку.</string>
 </resources>

@@ -2048,4 +2048,6 @@
     <string name="psp_memstick_empty_card">अभी Memory Stick नहीं है</string>
     <string name="psp_memstick_create_success">Memory Stick तैयार है।</string>
     <string name="psp_memstick_create_failure">Memory Stick नहीं बन सकी।</string>
+    <string name="achievements_unsupported_image">RetroAchievements इस गेम इमेज को नहीं पहचानता। गेम के समर्थित हैश जाँचें; किसी अन्य क्षेत्र या संस्करण की आवश्यकता हो सकती है।</string>
+    <string name="achievements_library_error">उपलब्धियों वाले गेम की पूरी सूची लोड नहीं हो सकी। अपना कनेक्शन जाँचें और फिर से प्रयास करें।</string>
 </resources>

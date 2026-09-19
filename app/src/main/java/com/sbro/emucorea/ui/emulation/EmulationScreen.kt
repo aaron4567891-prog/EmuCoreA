@@ -4707,6 +4707,14 @@ private fun InGameAchievementsTab() {
                 )
             }
 
+            state.unsupportedImage -> RaNoticeCard(stringResource(R.string.achievements_unsupported_image))
+
+            state.imageReadError -> RaNoticeCard(stringResource(R.string.achievements_game_unavailable), isError = true)
+
+            state.lastError != null -> RaNoticeCard(
+                stringResource(R.string.achievements_error, state.lastError.orEmpty()), isError = true
+            )
+
             !state.gameLoaded && state.game == null -> RaNoticeCard(stringResource(R.string.achievements_no_game))
 
             else -> {

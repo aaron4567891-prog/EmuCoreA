@@ -2069,4 +2069,6 @@
     <string name="psp_memstick_empty_card">Zatím žádná karta Memory Stick</string>
     <string name="psp_memstick_create_success">Karta Memory Stick je připravena.</string>
     <string name="psp_memstick_create_failure">Kartu Memory Stick se nepodařilo vytvořit.</string>
+    <string name="achievements_unsupported_image">RetroAchievements tento obraz hry nerozpoznává. Zkontrolujte podporované hashe hry; může být potřeba jiný region nebo verze.</string>
+    <string name="achievements_library_error">Nepodařilo se načíst úplný seznam her s úspěchy. Zkontrolujte připojení a zkuste to znovu.</string>
 </resources>

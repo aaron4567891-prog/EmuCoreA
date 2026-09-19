@@ -3,6 +3,11 @@ package com.sbro.emucorea.data
 import android.content.Context
 import com.sbro.emucorea.core.DocumentPathResolver
 import com.sbro.emucorea.core.NativeApp
+import com.sbro.emucorea.core.SetupValidator
+import com.sbro.emucorea.data.RetroAchievementsCatalog.parseAccountProgress
+import com.sbro.emucorea.data.RetroAchievementsCatalog.parseGameTitles
+import com.sbro.emucorea.data.RetroAchievementsCatalog.titleKey
+import com.sbro.emucorea.data.RetroAchievementsCatalog.titleKeys
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -10,13 +15,8 @@ import java.net.URLEncoder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -56,6 +56,8 @@ data class RetroAchievementsState(
     val loggedIn: Boolean = false,
     val gameLoaded: Boolean = false,
     val loading: Boolean = false,
+    val unsupportedImage: Boolean = false,
+    val imageReadError: Boolean = false,
     val richPresence: String = "",
     val lastError: String? = null,
     val user: RetroAchievementsUser? = null,
@@ -121,7 +123,7 @@ data class RetroAchievementsLibraryGame(
         get() = if (total <= 0) 0f else earned.toFloat() / total.toFloat()
 }
 
-private data class AccountProgressEntry(
+internal data class AccountProgressEntry(
     val gameId: Int,
     val earned: Int,
     val hardcore: Int,
@@ -186,9 +188,6 @@ class RetroAchievementsRepository private constructor(context: Context) {
 
     @Volatile
     private var cachedLibraryGames: List<RetroAchievementsLibraryGame> = emptyList()
-
-    @Volatile
-    private var cachedLibraryGamesAt = 0L
 
     fun hasStoredCredentials(): Boolean =
         !storedUsername.isNullOrBlank() && !storedToken.isNullOrBlank()
@@ -262,7 +261,7 @@ class RetroAchievementsRepository private constructor(context: Context) {
                     avatarUrl = it.optString("avatarUrl")
                 )
             }
-            val game = json.optJSONObject("game")?.let {
+            val game = json.optJSONObject("game")?.takeIf { it.optInt("id") > 0 }?.let {
                 RetroAchievementsGame(
                     id = it.optInt("id"),
                     title = it.optString("title"),
@@ -285,7 +284,9 @@ class RetroAchievementsRepository private constructor(context: Context) {
                 unofficial = json.optBoolean("unofficial"),
                 encore = json.optBoolean("encore"),
                 loggedIn = json.optBoolean("loggedIn"),
-                gameLoaded = json.optBoolean("gameLoaded"),
+                gameLoaded = json.optBoolean("gameLoaded") && game != null,
+                unsupportedImage = json.optBoolean("unsupportedImage"),
+                imageReadError = json.optBoolean("imageReadError"),
                 loading = json.optInt("loadState") in 1..4,
                 richPresence = json.optString("richPresence"),
                 lastError = json.optString("lastError").takeIf { it.isNotBlank() },
@@ -303,7 +304,7 @@ class RetroAchievementsRepository private constructor(context: Context) {
             } else {
                 val cached = cachedGameState
                 if (parsed.enabled && parsed.loggedIn && !parsed.loading && parsed.lastError == null &&
-                    cached?.game != null
+                    !parsed.unsupportedImage && loadedGamePath == null && cached?.game != null
                 ) {
                     // No active session: keep showing the last played game.
                     parsed.copy(game = cached.game, summary = cached.summary, gameLoaded = true)
@@ -408,30 +409,30 @@ class RetroAchievementsRepository private constructor(context: Context) {
             refreshCredentials()
             if (!enabled || !hasStoredCredentials()) return@withContext emptyList()
 
-            val now = System.currentTimeMillis()
-            if (!force && cachedLibraryGames.isNotEmpty() && now - cachedLibraryGamesAt < LIBRARY_CACHE_TTL_MS) {
-                return@withContext cachedLibraryGames
-            }
-
             val libraryGames = scanLibraryGames()
-            val progress = loadAccountProgress()
+            val progress = loadAccountProgress(force)
             val result = LinkedHashMap<String, RetroAchievementsLibraryGame>()
 
             if (progress.isNotEmpty()) {
                 val titleMap = loadGameTitles(progress.keys)
-                val byTitle = libraryGames.associateBy { it.title.toTitleKey() }
-                progress.values.forEach { entry ->
-                    val info = titleMap[entry.gameId] ?: return@forEach
-                    val raTitle = info.first.takeIf { it.isNotBlank() } ?: return@forEach
-                    val match = byTitle[raTitle.toTitleKey()] ?: return@forEach
+                val remoteByTitle = titleMap.entries.flatMap { entry ->
+                    titleKeys(entry.value.first).map { it to entry }
+                }.groupBy({ it.first }, { it.second })
+                libraryGames.forEach { match ->
+                    // Names only select a set to browse. Runtime support is always determined by hash.
+                    val keys = titleKeys(match.title) + titleKeys(match.fileName)
+                    val exact = titleMap.entries.filter { titleKey(it.value.first) in keys }
+                    val candidates = exact.ifEmpty { keys.flatMap { remoteByTitle[it].orEmpty() }.distinctBy { it.key } }
+                    val info = candidates.singleOrNull() ?: return@forEach
+                    val entry = progress[info.key] ?: return@forEach
                     result[match.path] = RetroAchievementsLibraryGame(
                         title = match.title,
                         path = match.path,
                         coverArtPath = match.coverArtPath,
                         serial = match.serial,
                         gameId = entry.gameId,
-                        raTitle = raTitle,
-                        imageUrl = info.second,
+                        raTitle = info.value.first,
+                        imageUrl = info.value.second,
                         earned = entry.earned,
                         total = entry.total
                     )
@@ -440,7 +441,7 @@ class RetroAchievementsRepository private constructor(context: Context) {
 
             val activeState = state()
             val activeGame = activeState.game
-            if (activeState.gameLoaded && activeGame != null) {
+            if (activeState.gameLoaded && activeGame != null && activeGame.id > 0) {
                 val activeItems = achievements()
                 val activeData = RetroAchievementsGameData(
                     gameId = activeGame.id,
@@ -457,7 +458,7 @@ class RetroAchievementsRepository private constructor(context: Context) {
                     gameDataCache[activeGame.id] = activeData
                 }
                 val match = libraryGames.firstOrNull {
-                    it.title.toTitleKey() == activeGame.title.toTitleKey()
+                    titleKey(it.title) == titleKey(activeGame.title)
                 }
                 val key = match?.path?.takeIf { it.isNotBlank() } ?: "id:${activeGame.id}"
                 result[key] = RetroAchievementsLibraryGame(
@@ -474,41 +475,11 @@ class RetroAchievementsRepository private constructor(context: Context) {
             }
 
             val sorted = result.values.sortedBy { it.title.lowercase() }
-            cachedLibraryGames = enrichLibraryProgress(sorted)
-            cachedLibraryGamesAt = now
+            cachedLibraryGames = sorted
             cachedLibraryGames
         }
 
     fun currentLibraryGames(): List<RetroAchievementsLibraryGame> = cachedLibraryGames
-
-    /**
-     * The console-wide progress list only reports achievement counts, so the
-     * unlocked counts for the matched games are pulled individually.
-     */
-    private suspend fun enrichLibraryProgress(
-        games: List<RetroAchievementsLibraryGame>
-    ): List<RetroAchievementsLibraryGame> {
-        if (games.isEmpty()) return games
-        val semaphore = Semaphore(4)
-        val username = storedUsername.orEmpty()
-        val token = storedToken.orEmpty()
-        return coroutineScope {
-            games.map { game ->
-                async(Dispatchers.IO) {
-                    semaphore.withPermit {
-                        val unlocked = runCatching {
-                            postRequest(
-                                "r" to "unlocks", "u" to username, "t" to token,
-                                "g" to game.gameId.toString(), "h" to "0"
-                            )?.parseUnlockIds().orEmpty()
-                        }.getOrDefault(emptySet())
-                        if (unlocked.isEmpty()) game
-                        else game.copy(earned = unlocked.size.coerceAtMost(game.total))
-                    }
-                }
-            }.awaitAll()
-        }
-    }
 
     suspend fun loadGameAchievements(game: RetroAchievementsLibraryGame): RetroAchievementsGameData? =
         withContext(Dispatchers.IO) {
@@ -530,10 +501,10 @@ class RetroAchievementsRepository private constructor(context: Context) {
             ) ?: return@withContext null
             val softcore = postRequest(
                 "r" to "unlocks", "u" to username, "t" to token, "g" to gameIdText, "h" to "0"
-            )?.parseUnlockIds().orEmpty()
+            )?.parseUnlockIds() ?: return@withContext null
             val hardcore = postRequest(
                 "r" to "unlocks", "u" to username, "t" to token, "g" to gameIdText, "h" to "1"
-            )?.parseUnlockIds().orEmpty()
+            )?.parseUnlockIds() ?: return@withContext null
             val data = patch.parsePatchGameData(game, softcore, hardcore) ?: return@withContext null
             gameDataCache[game.gameId] = data
             updateCachedLibraryGame(game.gameId, data.earnedCount, data.totalCount)
@@ -562,10 +533,8 @@ class RetroAchievementsRepository private constructor(context: Context) {
         val roots = preferences.gamePaths.first()
         if (roots.isEmpty()) return emptyList()
         val cacheRepository = GameLibraryCacheRepository(appContext)
-        return roots
-            .flatMap { root ->
-                runCatching { cacheRepository.loadSnapshot(root).games }.getOrDefault(emptyList())
-            }
+        val readableRoots = roots.filter { SetupValidator.hasCoreReadableGameFile(appContext, it) }
+        return cacheRepository.loadSnapshot(GameLibraryCacheRepository.libraryKey(readableRoots)).games
             .distinctBy { it.path }
             .sortedBy { it.title.lowercase() }
     }
@@ -581,14 +550,12 @@ class RetroAchievementsRepository private constructor(context: Context) {
             "r" to "allprogress",
             "u" to storedUsername.orEmpty(),
             "t" to storedToken.orEmpty(),
-            "c" to PLAYSTATION_CONSOLE_ID.toString()
-        ) ?: return cachedAccountProgress
+            "c" to RetroAchievementsCatalog.PSP_CONSOLE_ID.toString()
+        ) ?: error("Could not load PSP achievement catalog")
         val parsed = json.parseAccountProgress()
-        if (parsed.isNotEmpty()) {
-            cachedAccountProgress = parsed
-            cachedAccountProgressAt = now
-        }
-        return if (parsed.isNotEmpty()) parsed else cachedAccountProgress
+        cachedAccountProgress = parsed
+        cachedAccountProgressAt = now
+        return parsed
     }
 
     private fun loadGameTitles(ids: Set<Int>): Map<Int, Pair<String, String>> {
@@ -599,9 +566,10 @@ class RetroAchievementsRepository private constructor(context: Context) {
                 "u" to storedUsername.orEmpty(),
                 "t" to storedToken.orEmpty(),
                 "g" to chunk.joinToString(",")
-            ) ?: return@forEach
+            ) ?: error("Could not load achievement game titles")
             json.parseGameTitles().forEach { (id, info) -> gameTitleCache[id] = info }
         }
+        check(ids.all { gameTitleCache.containsKey(it) }) { "Incomplete achievement game titles" }
         return ids.mapNotNull { id -> gameTitleCache[id]?.let { id to it } }.toMap()
     }
 
@@ -627,66 +595,17 @@ class RetroAchievementsRepository private constructor(context: Context) {
         }.getOrNull().also { connection?.disconnect() }
     }
 
-    private fun String.parseAccountProgress(): Map<Int, AccountProgressEntry> = runCatching {
+    private fun String.parseUnlockIds(): Set<Int> {
         val root = JSONObject(this)
-        if (!root.optBoolean("Success", true)) return@runCatching emptyMap()
-        val response = root.optJSONObject("Response") ?: return@runCatching emptyMap()
-        buildMap {
-            response.keys().forEach { key ->
-                val gameId = key.toIntOrNull() ?: return@forEach
-                val item = response.optJSONObject(key) ?: return@forEach
-                val total = item.optInt("Achievements").coerceAtLeast(0)
-                if (total <= 0) return@forEach
-                put(
-                    gameId,
-                    AccountProgressEntry(
-                        gameId = gameId,
-                        earned = item.optInt("Unlocked").coerceIn(0, total),
-                        hardcore = item.optInt("UnlockedHardcore").coerceAtLeast(0),
-                        total = total
-                    )
-                )
-            }
-        }
-    }.getOrDefault(emptyMap())
-
-    private fun String.parseGameTitles(): Map<Int, Pair<String, String>> = runCatching {
-        val root = JSONObject(this)
-        if (!root.optBoolean("Success", true)) return@runCatching emptyMap()
-        buildMap {
-            root.optJSONArray("Response")?.let { response ->
-                for (index in 0 until response.length()) {
-                    val item = response.optJSONObject(index) ?: continue
-                    putRemoteGameTitle(item.optInt("ID"), item)
-                }
-            } ?: root.optJSONObject("Response")?.let { response ->
-                response.keys().forEach { key ->
-                    val item = response.optJSONObject(key) ?: return@forEach
-                    putRemoteGameTitle(key.toIntOrNull() ?: item.optInt("ID"), item)
-                }
-            }
-        }
-    }.getOrDefault(emptyMap())
-
-    private fun MutableMap<Int, Pair<String, String>>.putRemoteGameTitle(id: Int, item: JSONObject) {
-        if (id <= 0 || containsKey(id)) return
-        val image = item.optString("ImageIconURL").takeIf { it.isNotBlank() }
-            ?: item.optString("ImageIcon").takeIf { it.isNotBlank() }
-            ?: item.optString("ImageUrl").takeIf { it.isNotBlank() }
-        put(id, item.optString("Title") to normalizeImageUrl(image))
-    }
-
-    private fun String.parseUnlockIds(): Set<Int> = runCatching {
-        val root = JSONObject(this)
-        if (!root.optBoolean("Success", true)) return@runCatching emptySet()
-        val ids = root.optJSONArray("UserUnlocks") ?: return@runCatching emptySet()
-        buildSet {
+        check(root.optBoolean("Success")) { "Could not load achievement progress" }
+        val ids = root.getJSONArray("UserUnlocks")
+        return buildSet {
             for (index in 0 until ids.length()) {
                 val id = ids.optInt(index)
                 if (id > 0 && id != 101000001) add(id)
             }
         }
-    }.getOrDefault(emptySet())
+    }
 
     private fun String.parsePatchGameData(
         game: RetroAchievementsLibraryGame,
@@ -694,12 +613,13 @@ class RetroAchievementsRepository private constructor(context: Context) {
         hardcoreUnlocks: Set<Int>
     ): RetroAchievementsGameData? = runCatching {
         val root = JSONObject(this)
-        if (!root.optBoolean("Success", true)) return@runCatching null
+        if (!root.optBoolean("Success")) return@runCatching null
         val patch = root.optJSONObject("PatchData") ?: return@runCatching null
-        val array = patch.optJSONArray("Achievements")
+        val array = patch.optJSONArray("Achievements") ?: return@runCatching null
         val items = buildList {
-            for (index in 0 until (array?.length() ?: 0)) {
-                val item = array?.optJSONObject(index) ?: continue
+            for (index in 0 until array.length()) {
+                val item = array.optJSONObject(index) ?: continue
+                if (item.optInt("Flags", 3) != 3) continue
                 val title = item.optString("Title")
                 val description = item.optString("Description")
                 if (title.equals("Warning: Unknown Emulator", ignoreCase = true) ||
@@ -759,14 +679,12 @@ class RetroAchievementsRepository private constructor(context: Context) {
         }
     }
 
-    private fun String.toTitleKey(): String =
-        lowercase().substringBeforeLast('.').replace(Regex("[^a-z0-9]+"), "")
-
     fun onGameStarted(path: String) {
         ensureInitialized()
         val hashablePath = runCatching { resolveHashablePath(path) }.getOrNull() ?: path
         pendingGamePath = hashablePath
         if (!enabled || loadedGamePath == hashablePath) return
+        clearCachedGame()
         loadedGamePath = hashablePath
         NativeApp.achievementsLoadGame(hashablePath)
     }
@@ -820,7 +738,6 @@ class RetroAchievementsRepository private constructor(context: Context) {
         cachedAccountProgress = emptyMap()
         cachedAccountProgressAt = 0L
         cachedLibraryGames = emptyList()
-        cachedLibraryGamesAt = 0L
         gameDataCache.clear()
         gameTitleCache.clear()
         cachedActiveGameData = null
@@ -841,9 +758,7 @@ class RetroAchievementsRepository private constructor(context: Context) {
     fun setEncore(enabled: Boolean) = scope.launch { preferences.setRetroAchievementsEncore(enabled) }
 
     companion object {
-        private const val PLAYSTATION_CONSOLE_ID = 12
         private const val ACCOUNT_PROGRESS_TTL_MS = 15L * 60L * 1000L
-        private const val LIBRARY_CACHE_TTL_MS = 15L * 60L * 1000L
 
         @Volatile
         private var instance: RetroAchievementsRepository? = null

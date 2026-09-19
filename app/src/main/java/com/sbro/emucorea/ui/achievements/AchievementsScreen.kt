@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -64,6 +65,8 @@ import com.sbro.emucorea.data.AchievementItem
 import com.sbro.emucorea.data.RetroAchievementsGameData
 import com.sbro.emucorea.data.RetroAchievementsLibraryGame
 import com.sbro.emucorea.data.RetroAchievementsState
+import com.sbro.emucorea.ui.common.GameCoverArt
+import com.sbro.emucorea.ui.common.GameCoverAspectRatio
 import com.sbro.emucorea.ui.common.ScreenTopBar
 import com.sbro.emucorea.ui.common.appScreenTopPadding
 import com.sbro.emucorea.ui.common.navigationBarsHorizontalPaddingValues
@@ -81,6 +84,7 @@ fun AchievementsScreen(
     val state by viewModel.state.collectAsState()
     val ready by viewModel.ready.collectAsState()
     val libraryGames by viewModel.libraryGames.collectAsState()
+    val libraryError by viewModel.libraryError.collectAsState()
     val libraryLoading by viewModel.libraryLoading.collectAsState()
     val selectedGame by viewModel.selectedGame.collectAsState()
     val gameData by viewModel.gameData.collectAsState()
@@ -182,7 +186,13 @@ fun AchievementsScreen(
             }
         }
 
-        state.lastError?.let { error ->
+        if (state.unsupportedImage) {
+            item { NoticeCard(text = stringResource(R.string.achievements_unsupported_image)) }
+        }
+        if (state.imageReadError) {
+            item { NoticeCard(text = stringResource(R.string.achievements_game_unavailable), isError = true) }
+        }
+        state.lastError?.takeUnless { state.unsupportedImage || state.imageReadError }?.let { error ->
             item { NoticeCard(text = stringResource(R.string.achievements_error, error), isError = true) }
         }
 
@@ -200,7 +210,16 @@ fun AchievementsScreen(
             SectionHeader(text = stringResource(R.string.achievements_library_header))
         }
 
+        if (libraryError) {
+            item {
+                NoticeCard(text = stringResource(R.string.achievements_library_error), isError = true)
+                TextButton(onClick = { viewModel.refreshLibrary(force = true) }) {
+                    Text(stringResource(R.string.hub_retry))
+                }
+            }
+        }
         when {
+            libraryGames.isEmpty() && libraryError -> Unit
             libraryGames.isEmpty() && libraryLoading -> {
                 item { LibrarySkeleton() }
             }
@@ -210,7 +229,7 @@ fun AchievementsScreen(
             }
 
             else -> {
-                items(libraryGames, key = { it.gameId }) { game ->
+                items(libraryGames, key = { it.path.ifBlank { "id:${it.gameId}" } }) { game ->
                     LibraryGameCard(game = game, onClick = { viewModel.openGame(game) })
                 }
             }
@@ -412,9 +431,7 @@ private fun AccountSection(
 
 @Composable
 private fun LibraryGameCard(game: RetroAchievementsLibraryGame, onClick: () -> Unit) {
-    val coverModel: Any? = game.coverArtPath
-        ?.takeIf { it.isNotBlank() }
-        ?.let { path -> File(path).takeIf(File::exists) }
+    val coverPath = game.coverArtPath?.takeIf { File(it).isFile }
         ?: game.imageUrl.takeIf { it.isNotBlank() }
 
     Surface(
@@ -431,31 +448,15 @@ private fun LibraryGameCard(game: RetroAchievementsLibraryGame, onClick: () -> U
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
+            GameCoverArt(
+                coverPath = coverPath,
+                fallbackTitle = game.title,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .size(68.dp)
-                    .clip(neonShape(16.dp))
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)),
-                contentAlignment = Alignment.Center
-            ) {
-                if (coverModel != null) {
-                    AsyncImage(
-                        model = coverModel,
-                        contentDescription = game.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(68.dp)
-                            .clip(neonShape(16.dp))
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Rounded.EmojiEvents,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
+                    .width(120.dp)
+                    .aspectRatio(GameCoverAspectRatio)
+                    .clip(neonShape(12.dp))
+            )
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -814,7 +815,7 @@ private fun LibraryGameSkeletonCard(alpha: Float) {
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SkeletonBox(Modifier.size(68.dp), alpha, neonShape(16.dp))
+            SkeletonBox(Modifier.width(120.dp).aspectRatio(GameCoverAspectRatio), alpha, neonShape(16.dp))
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)

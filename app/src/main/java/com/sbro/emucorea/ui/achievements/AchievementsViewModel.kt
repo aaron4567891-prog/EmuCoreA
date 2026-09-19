@@ -39,6 +39,9 @@ class AchievementsViewModel(application: Application) : AndroidViewModel(applica
     private val _libraryLoading = MutableStateFlow(false)
     val libraryLoading: StateFlow<Boolean> = _libraryLoading.asStateFlow()
 
+    private val _libraryError = MutableStateFlow(false)
+    val libraryError: StateFlow<Boolean> = _libraryError.asStateFlow()
+
     private val _selectedGame = MutableStateFlow<RetroAchievementsLibraryGame?>(null)
     val selectedGame: StateFlow<RetroAchievementsLibraryGame?> = _selectedGame.asStateFlow()
 
@@ -83,16 +86,16 @@ class AchievementsViewModel(application: Application) : AndroidViewModel(applica
                 refreshLibrary()
             }
 
-            var wasLoggedIn = _state.value.loggedIn
+            var wasLoggedIn = _state.value.loggedIn && _state.value.enabled
             while (isActive) {
                 _state.value = withContext(Dispatchers.IO) { repository.state() }
                 _achievements.value = withContext(Dispatchers.IO) { repository.achievements() }
                 withContext(Dispatchers.IO) { repository.pollEvents() }.forEach { _events.tryEmit(it) }
 
-                if (_state.value.loggedIn && !wasLoggedIn) {
+                if (_state.value.loggedIn && _state.value.enabled && !wasLoggedIn) {
                     refreshLibrary()
                 }
-                wasLoggedIn = _state.value.loggedIn
+                wasLoggedIn = _state.value.loggedIn && _state.value.enabled
 
                 _selectedGame.value?.let { selected ->
                     if (_state.value.game?.id == selected.gameId && _state.value.gameLoaded) {
@@ -104,12 +107,14 @@ class AchievementsViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    fun refreshLibrary() {
+    fun refreshLibrary(force: Boolean = false) {
         if (_libraryLoading.value) return
         viewModelScope.launch {
             _libraryLoading.value = true
-            val games = runCatching { repository.loadLibraryAchievementGames() }.getOrDefault(emptyList())
-            _libraryGames.value = games
+            _libraryError.value = false
+            runCatching { repository.loadLibraryAchievementGames(force) }
+                .onSuccess { _libraryGames.value = it }
+                .onFailure { _libraryError.value = true }
             _libraryLoading.value = false
         }
     }
@@ -135,6 +140,7 @@ class AchievementsViewModel(application: Application) : AndroidViewModel(applica
 
     fun logout() {
         _libraryGames.value = emptyList()
+        _libraryError.value = false
         closeGame()
         repository.logout()
     }

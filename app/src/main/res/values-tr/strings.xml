@@ -2048,4 +2048,6 @@
     <string name="psp_memstick_empty_card">Henüz Memory Stick yok</string>
     <string name="psp_memstick_create_success">Memory Stick hazır.</string>
     <string name="psp_memstick_create_failure">Memory Stick oluşturulamadı.</string>
+    <string name="achievements_unsupported_image">RetroAchievements bu oyun imajını tanımıyor. Oyunun desteklenen karmalarını kontrol edin; farklı bir bölge veya sürüm gerekebilir.</string>
+    <string name="achievements_library_error">Başarım içeren oyunların tam listesi yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.</string>
 </resources>

@@ -106,6 +106,7 @@ struct CoreApi {
     bool (*load_game)(const retro_game_info*) = nullptr;
     void (*unload_game)() = nullptr;
     bool (*rewind_step)() = nullptr;
+    bool (*disc_achievement_hash)(const char*, char*) = nullptr;
 };
 
 CoreApi g_core;
@@ -284,6 +285,7 @@ bool LoadCoreLocked() {
     g_core.get_system_info = reinterpret_cast<void (*)(retro_system_info*)>(resolve("retro_get_system_info"));
     g_core.get_system_av_info = reinterpret_cast<void (*)(retro_system_av_info*)>(resolve("retro_get_system_av_info"));
     g_core.get_memory_data = reinterpret_cast<void* (*)(unsigned)>(resolve("retro_get_memory_data"));
+    g_core.disc_achievement_hash = reinterpret_cast<bool (*)(const char*, char*)>(resolve("emucorea_disc_achievement_hash"));
     g_core.get_memory_size = reinterpret_cast<size_t (*)(unsigned)>(resolve("retro_get_memory_size"));
     g_core.set_controller_port_device = reinterpret_cast<void (*)(unsigned, unsigned)>(resolve("retro_set_controller_port_device"));
     g_core.reset = reinterpret_cast<void (*)()>(resolve("retro_reset"));
@@ -1150,6 +1152,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM*, void*) {
     EmuCoreAAchievementsShutdown();
+}
+
+bool EmuCoreADiscAchievementHash(const char* path, char* hash) {
+    return g_core.disc_achievement_hash && g_core.disc_achievement_hash(path, hash);
 }
 
 void* EmuCoreAGetMemoryData(unsigned id) {

@@ -2047,4 +2047,6 @@
     <string name="psp_memstick_empty_card">Memory Stick はまだありません</string>
     <string name="psp_memstick_create_success">Memory Stick の準備ができました。</string>
     <string name="psp_memstick_create_failure">Memory Stick を作成できませんでした。</string>
+    <string name="achievements_unsupported_image">RetroAchievementsはこのゲームイメージを認識できません。対応するハッシュを確認してください。別の地域やバージョンのイメージが必要な場合があります。</string>
+    <string name="achievements_library_error">実績のあるゲームの一覧をすべて読み込めませんでした。接続を確認して再試行してください。</string>
 </resources>

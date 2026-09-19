@@ -15,6 +15,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstdio>
+#include <cctype>
 #include <cstring>
 #include <deque>
 #include <mutex>
@@ -25,6 +26,7 @@
 
 extern "C" void* EmuCoreAGetMemoryData(unsigned id);
 extern "C" size_t EmuCoreAGetMemorySize(unsigned id);
+extern "C" bool EmuCoreADiscAchievementHash(const char* path, char* hash);
 
 #include "rc_api_request.h"
 #include "rc_client.h"
@@ -87,6 +89,8 @@ struct AchievementsState
   bool unofficial = false;
   bool encore = false;
   std::string last_error;
+  bool unsupported_image = false;
+  bool image_read_error = false;
   std::deque<std::string> events;
   std::atomic<bool> has_game{false};
 
@@ -460,6 +464,7 @@ void LoginCallback(int result, const char* error_message, rc_client_t* client, v
 
 void LoadGameCallback(int result, const char* error_message, rc_client_t* client, void*)
 {
+  g_state.unsupported_image = result == RC_NO_GAME_LOADED;
   if (result == RC_OK)
   {
     g_state.last_error.clear();
@@ -595,6 +600,9 @@ extern "C" void EmuCoreAAchievementsOnSessionEnd()
 {
   std::lock_guard<std::recursive_mutex> lock(g_state.mutex);
   g_state.has_game.store(false, std::memory_order_relaxed);
+  g_state.unsupported_image = false;
+  g_state.image_read_error = false;
+  g_state.last_error.clear();
   if (g_state.client != nullptr)
     rc_client_unload_game(g_state.client);
   ReleaseMemoryLocked();
@@ -611,6 +619,9 @@ extern "C" void EmuCoreAAchievementsShutdown()
   ReleaseMemoryLocked();
   StopHttpWorkerLocked();
   g_state.has_game.store(false, std::memory_order_relaxed);
+  g_state.unsupported_image = false;
+  g_state.image_read_error = false;
+  g_state.last_error.clear();
 }
 
 // ---------------------------------------------------------------------------
@@ -740,10 +751,31 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_achievementsLoadGame(JNIEnv* env, j
   if (rc_libretro_memory_init(&g_state.memory_regions, nullptr, GetCoreMemoryInfo, RC_CONSOLE_PSP))
     g_state.memory_initialized = true;
   g_state.last_error.clear();
+  g_state.unsupported_image = false;
+  g_state.image_read_error = false;
 
   StartHttpWorkerLocked();
-  rc_client_begin_identify_and_load_game(g_state.client, RC_CONSOLE_PSP, game_path.c_str(), nullptr, 0,
+  std::string extension = game_path.substr(game_path.find_last_of('.') + 1);
+  for (char& ch : extension)
+    ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+  if (extension == "iso" || extension == "cso" || extension == "chd")
+  {
+    char hash[33] = {};
+    if (!EmuCoreADiscAchievementHash(game_path.c_str(), hash))
+    {
+      rc_client_unload_game(g_state.client);
+      g_state.image_read_error = true;
+      g_state.has_game.store(false, std::memory_order_relaxed);
+      LoadGameCallback(RC_INVALID_STATE, "Could not read game image for RetroAchievements", g_state.client, nullptr);
+      return;
+    }
+    rc_client_begin_load_game(g_state.client, hash, LoadGameCallback, nullptr);
+  }
+  else
+  {
+    rc_client_begin_identify_and_load_game(g_state.client, RC_CONSOLE_PSP, game_path.c_str(), nullptr, 0,
                                          LoadGameCallback, nullptr);
+  }
   g_state.has_game.store(true, std::memory_order_relaxed);
   PumpHttpResponsesLocked();
 }
@@ -753,6 +785,9 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_achievementsUnloadGame(JNIEnv*, job
 {
   std::lock_guard<std::recursive_mutex> lock(g_state.mutex);
   g_state.has_game.store(false, std::memory_order_relaxed);
+  g_state.unsupported_image = false;
+  g_state.image_read_error = false;
+  g_state.last_error.clear();
   if (g_state.client != nullptr)
     rc_client_unload_game(g_state.client);
   ReleaseMemoryLocked();
@@ -776,6 +811,8 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_achievementsStateJson(JNIEnv* env, 
   rc_client_t* client = g_state.client;
   const rc_client_user_t* user = client != nullptr ? rc_client_get_user_info(client) : nullptr;
   const rc_client_game_t* game = client != nullptr ? rc_client_get_game_info(client) : nullptr;
+  if (game != nullptr && game->id == 0)
+    game = nullptr;
   rc_client_user_game_summary_t summary{};
   if (client != nullptr)
     rc_client_get_user_game_summary(client, &summary);
@@ -814,7 +851,7 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_achievementsStateJson(JNIEnv* env, 
     unlocked_achievements = 0;
 
   char rich_presence[256] = "";
-  if (client != nullptr)
+  if (client != nullptr && game != nullptr)
     rc_client_get_rich_presence_message(client, rich_presence, sizeof(rich_presence));
 
   std::string json = "{";
@@ -831,6 +868,10 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_achievementsStateJson(JNIEnv* env, 
   json += user != nullptr ? "true" : "false";
   json += ",\"gameLoaded\":";
   json += game != nullptr ? "true" : "false";
+  json += ",\"imageReadError\":";
+  json += g_state.image_read_error ? "true" : "false";
+  json += ",\"unsupportedImage\":";
+  json += g_state.unsupported_image ? "true" : "false";
   json += ",\"loadState\":";
   json += std::to_string(client != nullptr ? rc_client_get_load_game_state(client) : 0);
   json += ",\"richPresence\":";

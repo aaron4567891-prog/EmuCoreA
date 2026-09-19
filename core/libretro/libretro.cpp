@@ -39,6 +39,10 @@
 #include "Core/HW/Display.h"
 #include "Core/CwCheat.h"
 #include "Core/ELF/ParamSFO.h"
+#include "Core/Loaders.h"
+#include "Core/FileSystems/BlockDevices.h"
+#include "Core/FileSystems/ISOFileSystem.h"
+#include "Common/Crypto/md5.h"
 
 #include "GPU/GPUState.h"
 #include "GPU/GPUCommon.h"
@@ -1926,6 +1930,57 @@ void retro_cheat_reset(void) {
       cheatEngine->Run();
    }
 
+}
+
+// Use the same decompression and disc reader as emulation for achievement hashes.
+extern "C" __attribute__((visibility("default"))) bool emucorea_disc_achievement_hash(const char *path, char *hash) {
+	if (!path || !hash) {
+		return false;
+	}
+	hash[0] = '\0';
+	std::unique_ptr<FileLoader> loader(ConstructFileLoader(Path(path)));
+	if (!loader || !loader->Exists()) {
+		return false;
+	}
+	std::string error;
+	std::shared_ptr<BlockDevice> blocks(ConstructBlockDevice(loader.get(), &error));
+	if (!blocks) {
+		return false;
+	}
+	SequentialHandleAllocator allocator;
+	ISOFileSystem fs(&allocator, blocks);
+	md5_context md5;
+	ppsspp_md5_starts(&md5);
+	uint8_t buffer[65536];
+	for (const char *name : {"PSP_GAME/PARAM.SFO", "PSP_GAME/SYSDIR/EBOOT.BIN"}) {
+		int handle = fs.OpenFile(name, FILEACCESS_READ);
+		if (handle < 0) {
+			return false;
+		}
+		const auto size = fs.SeekFile(handle, 0, FILEMOVE_END);
+		fs.SeekFile(handle, 0, FILEMOVE_BEGIN);
+		if (size == 0) {
+			fs.CloseFile(handle);
+			return false;
+		}
+		// Match rcheevos' 64 MiB cap for each file.
+		for (size_t remaining = std::min(size, size_t(64 * 1024 * 1024)); remaining > 0;) {
+			const size_t count = std::min(remaining, sizeof(buffer));
+			if (fs.ReadFile(handle, buffer, count) != count) {
+				fs.CloseFile(handle);
+				return false;
+			}
+			ppsspp_md5_update(&md5, buffer, count);
+			remaining -= count;
+		}
+		fs.CloseFile(handle);
+	}
+	uint8_t digest[16];
+	ppsspp_md5_finish(&md5, digest);
+	for (size_t i = 0; i < sizeof(digest); ++i) {
+		snprintf(hash + i * 2, 3, "%02x", digest[i]);
+	}
+	return true;
 }
 
 // EmuCoreA writes a complete PPSSPP CWCheat file for the selected game. The

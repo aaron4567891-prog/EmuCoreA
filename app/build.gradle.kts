@@ -179,6 +179,7 @@ dependencies {
         implementation(files(sdkDir.resolve("discord_partner_sdk.aar")))
     }
     testImplementation(libs.junit)
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)

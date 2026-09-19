@@ -2049,4 +2049,6 @@
     <string name="psp_memstick_empty_card">尚未建立 Memory Stick</string>
     <string name="psp_memstick_create_success">Memory Stick 已準備就緒。</string>
     <string name="psp_memstick_create_failure">無法建立 Memory Stick。</string>
+    <string name="achievements_unsupported_image">RetroAchievements 无法识别此游戏镜像。请检查游戏支持的哈希值；可能需要其他地区或版本的镜像。</string>
+    <string name="achievements_library_error">无法加载包含成就的完整游戏列表。请检查网络连接后重试。</string>
 </resources>

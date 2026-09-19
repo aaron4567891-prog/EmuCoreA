@@ -2050,4 +2050,6 @@
     <string name="psp_memstick_empty_card">Ainda não há Memory Stick</string>
     <string name="psp_memstick_create_success">Memory Stick pronto.</string>
     <string name="psp_memstick_create_failure">Não foi possível criar o Memory Stick.</string>
+    <string name="achievements_unsupported_image">O RetroAchievements não reconhece esta imagem do jogo. Verifique os hashes compatíveis; pode ser necessária outra região ou versão.</string>
+    <string name="achievements_library_error">Não foi possível carregar a lista completa de jogos com conquistas. Verifique a conexão e tente novamente.</string>
 </resources>
