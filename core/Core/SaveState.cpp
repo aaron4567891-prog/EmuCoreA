@@ -838,8 +838,9 @@ int g_screenshotFailures;
 	// NOTE: This can cause ending of the current renderpass, due to the readback needed for the screenshot.
 	// TODO: This should run the actual operations on a thread. While this returns true (for example), emulation
 	// *must* not run further, in order not to disturb the current state operation.
-	void Process() {
-		rewindStates.Process();
+	void Process(bool captureRewind) {
+		if (captureRewind)
+			rewindStates.Process();
 
 		if (!needsProcess)
 			return;

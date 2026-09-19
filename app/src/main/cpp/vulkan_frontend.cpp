@@ -133,7 +133,7 @@ struct State {
     VkCommandPool command_pool = VK_NULL_HANDLE;
     VkCommandBuffer command_buffer = VK_NULL_HANDLE;
     VkSemaphore acquire_semaphore = VK_NULL_HANDLE;
-    VkSemaphore present_semaphore = VK_NULL_HANDLE;
+    std::vector<VkSemaphore> present_semaphores;
     VkFence frame_fence = VK_NULL_HANDLE;
 
     ANativeWindow* preparation_window = nullptr;
@@ -157,6 +157,7 @@ struct State {
     retro_vulkan_image frame_image = {};
     bool has_frame_image = false;
     uint32_t sync_index = 0;
+    uint32_t submitted_sync_index = UINT32_MAX;
 };
 
 State g_vk;
@@ -402,8 +403,7 @@ bool CreateDevice() {
 
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    if (vkCreateSemaphore(g_vk.device, &semaphore_info, nullptr, &g_vk.acquire_semaphore) != VK_SUCCESS ||
-        vkCreateSemaphore(g_vk.device, &semaphore_info, nullptr, &g_vk.present_semaphore) != VK_SUCCESS) {
+    if (vkCreateSemaphore(g_vk.device, &semaphore_info, nullptr, &g_vk.acquire_semaphore) != VK_SUCCESS) {
         VK_LOGE("vkCreateSemaphore failed");
         return false;
     }
@@ -868,6 +868,10 @@ void DestroySwapchain() {
         if (view != VK_NULL_HANDLE) vkDestroyImageView(g_vk.device, view, nullptr);
     }
     g_vk.swapchain_views.clear();
+    for (VkSemaphore semaphore : g_vk.present_semaphores) {
+        if (semaphore != VK_NULL_HANDLE) vkDestroySemaphore(g_vk.device, semaphore, nullptr);
+    }
+    g_vk.present_semaphores.clear();
     if (g_vk.swapchain == VK_NULL_HANDLE) return;
     g_vk.pfn_destroy_swapchain(g_vk.device, g_vk.swapchain, nullptr);
     g_vk.swapchain = VK_NULL_HANDLE;
@@ -980,6 +984,15 @@ bool CreateSwapchain() {
     g_vk.swapchain_images.resize(actual_count);
     vkGetSwapchainImagesKHR(g_vk.device, g_vk.swapchain, &actual_count, g_vk.swapchain_images.data());
     g_vk.swapchain_initialized.assign(actual_count, false);
+    // Reacquiring an image guarantees its previous presentation consumed this semaphore.
+    g_vk.present_semaphores.assign(actual_count, VK_NULL_HANDLE);
+    VkSemaphoreCreateInfo semaphore_info{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+    for (VkSemaphore& semaphore : g_vk.present_semaphores) {
+        if (vkCreateSemaphore(g_vk.device, &semaphore_info, nullptr, &semaphore) != VK_SUCCESS) {
+            DestroySwapchain();
+            return false;
+        }
+    }
     g_vk.swapchain_format = format.format;
     g_vk.swapchain_extent = extent;
     g_vk.swapchain_transform = capabilities.currentTransform;
@@ -1057,14 +1070,17 @@ uint32_t GetSyncIndex(void*) {
 }
 
 uint32_t GetSyncIndexMask(void*) {
-    const uint32_t count = static_cast<uint32_t>(g_vk.swapchain_images.size());
-    return count > 0 ? ((1u << count) - 1u) : 1u;
+    // Core output images are independent of Android's acquired swapchain image.
+    return 3u;
 }
 
 void SetCommandBuffers(void*, uint32_t, const VkCommandBuffer*) {}
 
 void WaitSyncIndex(void*) {
     if (g_vk.device == VK_NULL_HANDLE || g_vk.frame_fence == VK_NULL_HANDLE) return;
+    // Present waits for the preceding submission before reusing its command
+    // buffer. With alternating core images, only the latest image can be in use.
+    if (g_vk.sync_index != g_vk.submitted_sync_index) return;
     vkWaitForFences(g_vk.device, 1, &g_vk.frame_fence, VK_TRUE, kFenceWaitTimeoutNs);
 }
 
@@ -1548,7 +1564,6 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
         VK_LOGW("Vulkan frame fence timed out");
         return false;
     }
-    vkResetFences(g_vk.device, 1, &g_vk.frame_fence);
 
     uint32_t swapchain_index = 0;
     VkResult result = g_vk.pfn_acquire(g_vk.device, g_vk.swapchain, UINT64_MAX, g_vk.acquire_semaphore,
@@ -1623,8 +1638,11 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = &g_vk.command_buffer;
     submit_info.signalSemaphoreCount = 1;
-    submit_info.pSignalSemaphores = &g_vk.present_semaphore;
+    submit_info.pSignalSemaphores = &g_vk.present_semaphores[swapchain_index];
+    std::unique_lock<std::mutex> queue_lock(g_queue_mutex);
+    vkResetFences(g_vk.device, 1, &g_vk.frame_fence);
     if (vkQueueSubmit(g_vk.queue, 1, &submit_info, g_vk.frame_fence) != VK_SUCCESS) {
+        g_vk.failed = true;
         VK_LOGW("vkQueueSubmit failed");
         return false;
     }
@@ -1632,13 +1650,15 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.waitSemaphoreCount = 1;
-    present_info.pWaitSemaphores = &g_vk.present_semaphore;
+    present_info.pWaitSemaphores = &g_vk.present_semaphores[swapchain_index];
     present_info.swapchainCount = 1;
     present_info.pSwapchains = &g_vk.swapchain;
     present_info.pImageIndices = &swapchain_index;
     result = g_vk.pfn_queue_present(g_vk.present_queue, &present_info);
+    queue_lock.unlock();
     g_vk.swapchain_initialized[swapchain_index] = true;
-    g_vk.sync_index = swapchain_index;
+    g_vk.submitted_sync_index = g_vk.sync_index;
+    g_vk.sync_index = (g_vk.sync_index + 1) % 2;
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         RecreateSwapchain();
@@ -1646,11 +1666,7 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
         VK_LOGW("vkQueuePresentKHR failed (0x%x)", result);
         return false;
     }
-    // The core reuses a single frame texture for every frame. Without waiting
-    // for this frame's blit to finish, the core starts overwriting that texture
-    // while the GPU is still sampling it, which shows up as trails/ghosting of
-    // the previous frame during menu transitions.
-    vkWaitForFences(g_vk.device, 1, &g_vk.frame_fence, VK_TRUE, kFenceWaitTimeoutNs);
+    // The next core frame uses the other image while this submission finishes.
     return true;
 }
 
@@ -1664,8 +1680,6 @@ void Destroy() {
         if (g_vk.command_pool != VK_NULL_HANDLE) vkDestroyCommandPool(g_vk.device, g_vk.command_pool, nullptr);
         if (g_vk.acquire_semaphore != VK_NULL_HANDLE)
             vkDestroySemaphore(g_vk.device, g_vk.acquire_semaphore, nullptr);
-        if (g_vk.present_semaphore != VK_NULL_HANDLE)
-            vkDestroySemaphore(g_vk.device, g_vk.present_semaphore, nullptr);
         if (g_vk.frame_fence != VK_NULL_HANDLE) vkDestroyFence(g_vk.device, g_vk.frame_fence, nullptr);
         if (g_vk.effect_descriptor_pool != VK_NULL_HANDLE)
             vkDestroyDescriptorPool(g_vk.device, g_vk.effect_descriptor_pool, nullptr);

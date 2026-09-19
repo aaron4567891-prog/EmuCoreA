@@ -190,6 +190,11 @@ void LibretroVulkanContext::CreateDrawContext() {
    vk->SetPresentation(std::move(libretroPresentation));
 
    bool useMultiThreading = g_Config.bRenderMultiThreading;
+#if defined(__ANDROID__)
+   // The frontend consumes this frame immediately in SwapBuffers(). Submitting
+   // on this thread avoids waking a worker only to wait for it again.
+   useMultiThreading = false;
+#endif
    if (g_Config.iInflightFrames == 1) {
       useMultiThreading = false;
    }

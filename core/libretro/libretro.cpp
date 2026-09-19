@@ -1244,7 +1244,10 @@ void retro_init(void)
 
    // Log levels must be set after g_Config.Load
 #ifdef NDEBUG
-   g_logManager.SetAllLogLevels(LogLevel::LWARNING);
+   g_Config.bEnableLogging = false;
+   g_Config.bRemoteDebuggerOnStartup = false;
+   g_logManager.SetAllLogEnable(false);
+   g_logManager.SetOutputsEnabled(static_cast<LogOutput>(0));
 #else
    g_logManager.SetAllLogLevels(LogLevel::LINFO);
 #endif
@@ -1385,7 +1388,7 @@ namespace Libretro {
       // The standalone PPSSPP UI processes queued rewind operations and
       // captures periodic rewind snapshots here. The libretro frame loop
       // must do the same or CanRewind() remains false forever.
-      SaveState::Process();
+      SaveState::Process(useEmuThread);
       ctx->SetRenderTarget();
       Draw::DrawContext *draw = ctx->GetDrawContext();
       if (draw) {
@@ -1801,6 +1804,11 @@ void retro_run(void) {
    VsyncSwapIntervalDetect();
    ctx->SwapBuffers();
    upload_output_audio_buffer();
+   // Capture rewind snapshots after submitting video and audio, so copying the
+   // state can overlap GPU work instead of delaying this frame's submission.
+   // The threaded renderer processes states on its own emulation thread.
+   if (!useEmuThread)
+      SaveState::Process();
    if (rumble_interface.set_rumble_state) {
       rumble_interface.set_rumble_state(0, RETRO_RUMBLE_STRONG,
          sceCtrlGetLeftVibration());

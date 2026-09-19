@@ -12,6 +12,7 @@
 //   * controller state forwarding into retro_input_state,
 //   * save-state (retro_serialize) file IO.
 #include <jni.h>
+#include "audio_resampler.h"
 
 #include <android/log.h>
 #include <android/native_window.h>
@@ -164,6 +165,8 @@ struct FrontendState {
     std::vector<int16_t> audio_ring;
     size_t audio_read_frame = 0;
     size_t audio_write_frame = 0;
+    uint64_t audio_generation = 0;
+    std::atomic<double> audio_playback_rate{1.0};
     std::atomic<int32_t> audio_declick_frames{0};
 
     // AAudio output configuration, applied when the next stream is opened.
@@ -583,6 +586,8 @@ namespace {
 
 struct AudioOutput {
     AAudioStream* stream = nullptr;
+    emucorea::AudioResampler resampler;
+    uint64_t audio_generation = 0;
     int32_t sample_rate = 44100;
     int32_t device_buffer_frames = 0;
     int32_t pacing_high_water_frames = 0;
@@ -598,8 +603,8 @@ struct AudioOutput {
 void AudioRingEnsureCapacity(size_t additional_frames) {
     const size_t capacity = kAudioRingCapacityFrames;
     size_t occupied = (g_frontend.audio_write_frame + capacity - g_frontend.audio_read_frame) % capacity;
-    if (occupied + additional_frames <= capacity) return;
-    const size_t drop = occupied + additional_frames - capacity;
+    if (occupied + additional_frames < capacity) return;
+    const size_t drop = occupied + additional_frames - (capacity - 1);
     g_frontend.audio_read_frame = (g_frontend.audio_read_frame + drop) % capacity;
     g_frontend.audio_declick_frames.store(kAudioDeclickFrames);
 }
@@ -649,19 +654,22 @@ aaudio_data_callback_result_t AudioDataCallback(AAudioStream*, void* user_data, 
 
     {
         std::lock_guard<std::mutex> lock(g_frontend.audio_mutex);
-        const size_t available =
-            (g_frontend.audio_write_frame + capacity - g_frontend.audio_read_frame) % capacity;
-        to_read = std::min(static_cast<size_t>(num_frames), available);
+        if (output->audio_generation != g_frontend.audio_generation) {
+            output->resampler.Reset();
+            output->audio_generation = g_frontend.audio_generation;
+        }
+        to_read = output->resampler.Read(g_frontend.audio_ring.data(), capacity,
+            g_frontend.audio_read_frame, g_frontend.audio_write_frame,
+            static_cast<size_t>(output->pacing_high_water_frames),
+            out, static_cast<size_t>(num_frames), g_frontend.audio_playback_rate.load());
         for (size_t i = 0; i < to_read; i++) {
-            const size_t slot = g_frontend.audio_read_frame;
             float frame_gain = gain;
             if (declick > 0) {
                 frame_gain *= 1.0f - static_cast<float>(declick) / static_cast<float>(kAudioDeclickFrames);
                 declick--;
             }
-            out[i * 2 + 0] = static_cast<int16_t>(g_frontend.audio_ring[slot * 2 + 0] * frame_gain);
-            out[i * 2 + 1] = static_cast<int16_t>(g_frontend.audio_ring[slot * 2 + 1] * frame_gain);
-            g_frontend.audio_read_frame = (slot + 1) % capacity;
+            out[i * 2 + 0] = static_cast<int16_t>(out[i * 2 + 0] * frame_gain);
+            out[i * 2 + 1] = static_cast<int16_t>(out[i * 2 + 1] * frame_gain);
         }
     }
 
@@ -1681,10 +1689,16 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_setAudioGain(JNIEnv*, jobject, jflo
 }
 
 JNIEXPORT void JNICALL
+Java_com_sbro_emucorea_core_NativeCoreBridge_setAudioPlaybackRate(JNIEnv*, jobject, jdouble rate) {
+    if (std::isfinite(rate)) g_frontend.audio_playback_rate.store(std::clamp(rate, 0.25, 2.0));
+}
+
+JNIEXPORT void JNICALL
 Java_com_sbro_emucorea_core_NativeCoreBridge_resetAudioQueue(JNIEnv*, jobject) {
     std::lock_guard<std::mutex> lock(g_frontend.audio_mutex);
     g_frontend.audio_read_frame = 0;
     g_frontend.audio_write_frame = 0;
+    ++g_frontend.audio_generation;
     g_frontend.audio_declick_frames.store(0);
 }
 
@@ -1740,12 +1754,13 @@ JNIEXPORT void JNICALL
 Java_com_sbro_emucorea_core_NativeCoreBridge_destroyAudioOutput(JNIEnv*, jobject, jlong handle) {
     if (handle == 0) return;
     auto* output = reinterpret_cast<AudioOutput*>(handle);
-    std::lock_guard<std::mutex> lock(output->mutex);
+    std::unique_lock<std::mutex> lock(output->mutex);
     if (output->stream != nullptr) {
         AAudioStream_requestStop(output->stream);
         AAudioStream_close(output->stream);
         output->stream = nullptr;
     }
+    lock.unlock();
     delete output;
 }
 
@@ -1795,6 +1810,7 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_flushAudioOutput(JNIEnv*, jobject, 
         std::lock_guard<std::mutex> lock(g_frontend.audio_mutex);
         g_frontend.audio_read_frame = 0;
         g_frontend.audio_write_frame = 0;
+        ++g_frontend.audio_generation;
         g_frontend.audio_declick_frames.store(0);
     }
     return 0;

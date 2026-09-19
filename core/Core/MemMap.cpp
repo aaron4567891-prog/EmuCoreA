@@ -374,7 +374,12 @@ static void DoMemoryVoid(PointerWrap &p, uint32_t start, uint32_t size) {
 		ParallelMemcpy(&g_threadManager, d, storage, size);
 		break;
 	case PointerWrap::MODE_WRITE:
+#if defined(__LIBRETRO__) && PPSSPP_PLATFORM(ANDROID)
+		// Keep snapshot copies on the frame thread to avoid worker scheduling stalls.
+		memcpy(storage, d, size);
+#else
 		ParallelMemcpy(&g_threadManager, storage, d, size);
+#endif
 		break;
 	case PointerWrap::MODE_MEASURE:
 		// Nothing to do here.

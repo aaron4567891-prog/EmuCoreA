@@ -118,8 +118,8 @@ namespace SaveState {
 	// Returns true if state is from an older PPSSPP version.
 	bool IsOldVersion();
 
-	// Check if there's any save stating needing to be done.  Normally called once per frame.
-	void Process();
+	// Process queued operations. A frontend may defer rewind capture until after presentation.
+	void Process(bool captureRewind = true);
 
 	// Notify save state code that new save data has been written.
 	void NotifySaveData();

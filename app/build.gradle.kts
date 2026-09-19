@@ -87,6 +87,8 @@ android {
             }
         }
         release {
+            isDebuggable = false
+            isJniDebuggable = false
             // AGP configures CMake with CMAKE_BUILD_TYPE=RelWithDebInfo, whose
             // default flags are "-O2 -g -DNDEBUG" and are appended after any -O3
             // given through cFlags/cppFlags, so that -O2 would win. Replace the

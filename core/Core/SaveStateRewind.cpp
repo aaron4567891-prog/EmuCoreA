@@ -116,6 +116,22 @@ void StateRingbuffer::Compress(std::vector<u8> &result, const std::vector<u8> &s
 		}
 	}
 
+	// Preallocate on the compression thread, including headroom for small state
+	// growth. Preserve existing bases because older snapshots still use them.
+	const size_t requiredCapacity = state.size() + 64 * 1024;
+	const size_t preparedSize = state.size() + 1024 * 1024;
+	auto prepare = [&](std::vector<u8> &candidate) {
+		if (candidate.capacity() < requiredCapacity) {
+			const size_t originalSize = candidate.size();
+			candidate.resize(preparedSize);
+			if (originalSize != 0)
+				candidate.resize(originalSize);
+		}
+	};
+	for (auto &candidate : bases_)
+		prepare(candidate);
+	prepare(buffer_);
+
 	double taken_s = time_now_d() - start_time;
 	DEBUG_LOG(Log::SaveState, "Rewind: Compressed save from %d bytes to %d in %0.2f ms.", (int)state.size(), (int)result.size(), taken_s * 1000.0);
 }
