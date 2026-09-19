@@ -45,7 +45,7 @@ The catalogs credit the original sources. Redistributable files are mirrored in 
 
 ## Credits and license
 
-EmuCoreA builds on PPSSPP and the libretro interface. The vendored core retains its upstream copyright and license notices in `core/`, including [PPSSPP's license](core/LICENSE.TXT). The root [LICENSE](LICENSE) reproduces the upstream license text. Dependencies under `core/ext/`, `core/ffmpeg/`, and other bundled components retain their own notices. The Android application code is maintained as part of EmuCoreA and has separate terms.
+EmuCoreA builds on PPSSPP and the libretro interface. The root [LICENSE.TXT](LICENSE.TXT) is an exact copy of PPSSPP's upstream license file. The vendored core and its dependencies retain their copyright and license notices in `core/`.
 
 Thanks to the PPSSPP and libretro contributors and to the RetroAchievements team for rcheevos.
 

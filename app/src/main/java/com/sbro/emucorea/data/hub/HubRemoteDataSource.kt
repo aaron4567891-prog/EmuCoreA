@@ -173,7 +173,7 @@ class HubRemoteDataSource(context: Context) {
         val parsed = URL(url)
         require(parsed.protocol == "https")
         require(parsed.host == "raw.githubusercontent.com")
-        require(parsed.path == "/sashkinbro/EmuCoreAX-News-Media-Hub/$commit/catalog/v1/manifest.json")
+        require(parsed.path == "/sashkinbro/EmuCoreX-News-Media-Hub/$commit/catalog/v1/manifest.json")
     }
 
     private fun resolvePinnedUrl(baseUrl: String, relativePath: String?): String {
@@ -186,9 +186,9 @@ class HubRemoteDataSource(context: Context) {
     }
 
     companion object {
-        const val CHANNEL_URL = "https://raw.githubusercontent.com/sashkinbro/EmuCoreAX-News-Media-Hub/refs/heads/main/channels/stable-v1.json"
-        const val CHANNEL_SIGNATURE_URL = "https://raw.githubusercontent.com/sashkinbro/EmuCoreAX-News-Media-Hub/refs/heads/main/channels/stable-v1.sig"
-        // The signed shared catalog versions its wire contract with the EmuCoreAX client code.
+        const val CHANNEL_URL = "https://raw.githubusercontent.com/sashkinbro/EmuCoreX-News-Media-Hub/refs/heads/main/channels/stable-v1.json"
+        const val CHANNEL_SIGNATURE_URL = "https://raw.githubusercontent.com/sashkinbro/EmuCoreX-News-Media-Hub/refs/heads/main/channels/stable-v1.sig"
+        // The signed shared catalog versions its wire contract with the EmuCoreX client code.
         // EmuCoreA implements that contract independently of its Android package version.
         private const val HUB_PROTOCOL_CLIENT_VERSION_CODE = 166
         private const val SUPPORTED_CHANNEL_FORMAT = 1

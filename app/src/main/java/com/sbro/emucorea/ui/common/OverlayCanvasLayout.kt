@@ -294,7 +294,9 @@ fun buildOverlayCanvasLayout(
     } else {
         OverlayPrimaryControlGapPortrait
     }) * responsiveScale
-    val leftStickRowStart = if (extraDpadLayout.visible) {
+    val leftStickRowStart = if (isLandscape && extraDpadLayout.visible) {
+        edgePadStart + (extraDpadSize - leftStickPanelWidth) / 2f
+    } else if (extraDpadLayout.visible) {
         edgePadStart + extraDpadSize + primaryControlGap
     } else {
         edgePadStart

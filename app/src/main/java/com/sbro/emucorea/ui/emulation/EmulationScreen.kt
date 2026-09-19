@@ -1047,7 +1047,7 @@ fun EmulationScreen(
         // The native core owns performance statistics when its OSD is enabled.
         // Toast notifications
         AnimatedVisibility(
-            visible = (shouldShowOverlay || showOverlayShortcut) && !uiState.showMenu && !showControlsEditor,
+            visible = showOverlayShortcut && !uiState.showMenu && !showControlsEditor,
             enter = fadeIn(tween(160)) + scaleIn(initialScale = 0.88f, animationSpec = tween(180)),
             exit = fadeOut(tween(160)) + scaleOut(targetScale = 0.88f, animationSpec = tween(160)),
             modifier = Modifier
