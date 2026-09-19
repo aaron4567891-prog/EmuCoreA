@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_create_title">Memory Stick oluştur</string>
+    <string name="psp_memstick_create_action">Kart oluştur</string>
+    <string name="psp_memstick_change_action">Kapasiteyi değiştir</string>
+    <string name="psp_memstick_create_body">Sanal Memory Stick kapasitesini seçin. PPSSPP kayıtları dosya olarak saklar; disk görüntüsü oluşturulmaz.</string>
+    <string name="psp_memstick_capacity">Kapasite</string>
+    <string name="psp_memstick_capacity_value">Kapasite: %1$s</string>
+    <string name="psp_memstick_saves_count">Kayıtlı oyun: %1$d</string>
+    <string name="psp_memstick_empty_card">Henüz Memory Stick yok</string>
+    <string name="psp_memstick_create_success">Memory Stick hazır.</string>
+    <string name="psp_memstick_create_failure">Memory Stick oluşturulamadı.</string>
+</resources>

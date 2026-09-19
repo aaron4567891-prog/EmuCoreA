@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_create_title">إنشاء Memory Stick</string>
+    <string name="psp_memstick_create_action">إنشاء البطاقة</string>
+    <string name="psp_memstick_change_action">تغيير السعة</string>
+    <string name="psp_memstick_create_body">اختر سعة بطاقة Memory Stick الافتراضية. يحفظ PPSSPP بيانات الألعاب كملفات دون إنشاء صورة قرص.</string>
+    <string name="psp_memstick_capacity">السعة</string>
+    <string name="psp_memstick_capacity_value">السعة: %1$s</string>
+    <string name="psp_memstick_saves_count">الألعاب المحفوظة: %1$d</string>
+    <string name="psp_memstick_empty_card">لا توجد بطاقة Memory Stick بعد</string>
+    <string name="psp_memstick_create_success">بطاقة Memory Stick جاهزة.</string>
+    <string name="psp_memstick_create_failure">تعذر إنشاء بطاقة Memory Stick.</string>
+</resources>

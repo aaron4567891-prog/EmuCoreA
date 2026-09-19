@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_title">Memory Stick de PSP</string>
+    <string name="psp_memstick_note">PPSSPP guarda las partidas en PSP/SAVEDATA. La capacidad es virtual; no se crea una imagen de tarjeta. El tamaño elegido se aplica al volver a iniciar un juego.</string>
+    <string name="psp_memstick_backup">Copia de partidas</string>
+    <string name="psp_memstick_restore">Restaurar partidas</string>
+    <string name="psp_memstick_saves">Partidas guardadas</string>
+    <string name="psp_memstick_empty">Aún no hay partidas guardadas de PSP.</string>
+    <string name="psp_memstick_backup_success">Partidas de PSP copiadas.</string>
+    <string name="psp_memstick_backup_failure">No se pudieron copiar las partidas de PSP.</string>
+    <string name="psp_memstick_restore_success">Partidas de PSP restauradas. Se conservaron los archivos existentes.</string>
+    <string name="psp_memstick_restore_failure">No se pudieron restaurar las partidas de PSP.</string>
+</resources>

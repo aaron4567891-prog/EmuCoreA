@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_create_title">Crea Memory Stick</string>
+    <string name="psp_memstick_create_action">Crea scheda</string>
+    <string name="psp_memstick_change_action">Cambia capacità</string>
+    <string name="psp_memstick_create_body">Scegli la capacità del Memory Stick virtuale. PPSSPP salva i dati in file, senza creare un’immagine disco.</string>
+    <string name="psp_memstick_capacity">Capacità</string>
+    <string name="psp_memstick_capacity_value">Capacità: %1$s</string>
+    <string name="psp_memstick_saves_count">Salvataggi: %1$d</string>
+    <string name="psp_memstick_empty_card">Nessun Memory Stick</string>
+    <string name="psp_memstick_create_success">Memory Stick pronto.</string>
+    <string name="psp_memstick_create_failure">Impossibile creare il Memory Stick.</string>
+</resources>

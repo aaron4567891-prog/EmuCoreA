@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_create_title">建立 Memory Stick</string>
+    <string name="psp_memstick_create_action">建立記憶卡</string>
+    <string name="psp_memstick_change_action">變更容量</string>
+    <string name="psp_memstick_create_body">選擇虛擬 Memory Stick 容量。PPSSPP 將遊戲存檔儲存為檔案，不會建立磁碟映像。</string>
+    <string name="psp_memstick_capacity">容量</string>
+    <string name="psp_memstick_capacity_value">容量：%1$s</string>
+    <string name="psp_memstick_saves_count">遊戲存檔：%1$d</string>
+    <string name="psp_memstick_empty_card">尚未建立 Memory Stick</string>
+    <string name="psp_memstick_create_success">Memory Stick 已準備就緒。</string>
+    <string name="psp_memstick_create_failure">無法建立 Memory Stick。</string>
+</resources>

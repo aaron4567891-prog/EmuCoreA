@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_title">PSP Memory Stick</string>
+    <string name="psp_memstick_note">PPSSPP stores game saves in PSP/SAVEDATA. Capacity is virtual; no card image is created. The selected size applies when you next launch a game.</string>
+    <string name="psp_memstick_backup">Back up saves</string>
+    <string name="psp_memstick_restore">Restore saves</string>
+    <string name="psp_memstick_saves">Saved games</string>
+    <string name="psp_memstick_empty">No PSP saves yet.</string>
+    <string name="psp_memstick_backup_success">PSP saves backed up.</string>
+    <string name="psp_memstick_backup_failure">Could not back up PSP saves.</string>
+    <string name="psp_memstick_restore_success">PSP saves restored. Existing files were kept.</string>
+    <string name="psp_memstick_restore_failure">Could not restore PSP saves.</string>
+</resources>

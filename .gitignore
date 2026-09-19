@@ -1,0 +1,56 @@
+# Build outputs
+/build/
+/app/build/
+/app/.cxx/
+/app/.externalNativeBuild/
+/core/build/
+/core/.cxx/
+/core-android/build/
+/core-android/.cxx/
+/core-android/.externalNativeBuild/
+/.gradle/
+/.kotlin/
+/out/
+
+# Local configuration
+local.properties
+
+# IDE
+/.idea/
+*.iml
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Local IGDB catalog builder and credentials
+/IGDB/
+/public/
+
+# Local release tooling
+/tools/
+
+# Firmware / BIOS dumps - never commit
+/bios/
+*.bin
+
+# Commercial game images - never commit
+*.iso
+*.cso
+*.chd
+*.pbp
+*.cue
+*.img
+
+# Native build artifacts (generated outside ignored build dirs)
+CMakeUserPresets.json
+compile_commands.json
+
+# Firebase local state
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# NOTE about core/: its upstream .gitignore also ignores FFmpeg static libraries
+# and a shader asset required by this build. These are force-added individually.

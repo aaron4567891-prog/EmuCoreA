@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_title">PSP मेमोरी स्टिक</string>
+    <string name="psp_memstick_note">PPSSPP गेम सेव PSP/SAVEDATA में रखता है। क्षमता आभासी है; कार्ड इमेज नहीं बनाई जाती। चुना गया आकार अगली बार गेम शुरू होने पर लागू होगा।</string>
+    <string name="psp_memstick_backup">सेव का बैकअप लें</string>
+    <string name="psp_memstick_restore">सेव पुनर्स्थापित करें</string>
+    <string name="psp_memstick_saves">सहेजे गए गेम</string>
+    <string name="psp_memstick_empty">अभी कोई PSP सेव नहीं है।</string>
+    <string name="psp_memstick_backup_success">PSP सेव का बैकअप बन गया।</string>
+    <string name="psp_memstick_backup_failure">PSP सेव का बैकअप नहीं बन सका।</string>
+    <string name="psp_memstick_restore_success">PSP सेव पुनर्स्थापित हो गए। मौजूदा फ़ाइलें सुरक्षित रहीं।</string>
+    <string name="psp_memstick_restore_failure">PSP सेव पुनर्स्थापित नहीं हो सके।</string>
+</resources>

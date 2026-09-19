@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_create_title">Memory Stick を作成</string>
+    <string name="psp_memstick_create_action">カードを作成</string>
+    <string name="psp_memstick_change_action">容量を変更</string>
+    <string name="psp_memstick_create_body">仮想 Memory Stick の容量を選択します。PPSSPP はセーブデータをファイルとして保存し、ディスクイメージは作成しません。</string>
+    <string name="psp_memstick_capacity">容量</string>
+    <string name="psp_memstick_capacity_value">容量: %1$s</string>
+    <string name="psp_memstick_saves_count">セーブデータ: %1$d</string>
+    <string name="psp_memstick_empty_card">Memory Stick はまだありません</string>
+    <string name="psp_memstick_create_success">Memory Stick の準備ができました。</string>
+    <string name="psp_memstick_create_failure">Memory Stick を作成できませんでした。</string>
+</resources>

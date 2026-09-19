@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_title">Карта памяти PSP</string>
+    <string name="psp_memstick_note">PPSSPP хранит сохранения игр в PSP/SAVEDATA. Объём виртуальный: образ карты не создаётся. Выбранный размер применяется при следующем запуске игры.</string>
+    <string name="psp_memstick_backup">Резервная копия сохранений</string>
+    <string name="psp_memstick_restore">Восстановить сохранения</string>
+    <string name="psp_memstick_saves">Сохранения игр</string>
+    <string name="psp_memstick_empty">Сохранений PSP пока нет.</string>
+    <string name="psp_memstick_backup_success">Сохранения PSP скопированы.</string>
+    <string name="psp_memstick_backup_failure">Не удалось скопировать сохранения PSP.</string>
+    <string name="psp_memstick_restore_success">Сохранения PSP восстановлены. Существующие файлы сохранены.</string>
+    <string name="psp_memstick_restore_failure">Не удалось восстановить сохранения PSP.</string>
+</resources>

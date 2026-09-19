@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_title">Paměťová karta PSP</string>
+    <string name="psp_memstick_note">PPSSPP ukládá pozice her do PSP/SAVEDATA. Kapacita je virtuální; obraz karty se nevytváří. Zvolená velikost se použije při dalším spuštění hry.</string>
+    <string name="psp_memstick_backup">Zálohovat pozice</string>
+    <string name="psp_memstick_restore">Obnovit pozice</string>
+    <string name="psp_memstick_saves">Uložené hry</string>
+    <string name="psp_memstick_empty">Zatím nejsou žádné pozice PSP.</string>
+    <string name="psp_memstick_backup_success">Pozice PSP byly zálohovány.</string>
+    <string name="psp_memstick_backup_failure">Pozice PSP se nepodařilo zálohovat.</string>
+    <string name="psp_memstick_restore_success">Pozice PSP byly obnoveny. Stávající soubory zůstaly zachovány.</string>
+    <string name="psp_memstick_restore_failure">Pozice PSP se nepodařilo obnovit.</string>
+</resources>

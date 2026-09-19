@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_title">Memory Stick PSP</string>
+    <string name="psp_memstick_note">PPSSPP menyimpan data permainan di PSP/SAVEDATA. Kapasitas bersifat virtual; berkas citra kartu tidak dibuat. Ukuran yang dipilih berlaku saat permainan berikutnya dijalankan.</string>
+    <string name="psp_memstick_backup">Cadangkan data simpan</string>
+    <string name="psp_memstick_restore">Pulihkan data simpan</string>
+    <string name="psp_memstick_saves">Permainan tersimpan</string>
+    <string name="psp_memstick_empty">Belum ada data simpan PSP.</string>
+    <string name="psp_memstick_backup_success">Data simpan PSP dicadangkan.</string>
+    <string name="psp_memstick_backup_failure">Data simpan PSP gagal dicadangkan.</string>
+    <string name="psp_memstick_restore_success">Data simpan PSP dipulihkan. Berkas yang ada tetap dipertahankan.</string>
+    <string name="psp_memstick_restore_failure">Data simpan PSP gagal dipulihkan.</string>
+</resources>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_create_title">Memory Stick बनाएँ</string>
+    <string name="psp_memstick_create_action">कार्ड बनाएँ</string>
+    <string name="psp_memstick_change_action">क्षमता बदलें</string>
+    <string name="psp_memstick_create_body">वर्चुअल Memory Stick की क्षमता चुनें। PPSSPP सेव को फ़ाइलों में रखता है; डिस्क इमेज नहीं बनती।</string>
+    <string name="psp_memstick_capacity">क्षमता</string>
+    <string name="psp_memstick_capacity_value">क्षमता: %1$s</string>
+    <string name="psp_memstick_saves_count">सेव किए गए गेम: %1$d</string>
+    <string name="psp_memstick_empty_card">अभी Memory Stick नहीं है</string>
+    <string name="psp_memstick_create_success">Memory Stick तैयार है।</string>
+    <string name="psp_memstick_create_failure">Memory Stick नहीं बन सकी।</string>
+</resources>

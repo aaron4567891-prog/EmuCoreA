@@ -1,0 +1,12 @@
+<resources>
+    <string name="psp_memstick_create_title">Memory Stick erstellen</string>
+    <string name="psp_memstick_create_action">Karte erstellen</string>
+    <string name="psp_memstick_change_action">Kapazität ändern</string>
+    <string name="psp_memstick_create_body">Wähle die Kapazität des virtuellen Memory Sticks. PPSSPP speichert Spielstände als Dateien; es wird kein Datenträgerabbild angelegt.</string>
+    <string name="psp_memstick_capacity">Kapazität</string>
+    <string name="psp_memstick_capacity_value">Kapazität: %1$s</string>
+    <string name="psp_memstick_saves_count">Spielstände: %1$d</string>
+    <string name="psp_memstick_empty_card">Noch kein Memory Stick</string>
+    <string name="psp_memstick_create_success">Memory Stick ist bereit.</string>
+    <string name="psp_memstick_create_failure">Memory Stick konnte nicht erstellt werden.</string>
+</resources>
