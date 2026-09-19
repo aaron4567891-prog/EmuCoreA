@@ -726,14 +726,19 @@ RectF FitDisplayRect(int win_width, int win_height, double aspect) {
             static_cast<float>(top + height)};
 }
 
-RectF DisplayRectForMode(int win_width, int win_height, double core_aspect) {
-    switch (g_frontend.display_aspect_mode.load()) {
-        case 0: return {0.0f, 0.0f, static_cast<float>(win_width), static_cast<float>(win_height)};
-        case 2: return FitDisplayRect(win_width, win_height, 4.0 / 3.0);
-        case 3: return FitDisplayRect(win_width, win_height, 16.0 / 9.0);
-        case 4: return FitDisplayRect(win_width, win_height, 10.0 / 7.0);
-        default: return FitDisplayRect(win_width, win_height, core_aspect);
+double DisplayAspectForMode(int mode, double core_aspect) {
+    switch (mode) {
+        case 2: return 4.0 / 3.0;
+        case 3: return 16.0 / 9.0;
+        case 4: return 10.0 / 7.0;
+        default: return core_aspect;
     }
+}
+
+RectF DisplayRectForMode(int win_width, int win_height, double core_aspect) {
+    const int mode = g_frontend.display_aspect_mode.load();
+    if (mode == 0) return {0.0f, 0.0f, static_cast<float>(win_width), static_cast<float>(win_height)};
+    return FitDisplayRect(win_width, win_height, DisplayAspectForMode(mode, core_aspect));
 }
 
 bool CreateEglContext(ANativeWindow* window) {
@@ -1056,8 +1061,9 @@ void RetroVideoRefresh(const void* data, unsigned width, unsigned height, size_t
         g_frontend.frame_width = width;
         g_frontend.frame_height = height;
         if (vulkan::IsActive()) {
-            const bool stretch = g_frontend.display_aspect_mode.load() == 0;
-            vulkan::Present(width, height, g_frontend.aspect_ratio, stretch);
+            const int mode = g_frontend.display_aspect_mode.load();
+            const double aspect = DisplayAspectForMode(mode, g_frontend.aspect_ratio);
+            vulkan::Present(width, height, aspect, mode == 0, mode == 1);
             return;
         }
         PresentHardwareFrame(static_cast<GLsizei>(width), static_cast<GLsizei>(height));

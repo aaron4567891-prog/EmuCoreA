@@ -1554,7 +1554,8 @@ bool EnsureContext(ANativeWindow* window, uint32_t window_generation) {
     return true;
 }
 
-bool Present(uint32_t source_width, uint32_t source_height, double display_aspect, bool stretch) {
+bool Present(uint32_t source_width, uint32_t source_height, double display_aspect, bool stretch,
+             bool adjust_aspect_for_crop) {
     if (!IsActive() || g_vk.device == VK_NULL_HANDLE || g_vk.swapchain == VK_NULL_HANDLE || !g_vk.has_frame_image) {
         return false;
     }
@@ -1592,7 +1593,7 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
         ? CropRect{0, 0, 0, 0}
         : ClampCrop(CropRect{g_vk.crop_left, g_vk.crop_top, g_vk.crop_right, g_vk.crop_bottom},
                     source_width, source_height);
-    if (IsCropActive(crop)) {
+    if (adjust_aspect_for_crop && IsCropActive(crop)) {
         // The caller's aspect describes the full frame; rescale it for the
         // trimmed region so the fit stays undistorted.
         const double source_aspect = static_cast<double>(source_width) / static_cast<double>(source_height);
