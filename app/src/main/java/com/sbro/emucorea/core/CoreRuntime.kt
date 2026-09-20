@@ -399,12 +399,14 @@ internal object CoreRuntime {
     }
 
     private fun pspTextureFilterName(): String {
-        // PPSSPP's own default is Auto. Only the app's explicit texture filter
-        // choice overrides it; otherwise low-resolution effects such as Tekken
-        // 6's title flame render as blocks with nearest-neighbour sampling.
+        // The shared GS filter setting defaults to 0, which the PS1 mapping reads
+        // as Nearest. PPSSPP's own default is Auto, and forcing nearest turns
+        // low-resolution effects such as Tekken 6's title flame into blocks, so 0
+        // means Auto here. An explicit choice in the PSP core options ("Texture
+        // Filtering") is applied afterwards and still wins.
         val filter = settings["EmuCoreA/GS:filter"]?.toIntOrNull() ?: return "Auto"
         return when {
-            filter <= 0 -> "Nearest"
+            filter <= 0 -> "Auto"
             filter == 1 -> "Linear"
             else -> "Auto max quality"
         }

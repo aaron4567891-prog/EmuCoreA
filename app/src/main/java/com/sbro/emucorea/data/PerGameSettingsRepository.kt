@@ -6,6 +6,7 @@ import com.sbro.emucorea.core.EmulatorBridge
 import com.sbro.emucorea.core.EmulatorStorage
 import com.sbro.emucorea.core.GsHackDefaults
 import com.sbro.emucorea.core.RendererDefaults
+import com.sbro.emucorea.core.UPSCALE_DEFAULT
 import com.sbro.emucorea.core.normalizeUpscale
 import org.json.JSONArray
 import org.json.JSONObject
@@ -19,7 +20,7 @@ data class PerGameSettings(
     val gpuDriverType: Int = 0,
     val customDriverPath: String? = null,
     val mediatekAngleOpenGl: Boolean = false,
-    val upscaleMultiplier: Float = 1f,
+    val upscaleMultiplier: Float = UPSCALE_DEFAULT,
     val aspectRatio: Int = 1,
     val localMultiplayerMode: Int = AppPreferences.LOCAL_MULTIPLAYER_OFF,
     val displayCrop: DisplayCrop = DisplayCrop.None,
@@ -823,8 +824,8 @@ private fun JSONObject.readUpscaleMultiplier(): Float {
     val doubleValue = optDouble("upscaleMultiplier", Double.NaN)
     return when {
         !doubleValue.isNaN() -> doubleValue.toFloat()
-        has("upscaleMultiplier") -> optInt("upscaleMultiplier", 1).toFloat()
-        else -> 1f
+        has("upscaleMultiplier") -> optInt("upscaleMultiplier", UPSCALE_DEFAULT.toInt()).toFloat()
+        else -> UPSCALE_DEFAULT
     }.let(::normalizeUpscale)
 }
 

@@ -24,6 +24,7 @@ import com.sbro.emucorea.core.NativeApp
 import com.sbro.emucorea.core.SetupValidator
 import com.sbro.emucorea.core.StorageAccess
 import com.sbro.emucorea.core.TvInterfaceMode
+import com.sbro.emucorea.core.UPSCALE_DEFAULT
 import com.sbro.emucorea.core.normalizeUpscale
 import com.sbro.emucorea.data.AppPreferences
 import com.sbro.emucorea.data.DisplayCrop
@@ -121,7 +122,7 @@ data class SettingsUiState(
     val languageTag: String? = null,
     val tvInterfaceMode: TvInterfaceMode = TvInterfaceMode.AUTO,
     val renderer: Int = RendererDefaults.defaultForHardware(),
-    val upscaleMultiplier: Float = 1f,
+    val upscaleMultiplier: Float = UPSCALE_DEFAULT,
     val aspectRatio: Int = 1,
     val localMultiplayerMode: Int = AppPreferences.LOCAL_MULTIPLAYER_OFF,
     val displayCrop: DisplayCrop = DisplayCrop.None,

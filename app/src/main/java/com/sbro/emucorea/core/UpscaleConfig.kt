@@ -3,6 +3,9 @@ package com.sbro.emucorea.core
 import kotlin.math.roundToInt
 
 const val UPSCALE_MIN = 1.0f
+// Fresh installs start at 2x: the PSP panel's native 480x272 looks soft on
+// modern tablet screens, and the devices this runs on handle 2x comfortably.
+const val UPSCALE_DEFAULT = 2.0f
 // The bundled PPSSPP option table tops out at 4800x2720 (10x).
 const val UPSCALE_MAX = 10.0f
 

@@ -19,6 +19,7 @@ import com.sbro.emucorea.core.PerformanceProfiles
 import com.sbro.emucorea.core.PerformancePresets
 import com.sbro.emucorea.core.RendererDefaults
 import com.sbro.emucorea.core.TvInterfaceMode
+import com.sbro.emucorea.core.UPSCALE_DEFAULT
 import com.sbro.emucorea.core.normalizeUpscale
 import com.sbro.emucorea.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.Flow
@@ -68,7 +69,7 @@ data class SettingsSnapshot(
     val performanceProfile: Int = PerformanceProfiles.SAFE,
     val gpuHardwareProfile: Int = GpuHardwareProfiles.ADRENO,
     val renderer: Int = RendererDefaults.defaultForHardware(),
-    val upscaleMultiplier: Float = 1f,
+    val upscaleMultiplier: Float = UPSCALE_DEFAULT,
     val aspectRatio: Int = 1,
     val displayCrop: DisplayCrop = DisplayCrop.None,
     val shaderChainEnabled: Boolean = false,
@@ -4593,7 +4594,7 @@ class AppPreferences(private val context: Context) {
     private fun readUpscale(prefs: Preferences): Float {
         return (prefs[UPSCALE]
             ?: prefs[UPSCALE_LEGACY]?.toFloat()
-            ?: 1f).let(::normalizeUpscale)
+            ?: UPSCALE_DEFAULT).let(::normalizeUpscale)
     }
 
     private fun sanitizeRegionFramerate(value: Float?, fallback: Float): Float {
@@ -4630,8 +4631,8 @@ class AppPreferences(private val context: Context) {
         val doubleValue = optDouble("upscaleMultiplier", Double.NaN)
         return when {
             !doubleValue.isNaN() -> doubleValue.toFloat()
-            has("upscaleMultiplier") -> optInt("upscaleMultiplier", 1).toFloat()
-            else -> 1f
+            has("upscaleMultiplier") -> optInt("upscaleMultiplier", UPSCALE_DEFAULT.toInt()).toFloat()
+            else -> UPSCALE_DEFAULT
         }.let(::normalizeUpscale)
     }
 

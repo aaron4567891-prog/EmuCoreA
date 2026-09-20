@@ -12,6 +12,7 @@ import com.sbro.emucorea.core.GpuHardwareProfiles
 import com.sbro.emucorea.core.NativeApp
 import com.sbro.emucorea.core.SetupValidator
 import com.sbro.emucorea.core.StorageAccess
+import com.sbro.emucorea.core.UPSCALE_DEFAULT
 import com.sbro.emucorea.data.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,7 +106,7 @@ class OnboardingViewModel(application: Application) : AndroidViewModel(applicati
                 dithering = audioSettings.dithering,
                 upscaleMultiplier = EmulatorBridge.getSetting("EmuCoreA", "UpscaleMultiplier", "float")?.toFloatOrNull()
                     ?: EmulatorBridge.getSetting("EmuCoreA", "UpscaleMultiplier", "int")?.toIntOrNull()?.toFloat()
-                    ?: 1f
+                    ?: UPSCALE_DEFAULT
             )
         }
     }
