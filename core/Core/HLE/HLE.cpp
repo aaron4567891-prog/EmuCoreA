@@ -226,14 +226,15 @@ DisableHLEFlags AlwaysDisableHLEFlags() {
 	// sceUtility can load them (modules 0x103 and 0x104), so unlike the rest a game may import them
 	// without carrying a copy.
 	//
-	// sceMpeg and sceMp4 are video, and unlike the rest above they need a module we may not have -
-	// sceMp4's two are firmware-only. HLECheckModuleAvailability takes the flag back off when the
-	// module isn't there, as it does for sceFont's fonts.
+	// sceMpeg and sceMp4 are video. Upstream turned both on by default on 2026-09-18, but with a
+	// firmware installed (which EmuCoreA does) Tekken 6 then never gets past the stage loading
+	// screen. Every PPSSPP release so far ran them through HLE, so keep them there; users can still
+	// ask for the real modules through the HLE settings, and HLECheckModuleAvailability above
+	// already handles the case where neither the firmware nor the disc has one.
 	return DisableHLEFlags::scePsmf | DisableHLEFlags::scePsmfPlayer | DisableHLEFlags::sceCcc |
 		DisableHLEFlags::sceDeflt | DisableHLEFlags::sceAdler | DisableHLEFlags::sceMd5 |
 		DisableHLEFlags::sceSha256 | DisableHLEFlags::sceMt19937 | DisableHLEFlags::sceSfmt19937 |
-		DisableHLEFlags::sceHeap | DisableHLEFlags::sceFont |
-		DisableHLEFlags::sceMpeg | DisableHLEFlags::sceMp4;
+		DisableHLEFlags::sceHeap | DisableHLEFlags::sceFont;
 }
 
 // Which modules we're HLE-ing is part of the machine's state, not a live setting: it's decided
