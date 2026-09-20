@@ -2027,7 +2027,9 @@
 <string name="formats_psp_homebrew_body">PBP पैकेज और PSP के ELF या PRX प्रोग्राम भी खोले जा सकते हैं।</string>
     <string name="settings_network_tab">नेटवर्क</string>
     <string name="emulation_fast_forward">तेज़ी से आगे बढ़ाएँ (दबाए रखें)</string>
+    <string name="emulation_transport_fast_forward">फ़ास्ट-फ़ॉरवर्ड</string>
     <string name="emulation_rewind">पीछे ले जाएँ (दबाए रखें)</string>
+    <string name="emulation_transport_rewind">रिवाइंड</string>
     <string name="psp_memstick_title">PSP मेमोरी स्टिक</string>
     <string name="psp_memstick_note">PPSSPP गेम सेव PSP/SAVEDATA में रखता है। क्षमता आभासी है; कार्ड इमेज नहीं बनाई जाती। चुना गया आकार अगली बार गेम शुरू होने पर लागू होगा।</string>
     <string name="psp_memstick_backup">सेव का बैकअप लें</string>

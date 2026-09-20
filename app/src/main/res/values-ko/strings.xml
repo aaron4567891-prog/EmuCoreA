@@ -2026,7 +2026,9 @@
 <string name="formats_psp_homebrew_body">PBP 패키지와 PSP ELF 또는 PRX 실행 파일도 열 수 있습니다.</string>
     <string name="settings_network_tab">네트워크</string>
     <string name="emulation_fast_forward">빨리 감기 (길게 누르기)</string>
+    <string name="emulation_transport_fast_forward">빨리 감기</string>
     <string name="emulation_rewind">되감기 (길게 누르기)</string>
+    <string name="emulation_transport_rewind">되감기</string>
     <string name="psp_memstick_title">PSP 메모리 스틱</string>
     <string name="psp_memstick_note">PPSSPP는 게임 저장 데이터를 PSP/SAVEDATA에 저장합니다. 용량은 가상 값이며 카드 이미지 파일은 만들지 않습니다. 선택한 크기는 다음 게임 실행부터 적용됩니다.</string>
     <string name="psp_memstick_backup">저장 데이터 백업</string>

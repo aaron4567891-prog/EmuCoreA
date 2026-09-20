@@ -2041,7 +2041,9 @@
 <string name="formats_psp_homebrew_body">Paket PBP serta program PSP ELF atau PRX juga dapat dibuka.</string>
     <string name="settings_network_tab">Jaringan</string>
     <string name="emulation_fast_forward">Maju cepat (tahan)</string>
+    <string name="emulation_transport_fast_forward">Maju cepat</string>
     <string name="emulation_rewind">Putar mundur (tahan)</string>
+    <string name="emulation_transport_rewind">Putar mundur</string>
     <string name="psp_memstick_title">Memory Stick PSP</string>
     <string name="psp_memstick_note">PPSSPP menyimpan data permainan di PSP/SAVEDATA. Kapasitas bersifat virtual; berkas citra kartu tidak dibuat. Ukuran yang dipilih berlaku saat permainan berikutnya dijalankan.</string>
     <string name="psp_memstick_backup">Cadangkan data simpan</string>

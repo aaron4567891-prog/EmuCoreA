@@ -14,6 +14,9 @@ import android.os.Handler
 import android.os.Looper
 import org.json.JSONObject
 import java.security.MessageDigest
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 object NativeApp {
 
@@ -52,6 +55,8 @@ object NativeApp {
     private val timeControlHandler = Handler(Looper.getMainLooper())
     private val timeControlButtons = Array(2) { Array(4) { HoldButton() } }
     private val timeControlTapPulse = Array(2) { BooleanArray(2) }
+    private val _timeControlMode = MutableStateFlow(0)
+    val timeControlMode: StateFlow<Int> = _timeControlMode.asStateFlow()
     private var profilerActive = false
     private var hangTraceActive = false
 
@@ -567,7 +572,9 @@ object NativeApp {
         val fastForward = (0..1).any { pad ->
             timeControlButtons[pad][0].active || timeControlButtons[pad][2].active
         }
-        CoreRuntime.setTimeControl(if (rewind) 2 else if (fastForward) 1 else 0)
+        val mode = if (rewind) 2 else if (fastForward) 1 else 0
+        _timeControlMode.value = mode
+        CoreRuntime.setTimeControl(mode)
     }
 
     private fun pspButtonBit(index: Int): Int? = when (index) {

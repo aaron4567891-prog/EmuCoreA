@@ -2027,7 +2027,9 @@
 <string name="formats_psp_homebrew_body">PBP paketleri ile PSP ELF veya PRX çalıştırılabilir dosyaları da açılabilir.</string>
     <string name="settings_network_tab">Ağ</string>
     <string name="emulation_fast_forward">Hızlı ileri sar (basılı tut)</string>
+    <string name="emulation_transport_fast_forward">İleri sar</string>
     <string name="emulation_rewind">Geri sar (basılı tut)</string>
+    <string name="emulation_transport_rewind">Geri sar</string>
     <string name="psp_memstick_title">PSP Memory Stick</string>
     <string name="psp_memstick_note">PPSSPP oyun kayıtlarını PSP/SAVEDATA içinde saklar. Kapasite sanaldır; kart görüntüsü oluşturulmaz. Seçilen boyut oyunun sonraki açılışında uygulanır.</string>
     <string name="psp_memstick_backup">Kayıtları yedekle</string>

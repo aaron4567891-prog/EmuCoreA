@@ -124,12 +124,15 @@ internal fun replacePerformanceGpuName(text: String, gpuName: String): String {
     }
 }
 
+enum class EmulationTransportMode { None, FastForward, Rewind }
+
 data class EmulationUiState(
     val runtimeFailure: RuntimeFailure? = null,
     val isRunning: Boolean = false,
     val isStarting: Boolean = false,
     val isPaused: Boolean = false,
     val showMenu: Boolean = false,
+    val transportMode: EmulationTransportMode = EmulationTransportMode.None,
     val isActionInProgress: Boolean = false,
     val actionLabel: String? = null,
     val controlsVisible: Boolean = true,
@@ -701,6 +704,18 @@ class EmulationViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     init {
+        viewModelScope.launch {
+            NativeApp.timeControlMode.collect { mode ->
+                val transport = when (mode) {
+                    1 -> EmulationTransportMode.FastForward
+                    2 -> EmulationTransportMode.Rewind
+                    else -> EmulationTransportMode.None
+                }
+                if (_uiState.value.transportMode != transport) {
+                    _uiState.value = _uiState.value.copy(transportMode = transport)
+                }
+            }
+        }
         viewModelScope.launch {
             preferences.overlayShow.collect { enabled ->
                 _uiState.value = _uiState.value.copy(controlsVisible = enabled)

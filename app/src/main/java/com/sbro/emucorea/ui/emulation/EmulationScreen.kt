@@ -1372,6 +1372,20 @@ fun EmulationScreen(
             }
         }
 
+        AnimatedVisibility(
+            visible = uiState.transportMode != EmulationTransportMode.None &&
+                !uiState.showMenu &&
+                !showControlsEditor,
+            enter = fadeIn(tween(120)) + scaleIn(initialScale = 0.94f, animationSpec = tween(120)),
+            exit = fadeOut(tween(120)) + scaleOut(targetScale = 0.94f, animationSpec = tween(120)),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = overlayTopSafeInset + 14.dp)
+                .zIndex(32f)
+        ) {
+            TransportStatusOverlay(uiState.transportMode)
+        }
+
         // On-screen controls
         if (shouldShowOverlay && !uiState.showMenu && !showControlsEditor) {
             val scaleFactor = uiState.overlayScale / 100f
@@ -5049,6 +5063,49 @@ private fun LiveSelectionChip(
             )
         }
     )
+}
+
+@Composable
+private fun TransportStatusOverlay(mode: EmulationTransportMode) {
+    if (mode == EmulationTransportMode.None) return
+    val fastForward = mode == EmulationTransportMode.FastForward
+    Surface(
+        shape = neonShape(8.dp),
+        color = Color(0xDD10131A),
+        tonalElevation = 8.dp,
+        shadowElevation = 10.dp,
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.22f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = if (fastForward) ">>" else "<<",
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Black,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = 0.sp
+                )
+            )
+            Text(
+                text = stringResource(
+                    if (fastForward) {
+                        R.string.emulation_transport_fast_forward
+                    } else {
+                        R.string.emulation_transport_rewind
+                    }
+                ),
+                color = Color.White.copy(alpha = 0.9f),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp
+                )
+            )
+        }
+    }
 }
 
 @Composable
