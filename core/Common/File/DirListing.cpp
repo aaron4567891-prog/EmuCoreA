@@ -1,5 +1,10 @@
 #include "ppsspp_config.h"
 
+#ifdef HAVE_LIBRETRO_VFS
+#include <file/file_path.h>
+#include <retro_dirent.h>
+#endif
+
 #if PPSSPP_PLATFORM(WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #include "Common/CommonWindows.h"
@@ -111,6 +116,19 @@ bool GetFileInfo(const Path &path, FileInfo * fileInfo) {
 
 	// TODO: Expand relative paths?
 	fileInfo->fullName = path;
+
+#ifdef HAVE_LIBRETRO_VFS
+	// SAF virtual paths are owned by the Android frontend, not the host filesystem.
+	if (path.ToString().compare(0, 18, "/__emucorea_saf__/") == 0) {
+		int flags = path_stat(path.c_str());
+		fileInfo->exists = (flags & RETRO_VFS_STAT_IS_VALID) != 0;
+		fileInfo->isDirectory = (flags & RETRO_VFS_STAT_IS_DIRECTORY) != 0;
+		fileInfo->isWritable = false;
+		fileInfo->access = fileInfo->isDirectory ? 0555 : 0444;
+		fileInfo->size = fileInfo->exists && !fileInfo->isDirectory ? File::GetFileSize(path) : 0;
+		return fileInfo->exists;
+	}
+#endif
 
 #if PPSSPP_PLATFORM(WINDOWS)
 	WIN32_FILE_ATTRIBUTE_DATA attrs;
@@ -247,6 +265,27 @@ bool GetFilesInDir(const Path &directory, std::vector<FileInfo> *files, const ch
 		DEBUG_LOG(Log::IO, "GetFilesInDir: Found %d entries (%d before filter). Path: %s", (int)files->size(), beforeFilter, directory.ToVisualString().c_str());
 		return exists;
 	}
+
+#ifdef HAVE_LIBRETRO_VFS
+	if (directory.ToString().compare(0, 18, "/__emucorea_saf__/") == 0) {
+		RDIR *dir = retro_opendir_include_hidden(directory.c_str(), (flags & GETFILES_GETHIDDEN) != 0);
+		if (!dir) return false;
+		std::vector<FileInfo> entries;
+		while (retro_readdir(dir)) {
+			const char *name = retro_dirent_get_name(dir);
+			if (!name || !strcmp(name, ".") || !strcmp(name, "..")) continue;
+			FileInfo info;
+			if (GetFileInfo(directory / name, &info)) {
+				info.name = name;
+				entries.push_back(std::move(info));
+			}
+		}
+		retro_closedir(dir);
+		*files = ApplyFilter(std::move(entries), filter, prefix);
+		std::sort(files->begin(), files->end());
+		return true;
+	}
+#endif
 
 	std::set<std::string> filters;
 	if (filter) {

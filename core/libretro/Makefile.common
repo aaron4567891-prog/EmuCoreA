@@ -1134,6 +1134,7 @@ SOURCES_C += $(LIBRETROCOMMONDIR)/compat/compat_posix_string.c \
              $(LIBRETROCOMMONDIR)/encodings/encoding_utf.c \
              $(LIBRETROCOMMONDIR)/file/file_path.c \
              $(LIBRETROCOMMONDIR)/file/file_path_io.c \
+             $(LIBRETROCOMMONDIR)/file/retro_dirent.c \
              $(LIBRETROCOMMONDIR)/streams/file_stream.c \
              $(LIBRETROCOMMONDIR)/streams/file_stream_transforms.c \
              $(LIBRETROCOMMONDIR)/string/stdstring.c \

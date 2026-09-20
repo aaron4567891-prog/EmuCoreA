@@ -1251,7 +1251,7 @@ object EmulatorBridge {
         if (surface == null || !surface.isValid || width <= 0 || height <= 0) return
         val bitmap = withContext(Dispatchers.Main) {
             runCatching {
-                val frame = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val frame = createSaveStatePreviewBitmap(width, height)
                 val copied = suspendCancellableCoroutine { continuation ->
                     try {
                         PixelCopy.request(

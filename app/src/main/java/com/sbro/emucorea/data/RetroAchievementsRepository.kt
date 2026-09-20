@@ -689,31 +689,10 @@ class RetroAchievementsRepository private constructor(context: Context) {
         NativeApp.achievementsLoadGame(hashablePath)
     }
 
-    /**
-     * rcheevos needs real, readable files: scoped storage denies direct reads
-     * of the shared-storage game library, so SAF PSP images are materialized
-     * into app cache before the PSP hash is calculated.
-     */
+    /** Hash the original game through the same seekable SAF VFS used by the core. */
     private fun resolveHashablePath(path: String): String? {
-        if (!path.startsWith("content://")) {
-            val file = File(path)
-            return if (file.isFile && file.canRead()) file.absolutePath else null
-        }
-
-        val direct = DocumentPathResolver.resolveFilePath(appContext, path)
-        if (direct != null) {
-            val file = File(direct)
-            if (file.isFile && file.canRead()) return file.absolutePath
-        }
-
         val prepared = DocumentPathResolver.prepareGameLaunchPath(appContext, path) ?: return null
-        if (!prepared.startsWith("content://")) {
-            val file = File(prepared)
-            if (file.isFile && file.canRead()) return file.absolutePath
-        }
-
-        val directory = File(appContext.cacheDir, "psp-achievements/${prepared.hashCode()}")
-        return DocumentPathResolver.materializeSingleFileDisc(appContext, prepared, directory)
+        return com.sbro.emucorea.core.PspStorageBridge.prepare(appContext, prepared)
     }
 
     fun onGameStopped() {

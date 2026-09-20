@@ -4,9 +4,6 @@ package com.sbro.emucorea.core
 
 import android.content.Context
 import android.graphics.Rect
-import android.net.Uri
-import android.os.ParcelFileDescriptor
-import android.system.Os
 import android.util.Log
 import android.view.Surface
 import com.sbro.emucorea.data.RetroArchShaderEffects
@@ -71,8 +68,6 @@ internal object CoreRuntime {
     @Volatile private var performanceMetricsEnabled = false
     @Volatile private var detailedPerformanceMetrics = false
     @Volatile private var performanceMetricsSnapshot: String? = null
-    private var discDescriptor: ParcelFileDescriptor? = null
-    private var discLink: File? = null
 
     private val desiredPadButtons = AtomicIntegerArray(IntArray(2) { 0xFFFF })
     private val pendingPadPressEdges = AtomicIntegerArray(2)
@@ -546,7 +541,6 @@ internal object CoreRuntime {
                     session = 0L
                 }
             }
-            releaseDiscDescriptor()
             paused = false
             renderedFirstFrame = false
             sessionStartedAtNanos = 0L
@@ -1023,65 +1017,12 @@ internal object CoreRuntime {
     }
 
     private fun loadDisc(handle: Long, gamePath: String): Int {
-        if (!gamePath.startsWith("content://")) return bridge.loadDisc(handle, gamePath)
-        val appContext = context
-        if (appContext != null) {
-            val directory = File(appContext.cacheDir, "swanstation-cue/${gamePath.hashCode()}")
-            DocumentPathResolver.materializePreparedCue(gamePath, directory)?.let { cuePath ->
-                return bridge.loadDisc(handle, cuePath)
-            }
-            // Single-file images (CHD/ISO/PBP/...) cannot be reopened through a
-            // /proc/self/fd symlink under scoped storage, so stream them into
-            // app-owned cache with their original extension first.
-            DocumentPathResolver.materializeSingleFileDisc(appContext, gamePath, directory)?.let { imagePath ->
-                return bridge.loadDisc(handle, imagePath)
-            }
-        }
-        val resolver = context?.contentResolver ?: return -1
-        val descriptor = runCatching {
-            resolver.openFileDescriptor(Uri.parse(gamePath), "r")
-        }.getOrNull() ?: return -1
-        releaseDiscDescriptor()
-        discDescriptor = descriptor
-        // The core picks its disc container by file extension, so expose the
-        // live SAF descriptor through a cache symlink that keeps the original
-        // extension ("/proc/self/fd/N" alone would be rejected as unknown).
-        val extension = discExtensionFor(gamePath)
-        val link = context?.cacheDir?.let { File(it, "swanstation-disc/disc-${gamePath.hashCode()}.$extension") }
-        if (link != null && createDiscSymlink(link, descriptor.fd)) {
-            discLink = link
-            val linked = bridge.loadDisc(handle, link.absolutePath)
-            if (linked == 0) return 0
-            releaseDiscDescriptor()
-        }
-        return runCatching {
-            bridge.loadDiscFd(handle, descriptor.fd, 0L, descriptor.statSize.coerceAtLeast(0L))
-        }.onFailure { error ->
-            Log.e(TAG, "Unable to open PSP game through SAF: $gamePath", error)
-        }.getOrDefault(-1)
-    }
-
-    private fun discExtensionFor(gamePath: String): String {
-        val name = runCatching {
-            context?.let { DocumentPathResolver.getDisplayName(it, gamePath) }
-        }.getOrNull().orEmpty()
-        return name.substringAfterLast('.', "").lowercase(Locale.ROOT)
-            .takeIf { it.isNotBlank() && it.length <= 4 }
-            ?: "bin"
-    }
-
-    private fun createDiscSymlink(link: File, fd: Int): Boolean = runCatching {
-        link.parentFile?.mkdirs()
-        if (link.exists()) link.delete()
-        Os.symlink("/proc/self/fd/$fd", link.absolutePath)
-        true
-    }.getOrDefault(false)
-
-    private fun releaseDiscDescriptor() {
-        discLink?.let { link -> runCatching { link.delete() } }
-        discLink = null
-        discDescriptor?.let { descriptor -> runCatching { descriptor.close() } }
-        discDescriptor = null
+        context?.let(PspStorageBridge::removeLegacyImageCache)
+        val path = if (gamePath.startsWith("content://")) {
+            val app = context ?: return -1
+            PspStorageBridge.prepare(app, gamePath) ?: return -1
+        } else gamePath
+        return bridge.loadDisc(handle, path)
     }
 
     fun hasDiscMedia(): Boolean = sessionLock.withLock {

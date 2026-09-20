@@ -430,9 +430,14 @@ void retro_set_environment(retro_environment_t cb)
    environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_UPDATE_DISPLAY_CALLBACK, &update_display_cb);
 
 #ifdef HAVE_LIBRETRO_VFS
-   struct retro_vfs_interface_info vfs_iface_info { 2, nullptr };
-   if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+   struct retro_vfs_interface_info vfs_iface_info { 3, nullptr };
+   if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info)) {
       File::InitLibretroVFS(&vfs_iface_info);
+   } else {
+      vfs_iface_info = { 2, nullptr };
+      if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+         File::InitLibretroVFS(&vfs_iface_info);
+   }
 #endif
 }
 

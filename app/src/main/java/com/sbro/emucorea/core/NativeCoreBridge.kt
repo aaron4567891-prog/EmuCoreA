@@ -40,7 +40,6 @@ class NativeCoreBridge {
     /** Boots the core with no content into the PlayStation BIOS. */
     external fun loadBiosOnly(handle: Long): Int
     external fun loadDisc(handle: Long, path: String): Int
-    external fun loadDiscFd(handle: Long, fd: Int, offset: Long, size: Long): Int
     external fun reset(handle: Long): Int
 
     /** Runs one guest frame; audio is pulled by the output stream callback. */

@@ -13,6 +13,7 @@
 //   * save-state (retro_serialize) file IO.
 #include <jni.h>
 #include "audio_resampler.h"
+#include "storage_vfs.h"
 
 #include <android/log.h>
 #include <android/native_window.h>
@@ -557,6 +558,7 @@ bool EnvironmentCallback(unsigned cmd, void* data) {
             g_frontend.shutdown_requested.store(true);
             return true;
         case RETRO_ENVIRONMENT_GET_VFS_INTERFACE:
+            return GetStorageVfs(static_cast<retro_vfs_interface_info *>(data));
         case RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME:
         case RETRO_ENVIRONMENT_GET_DISK_CONTROL_INTERFACE_VERSION:
         default:
@@ -1157,6 +1159,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
     JNIEnv* env = nullptr;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_OK) {
         EmuCoreAAchievementsInitializeJava(env);
+        if (!InitializeStorageVfs(vm, env)) return JNI_ERR;
     }
     LOGI("emucorea_jni loaded");
     return JNI_VERSION_1_6;
@@ -1398,27 +1401,6 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_loadDisc(JNIEnv* env, jobject, jlon
     g_frontend.shutdown_requested.store(false);
     g_frontend.av_info_refresh_pending.store(true);
     LOGI("Loaded content: %s", path_string.c_str());
-    return 0;
-}
-
-JNIEXPORT jint JNICALL
-Java_com_sbro_emucorea_core_NativeCoreBridge_loadDiscFd(JNIEnv*, jobject, jlong handle, jint fd,
-                                                        jlong, jlong) {
-    if (handle == 0 || fd < 0) return -1;
-    const std::string path = "/proc/self/fd/" + std::to_string(fd);
-
-    std::lock_guard<std::mutex> lock(g_frontend.core_mutex);
-    if (!LoadCoreLocked() || !g_frontend.core_initialized.load()) return -2;
-    if (g_frontend.game_loaded.load()) {
-        if (g_core.unload_game != nullptr) g_core.unload_game();
-        g_frontend.game_loaded.store(false);
-    }
-
-    retro_game_info info{};
-    info.path = path.c_str();
-    if (!g_core.load_game(&info)) return -3;
-    g_frontend.game_loaded.store(true);
-    g_frontend.av_info_refresh_pending.store(true);
     return 0;
 }
 

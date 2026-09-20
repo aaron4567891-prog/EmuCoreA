@@ -19,6 +19,7 @@ set(LIBRETRO_SRCS ${LIBRETRO_SRCS}
 	libretro-common/encodings/encoding_utf.c
 	libretro-common/file/file_path.c
 	libretro-common/file/file_path_io.c
+	libretro-common/file/retro_dirent.c
 	libretro-common/streams/file_stream.c
 	libretro-common/streams/file_stream_transforms.c
 	libretro-common/string/stdstring.c

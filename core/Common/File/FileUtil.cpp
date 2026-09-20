@@ -116,6 +116,7 @@ constexpr bool LOG_IO = false;
 #endif
 
 #ifdef HAVE_LIBRETRO_VFS
+#include <retro_dirent.h>
 static retro_vfs_mkdir_t LibretroMkdirCallback = nullptr;
 
 // Creates a directory at the given path. Parent directories are not created if
@@ -138,6 +139,7 @@ namespace File {
 void InitLibretroVFS(const struct retro_vfs_interface_info *vfs) noexcept {
 	filestream_vfs_init(vfs);
 	path_vfs_init(vfs);
+	dirent_vfs_init(vfs);
 	LibretroMkdirCallback = vfs->required_interface_version >= 3 ? vfs->iface->mkdir : nullptr;
 }
 #endif
@@ -1007,6 +1009,15 @@ uint64_t GetFileSize(const Path &filename) {
 	}
 
 #ifdef HAVE_LIBRETRO_VFS
+	// VFS v3 stat sizes are only 32-bit, and document providers may omit their metadata size.
+	// Seek the original descriptor for an accurate size; no file contents are copied.
+	if (filename.ToString().compare(0, 18, "/__emucorea_saf__/") == 0) {
+		FILE *file = OpenCFile(filename, "rb");
+		if (!file) return 0;
+		uint64_t size = GetFileSize(file);
+		fclose(file);
+		return size;
+	}
 	return path_get_size(filename.c_str());
 #elif defined(_WIN32) && defined(UNICODE)
 	WIN32_FILE_ATTRIBUTE_DATA attr;
@@ -1306,7 +1317,7 @@ int Fseek(FILE *file, int64_t offset, int whence) {
 			whence = RETRO_VFS_SEEK_POSITION_END;
 			break;
 	}
-	return filestream_seek(file, offset, whence) != 0 ? -1 : 0;
+	return filestream_seek(file, offset, whence) < 0 ? -1 : 0;
 #elif defined(_WIN32)
 	return _fseeki64(file, offset, whence);
 #elif (defined(__ANDROID__) && __ANDROID_API__ < 24) || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS < 64)
@@ -1329,7 +1340,7 @@ int64_t Fseektell(FILE *file, int64_t offset, int whence) {
 			whence = RETRO_VFS_SEEK_POSITION_END;
 			break;
 	}
-	return filestream_seek(file, offset, whence) != 0 ? -1 : filestream_tell(file);
+	return filestream_seek(file, offset, whence) < 0 ? -1 : filestream_tell(file);
 #elif defined(_WIN32)
 	return _fseeki64(file, offset, whence) != 0 ? -1 : _ftelli64(file);
 #elif (defined(__ANDROID__) && __ANDROID_API__ < 24) || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS < 64)

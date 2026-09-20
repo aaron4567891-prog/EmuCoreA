@@ -9,6 +9,7 @@
 // event queue and owns the account token persistence.
 
 #include <jni.h>
+#include "storage_vfs.h"
 
 #include <android/log.h>
 
@@ -501,8 +502,23 @@ void EnsureHashSupportLocked()
     return;
 
   hash_support_initialized = true;
-  // Install the standard file reader for PSP ISO and PBP hashing.
-  rc_hash_init_custom_filereader(nullptr);
+  // Use the same direct SAF descriptors as the core, including PBP hashing.
+  static retro_vfs_interface_info vfs{3, nullptr};
+  GetStorageVfs(&vfs);
+  rc_hash_filereader reader{};
+  reader.open = [](const char *path) -> void * { return vfs.iface->open(path, RETRO_VFS_FILE_ACCESS_READ, 0); };
+  reader.seek = [](void *file, int64_t offset, int origin) {
+    const int whence = origin == SEEK_SET ? RETRO_VFS_SEEK_POSITION_START :
+        origin == SEEK_CUR ? RETRO_VFS_SEEK_POSITION_CURRENT : RETRO_VFS_SEEK_POSITION_END;
+    vfs.iface->seek(static_cast<retro_vfs_file_handle *>(file), offset, whence);
+  };
+  reader.tell = [](void *file) -> int64_t { return vfs.iface->tell(static_cast<retro_vfs_file_handle *>(file)); };
+  reader.read = [](void *file, void *buffer, size_t size) -> size_t {
+    const int64_t count = vfs.iface->read(static_cast<retro_vfs_file_handle *>(file), buffer, size);
+    return count > 0 ? static_cast<size_t>(count) : 0;
+  };
+  reader.close = [](void *file) { vfs.iface->close(static_cast<retro_vfs_file_handle *>(file)); };
+  rc_hash_init_custom_filereader(&reader);
 
 
 }

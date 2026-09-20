@@ -68,6 +68,7 @@ endif()
 
 add_library(emucorea_jni SHARED
     native_bridge.cpp
+    storage_vfs.cpp
     achievements_bridge.cpp
     shader_effect.cpp
     shader_chain.cpp

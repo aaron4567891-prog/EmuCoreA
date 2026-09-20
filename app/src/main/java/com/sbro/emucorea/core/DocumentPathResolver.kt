@@ -9,7 +9,6 @@ import android.provider.DocumentsContract
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.Reader
@@ -22,14 +21,6 @@ object DocumentPathResolver {
     private val cueFileDirective = Regex(
         pattern = """^(\s*)FILE\s+(?:\"([^\"]+)\"|(\S+))\s+(\S+)\s*$""",
         option = RegexOption.IGNORE_CASE
-    )
-
-    // Whole-text rewrite used when materialising SAF CUE tracks: group 1 is the
-    // FILE prefix (+ BOM/indent), group 2 the unquoted path, group 3 the
-    // trailing `BINARY` token.
-    private val cueBinaryFileRewrite = Regex(
-        pattern = """^(\uFEFF?\s*FILE\s+)(?:\"[^\"]+\"|(\S+))(\s+BINARY\s*)$""",
-        options = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)
     )
 
     private data class PreparedDiscResources(
@@ -315,145 +306,6 @@ object DocumentPathResolver {
                     )
                 }
         }
-
-    /**
-     * Copies the open SAF CUE track descriptors into [targetDir] as real files
-     * and rewrites the cuesheet to reference them. SwanStation resolves content
-     * through real paths, and the copied files stay valid for the whole session
-     * (unlike `/proc/self/fd/N`, which the core may open after the descriptors
-     * are released). Existing files with the expected size are reused.
-     */
-    fun materializePreparedCue(launchPath: String, targetDir: File): String? {
-        val resources = synchronized(preparedDiscLock) {
-            preparedDiscResources?.takeIf { it.launchPath == launchPath }
-        } ?: return null
-        if (!targetDir.exists() && !targetDir.mkdirs()) return null
-
-        var index = 0
-        val rewritten = cueBinaryFileRewrite.replace(resources.cueText) { match ->
-            val descriptor = resources.descriptors.getOrNull(index)
-            if (descriptor == null) {
-                match.value
-            } else {
-                index += 1
-                val trackFile = File(targetDir, "track_$index.bin")
-                val expected = descriptor.statSize
-                if (!(trackFile.isFile && expected > 0 && trackFile.length() == expected)) {
-                    val copied = runCatching {
-                        FileInputStream(descriptor.fileDescriptor).use { input ->
-                            FileOutputStream(trackFile).use { output -> input.copyTo(output) }
-                        }
-                        true
-                    }.onFailure { error ->
-                        Log.e(TAG, "Unable to materialize CUE track $index for $launchPath", error)
-                    }.getOrDefault(false)
-                    if (!copied) return@replace match.value
-                }
-                "${match.groupValues[1]}\"${trackFile.absolutePath}\"${match.groupValues[3]}"
-            }
-        }
-        val cueFile = File(targetDir, "disc.cue")
-        cueFile.writeText(rewritten)
-        return cueFile.absolutePath
-    }
-
-    /**
-     * Like [materializePreparedCue], but the written cuesheet keeps the track
-     * files as names relative to the cuesheet itself. rcheevos resolves every
-     * `FILE` entry against the cuesheet directory, so the absolute paths used
-     * for emulation would be mangled there. Track files are shared with
-     * [materializePreparedCue] (`track_N.bin`) and reused when already copied.
-     */
-    fun materializeHashableCue(launchPath: String, targetDir: File): String? {
-        val resources = synchronized(preparedDiscLock) {
-            preparedDiscResources?.takeIf { it.launchPath == launchPath }
-        } ?: return null
-        if (!targetDir.exists() && !targetDir.mkdirs()) return null
-
-        var index = 0
-        val rewritten = cueBinaryFileRewrite.replace(resources.cueText) { match ->
-            val descriptor = resources.descriptors.getOrNull(index)
-            if (descriptor == null) {
-                match.value
-            } else {
-                index += 1
-                val trackFile = File(targetDir, "track_$index.bin")
-                val expected = descriptor.statSize
-                if (!(trackFile.isFile && expected > 0 && trackFile.length() == expected)) {
-                    val copied = runCatching {
-                        FileInputStream(descriptor.fileDescriptor).use { input ->
-                            FileOutputStream(trackFile).use { output -> input.copyTo(output) }
-                        }
-                        true
-                    }.onFailure { error ->
-                        Log.e(TAG, "Unable to materialize CUE track $index for $launchPath", error)
-                    }.getOrDefault(false)
-                    if (!copied) return@replace match.value
-                }
-                "${match.groupValues[1]}\"${trackFile.name}\"${match.groupValues[3]}"
-            }
-        }
-        val cueFile = File(targetDir, "ra.cue")
-        cueFile.writeText(rewritten)
-        return cueFile.absolutePath
-    }
-
-    /**
-     * Copies a single-file disc image opened through SAF into [targetDir] under
-     * a real path with its original extension. SwanStation picks the container
-     * from the path extension and reopens the image by path, which scoped
-     * storage denies for `/proc/self/fd` symlinks, so CHD/ISO/PBP images must
-     * be streamed once into app-owned storage. Existing copies with the same
-     * size as the source document are reused.
-     */
-    fun materializeSingleFileDisc(context: Context, launchPath: String, targetDir: File): String? {
-        if (!launchPath.startsWith("content://")) return null
-        val uri = launchPath.toUri()
-        val displayName = getDisplayName(context, launchPath)
-        val extension = displayName.substringAfterLast('.', "").lowercase()
-        if (extension.isBlank() || extension.length > 5) return null
-        if (!targetDir.exists() && !targetDir.mkdirs()) return null
-
-        val sourceSize = querySourceSize(context, uri)
-        val targetName = if (displayName.equals("EBOOT.BIN", true)) "EBOOT.BIN"
-            else if (displayName.equals("BOOT.BIN", true)) "BOOT.BIN" else "disc.$extension"
-        val target = File(targetDir, targetName)
-        if (target.isFile && sourceSize > 0 && target.length() == sourceSize) {
-            return target.absolutePath
-        }
-
-        val staging = File(targetDir, ".disc.$extension.part")
-        staging.delete()
-        val copied = runCatching {
-            context.contentResolver.openInputStream(uri)?.use { input ->
-                FileOutputStream(staging).use { output -> input.copyTo(output, 1 shl 20) }
-            } ?: return null
-            true
-        }.onFailure { error ->
-            Log.e(TAG, "Unable to materialize disc image $launchPath", error)
-        }.getOrDefault(false)
-        if (!copied) {
-            staging.delete()
-            return null
-        }
-        if (sourceSize > 0 && staging.length() != sourceSize) {
-            Log.e(TAG, "Disc image copy is incomplete: ${staging.length()} != $sourceSize for $launchPath")
-            staging.delete()
-            return null
-        }
-        if (!staging.renameTo(target)) {
-            staging.delete()
-            return null
-        }
-        Log.i(TAG, "Materialized disc image ${target.absolutePath} (${target.length()} bytes) from $launchPath")
-        return target.absolutePath
-    }
-
-    private fun querySourceSize(context: Context, uri: Uri): Long = runCatching {
-        context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { cursor ->
-            if (cursor.moveToFirst() && !cursor.isNull(0)) cursor.getLong(0) else -1L
-        } ?: -1L
-    }.getOrDefault(-1L)
 
     private fun prepareUriGameLaunchPath(context: Context, uri: Uri): String? {
         val resolvedDirect = resolveFilePath(context, uri.toString())
