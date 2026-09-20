@@ -892,6 +892,16 @@
     <string name="settings_help_core_texture_anisotropic_filtering">道路や床など斜めから見るテクスチャを、選んだレベルまでシャープにします。ほとんどの GPU では性能への影響はごくわずかなので、地面がぼやける場合は 8x や 16x が安全です。元の柔らかい見た目にしたい場合だけオフにしてください。</string>
     <string name="settings_help_core_texture_filtering">拡大時のテクスチャのサンプリング方法を設定します。Auto はほとんどのゲームに合い、Nearest はピクセルアートをくっきり保ち、Linear はテクスチャを滑らかにし、Auto max quality はわずかな GPU 負荷で端末が対応する最高のフィルターを適用します。2D をよりシャープに、3D をより滑らかにしたいときに変更してください。</string>
     <string name="settings_help_core_texture_replacement">元のグラフィックの代わりに、ゲームのテクスチャフォルダーから置き換えテクスチャパックを読み込みます。そのゲーム用の互換パックがインストールされている場合のみ機能します。HD パックを使うときはオンにし、パックでクラッシュする場合や元の見た目を好む場合はオフにしてください。</string>
+    <string name="settings_help_core_cpu_core">エミュレーターが PSP の CPU 命令をどう変換するかを選びます。Dynarec (JIT) は端末向けにコードを再コンパイルし圧倒的に高速です。IR Interpreter は遅い代わりに正確な場合がある中間方式で、Interpreter は最も遅く主にデバッグ向けです。特定のゲームが誤動作しない限り Dynarec (JIT) のままにしてください。</string>
+    <string name="settings_help_core_ignore_bad_memory_access">有効な範囲外のメモリを読み書きしても、エラーで停止せずゲームを続行できるようにします。これにより多くの商業ゲームが最新ハードでも動作しますが、壊れたゲームは破損した状態のまま続くことがあります。不正なメモリアクセスによるクラッシュを調査している場合を除き、オンのままにしてください。</string>
+    <string name="settings_help_core_io_timing_method">ディスクとメモリのアクセス時間のシミュレーション方法を制御します。Fast は高速に読み込み、ほとんどのゲームに最適です。Host は実際のハードウェアのタイミングに従い、それに依存するゲームを修正できます。Simulate UMD delays は UMD のシーク時間を期待するゲーム向けに再現します。ゲームが固まる、または速すぎる場合のみ Host や UMD 遅延に切り替えてください。</string>
+    <string name="settings_help_core_locked_cpu_speed">エミュレートする PSP CPU を各ゲーム任せにせず固定クロックにします。ほとんどのゲームは自ら速度を管理するため、オフのままにしてください。低い値は速すぎたり不具合のあるゲームを修正でき、高い値は発熱とバッテリー消費と引き換えに重いゲームの引っかかりを減らせます。</string>
+    <string name="settings_help_core_memstick_size">エミュレートする Memory Stick の容量を設定します。一部のゲームは保存前に空き容量を確認したり、カードが小さいと起動を拒否するため、大きなセーブには大きめの容量が安全です。16 GB でほとんどのゲームに足ります。ゲームが容量不足を訴える場合のみ増やしてください。</string>
+    <string name="settings_help_core_cache_iso">読み込み中にゲームイメージ全体を RAM にコピーし、以降のディスク読み取りがストレージに触れないようにします。オープンワールドゲームの引っかかりを解消できますが、読み込みが長くなり十分な空きメモリが必要です。RAM が 4 GB 以下の端末ではオフのままにしてください。</string>
+    <string name="settings_help_core_cheats">読み込んだゲームに対して PPSSPP 内蔵のチートエンジンを有効にし、チートコードを効かせます。チートを使いたいときだけオンにしてください。オフにしても何も削除されず、ゲームは通常の動作に戻ります。</string>
+    <string name="settings_help_core_psp_model">エミュレートする PSP のハードウェアリビジョンを選びます。PSP-2000/3000 はほとんどの端末に合い、既定として最適です。PSP-1000 は 64 MB ではなく 32 MB の RAM を提供し、一部の初期ゲームがこれを期待します。ゲームが本体を誤認識したり誤動作する場合のみ変更してください。</string>
+    <string name="settings_help_core_button_preference">PSP ゲーム内のメニューをどのフェイスボタンで決定するかを選びます。欧米のゲームは×、日本のゲームは○を使うことが多いので、自分のゲームに合う方を選んでください。変わるのはゲーム内のボタン割り当てだけで、エミュレーター自体のメニューには影響しません。</string>
+    <string name="settings_help_core_analog_is_circular">物理ゲームパッド使用時に、丸型と四角型のアナログスティックのゲートの違いを補正します。ゲーム内の移動が斜めに偏る、またはスティックが角に届かない場合にオンにしてください。PSP のゲートにすでに合っているタッチ操作ではオフのままにしてください。</string>
     <string name="settings_help_gyro_invert_x">ジャイロの水平軸を反転します。エイムがスマートフォンと同じ向きに回るならオフのままにし、左右が逆に感じるならオンにします。カメラ操作で好む人もいます。</string>
     <string name="settings_help_gyro_invert_y">エイムモードでジャイロの垂直軸を反転します。見上げる・見下ろす動きがスマートフォンの傾きと逆になる場合にオンにします。</string>
     <string name="settings_help_multitap_mode">PSP の 1 組のコントロールを共有し、1 台の端末でより多くのプレイヤーが参加できます。各プレイヤーには個別の PSP ポートが割り当てられます。ゲームがそのポートだけを確認する場合は 1 つのポートを有効にし、ゲームごとに使うポートが違う場合は両方を有効にし、通常のシングルプレイではオフにします。</string>

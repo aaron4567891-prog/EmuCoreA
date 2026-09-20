@@ -894,6 +894,16 @@
     <string name="settings_help_core_texture_anisotropic_filtering">提升斜視紋理（如道路與地板）的銳利度至所選等級。在大多數 GPU 上效能成本極低，因此地面模糊時 8x 或 16x 都很安全。只有想保留原始柔和外觀時才關閉。</string>
     <string name="settings_help_core_texture_filtering">設定紋理縮放時的取樣方式。Auto 適合大多數遊戲，Nearest 保留銳利的像素畫，Linear 讓紋理平滑，Auto max quality 以少量 GPU 成本套用裝置支援的最佳濾鏡。想要更銳利的 2D 或更平滑的 3D 時可調整。</string>
     <string name="settings_help_core_texture_replacement">從遊戲的紋理資料夾載入替代紋理包，而非原始圖像。只有在為該遊戲安裝相容紋理包時才有效。使用 HD 紋理包時開啟；若紋理包導致崩潰或你偏好原始外觀則關閉。</string>
+    <string name="settings_help_core_cpu_core">選擇模擬器如何轉譯 PSP CPU 指令。Dynarec (JIT) 會為你的裝置重新編譯程式碼，速度遠勝其他選項；IR Interpreter 是較慢但有時更準確的中間方案；Interpreter 最慢，主要用於除錯。除非特定遊戲行為異常，否則請保持 Dynarec (JIT)。</string>
+    <string name="settings_help_core_ignore_bad_memory_access">讓遊戲在讀寫有效範圍外的記憶體時繼續執行，而不是報錯停止。這能讓許多商業遊戲在現代硬體上運作，但損壞的遊戲可能帶著錯誤狀態繼續。除非你正在排查無效記憶體存取造成的當機，否則請保持開啟。</string>
+    <string name="settings_help_core_io_timing_method">控制光碟與記憶體存取時間的模擬方式。Fast 載入快速，適合大多數遊戲；Host 遵循真實硬體時序，可修正依賴它的遊戲；Simulate UMD delays 會為期待 UMD 搜尋時間的遊戲重現該延遲。僅在遊戲卡住或跑得太快時才改用 Host 或 UMD 延遲。</string>
+    <string name="settings_help_core_locked_cpu_speed">將模擬的 PSP CPU 鎖定在固定時脈，而非讓每個遊戲自行選擇。大多數遊戲會自行管理速度，因此請保持關閉。較低數值可修正跑太快或異常的遊戲；較高數值可減少重度遊戲的卡頓，但會增加發熱與耗電。</string>
+    <string name="settings_help_core_memstick_size">設定模擬 Memory Stick 的容量。有些遊戲在存檔前會檢查可用空間，或卡片太小就拒絕啟動，因此較大容量對大型存檔更安全。16 GB 足以應付大多數遊戲；只有在遊戲抱怨空間不足時才調高。</string>
+    <string name="settings_help_core_cache_iso">載入時將整個遊戲映像複製到 RAM，之後光碟讀取就不再存取儲存空間。這能消除開放世界遊戲的卡頓，但載入更久且需要足夠的可用記憶體，因此 RAM 為 4 GB 以下的裝置請保持關閉。</string>
+    <string name="settings_help_core_cheats">為載入的遊戲啟用 PPSSPP 內建的金手指引擎，讓金手指碼生效。只在你需要使用金手指時開啟；關閉不會刪除任何內容，遊戲會恢復正常行為。</string>
+    <string name="settings_help_core_psp_model">選擇模擬的 PSP 硬體版本。PSP-2000/3000 對應大多數裝置，是最佳預設；PSP-1000 提供 32 MB RAM（而非 64 MB），部分早期遊戲預期如此。僅在遊戲誤判主機或行為異常時更改。</string>
+    <string name="settings_help_core_button_preference">選擇 PSP 遊戲中由哪個正面按鈕確認選單。許多歐美遊戲使用叉號，許多日式遊戲使用圓圈，請選擇符合你遊戲的按鈕。這只改變遊戲內的按鍵對應，不影響模擬器本身的選單。</string>
+    <string name="settings_help_core_analog_is_circular">使用實體手把時，補償圓形與方形類比搖桿範圍的差異。若遊戲中移動偏向對角線或搖桿到不了邊角，請開啟；觸控操作已符合 PSP 範圍，請保持關閉。</string>
     <string name="settings_help_gyro_invert_x">反轉陀螺儀的水平軸。若瞄準與手機轉動方向一致，請保持關閉；若左右感覺相反則開啟，有些玩家偏好這樣控制鏡頭。</string>
     <string name="settings_help_gyro_invert_y">在瞄準模式中反轉陀螺儀的垂直軸。若上下視角與手機傾斜方向相反，請開啟。</string>
     <string name="settings_help_multitap_mode">共用 PSP 的單一控制組，讓更多玩家在同一台裝置上加入。每位玩家會分配到各自的 PSP 連接埠。若遊戲只檢查該連接埠，保留一個連接埠啟用；不同遊戲使用不同連接埠時啟用兩者；一般單人遊玩則關閉。</string>

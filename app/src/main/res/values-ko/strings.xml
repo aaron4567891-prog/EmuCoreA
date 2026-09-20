@@ -892,6 +892,16 @@
     <string name="settings_help_core_texture_anisotropic_filtering">도로나 바닥처럼 비스듬히 보이는 텍스처를 선택한 단계까지 선명하게 합니다. 대부분의 GPU에서 성능 비용이 거의 없으므로 바닥이 흐릿하면 8x 또는 16x가 안전합니다. 원래의 부드러운 모습을 원할 때만 끄세요.</string>
     <string name="settings_help_core_texture_filtering">확대할 때 텍스처를 샘플링하는 방식을 설정합니다. Auto는 대부분의 게임에 적합하고, Nearest는 픽셀 아트를 선명하게 유지하며, Linear는 텍스처를 부드럽게 하고, Auto max quality는 약간의 GPU 비용으로 기기가 지원하는 최고 필터를 적용합니다. 더 선명한 2D나 더 부드러운 3D를 원할 때 변경하세요.</string>
     <string name="settings_help_core_texture_replacement">원본 그래픽 대신 게임의 텍스처 폴더에서 교체 텍스처 팩을 불러옵니다. 해당 게임에 호환 팩이 설치된 경우에만 작동합니다. HD 팩을 사용하려면 켜고, 팩이 충돌을 일으키거나 원본 모습을 선호하면 끄세요.</string>
+    <string name="settings_help_core_cpu_core">에뮬레이터가 PSP CPU 명령을 어떻게 변환할지 선택합니다. Dynarec (JIT)은 기기에 맞게 코드를 다시 컴파일해 가장 빠르고, IR Interpreter는 더 느리지만 때때로 더 정확한 중간 방식이며, Interpreter는 가장 느리고 주로 디버깅에 유용합니다. 특정 게임이 잘못 동작하지 않으면 Dynarec (JIT)을 유지하세요.</string>
+    <string name="settings_help_core_ignore_bad_memory_access">유효 범위를 벗어난 메모리를 읽거나 써도 오류로 멈추지 않고 게임이 계속 실행되게 합니다. 최신 하드웨어에서 많은 상용 게임이 동작하게 해 주지만, 손상된 게임은 잘못된 상태로 계속될 수 있습니다. 잘못된 메모리 접근으로 인한 충돌을 조사 중이 아니라면 켜 두세요.</string>
+    <string name="settings_help_core_io_timing_method">디스크와 메모리 접근 타이밍을 어떻게 시뮬레이션할지 제어합니다. Fast는 빠르게 불러오며 대부분의 게임에 가장 좋고, Host는 실제 하드웨어 타이밍을 따르며 그것에 의존하는 게임을 고칠 수 있고, Simulate UMD delays는 UMD 탐색 시간을 기대하는 게임을 위해 이를 재현합니다. 게임이 멈추거나 너무 빠르게 실행될 때만 Host나 UMD 지연으로 바꾸세요.</string>
+    <string name="settings_help_core_locked_cpu_speed">에뮬레이트되는 PSP CPU를 각 게임이 선택하게 두지 않고 고정 클럭으로 잠급니다. 대부분의 게임은 스스로 속도를 관리하므로 꺼 두세요. 낮은 값은 너무 빠르거나 오류가 나는 게임을 고칠 수 있고, 높은 값은 발열과 배터리 소모를 대가로 무거운 게임의 끊김을 줄일 수 있습니다.</string>
+    <string name="settings_help_core_memstick_size">에뮬레이트되는 Memory Stick 크기를 설정합니다. 일부 게임은 저장 전에 여유 공간을 확인하거나 카드가 작아 보이면 시작을 거부하므로, 큰 세이브에는 더 큰 크기가 안전합니다. 16 GB면 대부분의 게임에 충분합니다. 게임이 저장 공간을 문제 삼을 때만 늘리세요.</string>
+    <string name="settings_help_core_cache_iso">로딩 중 게임 이미지 전체를 RAM에 복사해 이후 디스크 읽기가 저장소를 건드리지 않게 합니다. 오픈 월드 게임의 끊김을 없앨 수 있지만 로딩이 길어지고 충분한 여유 메모리가 필요하므로, RAM이 4 GB 이하인 기기에서는 꺼 두세요.</string>
+    <string name="settings_help_core_cheats">불러온 게임에 대해 PPSSPP 내장 치트 엔진을 켜고 치트 코드가 적용되게 합니다. 치트를 사용할 때만 켜세요. 끄더라도 아무것도 삭제되지 않고 게임은 정상 동작으로 돌아갑니다.</string>
+    <string name="settings_help_core_psp_model">에뮬레이트할 PSP 하드웨어 리비전을 선택합니다. PSP-2000/3000은 대부분의 기기와 맞고 기본값으로 가장 좋습니다. PSP-1000은 64 MB 대신 32 MB RAM을 제공하며 일부 초기 게임이 이를 기대합니다. 게임이 콘솔을 잘못 인식하거나 잘못 동작할 때만 바꾸세요.</string>
+    <string name="settings_help_core_button_preference">PSP 게임 내 메뉴를 어느 페이스 버튼으로 확인할지 선택합니다. 서양 게임은 십자, 일본 게임은 원을 많이 사용하므로 자신의 게임에 맞는 쪽을 고르세요. 게임 내 버튼 매핑만 바뀌며 에뮬레이터 자체 메뉴에는 영향이 없습니다.</string>
+    <string name="settings_help_core_analog_is_circular">물리 게임패드를 사용할 때 원형과 사각형 아날로그 스틱 게이트의 차이를 보정합니다. 게임에서 움직임이 대각선으로 치우치거나 스틱이 모서리에 닿지 않으면 켜세요. PSP 게이트와 이미 일치하는 터치 컨트롤에서는 꺼 두세요.</string>
     <string name="settings_help_gyro_invert_x">자이로의 가로축을 반전합니다. 조준이 휴대폰과 같은 방향으로 돌면 꺼 두고, 좌우가 반대로 느껴지면 켜세요. 카메라 조작에서 선호하는 사용자도 있습니다.</string>
     <string name="settings_help_gyro_invert_y">조준 모드에서 자이로의 세로축을 반전합니다. 위아래 시점이 휴대폰 기울기와 반대로 움직이면 켜세요.</string>
     <string name="settings_help_multitap_mode">PSP의 단일 컨트롤 세트를 공유해 한 기기에서 더 많은 플레이어가 참여할 수 있습니다. 각 플레이어에게 별도의 PSP 포트가 배정됩니다. 게임이 해당 포트만 확인하면 하나의 포트를 활성화하고, 게임마다 다른 포트를 쓰면 둘 다 활성화하며, 일반 싱글 플레이는 끔으로 두세요.</string>
