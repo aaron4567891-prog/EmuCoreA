@@ -3,7 +3,7 @@
 [![Discord](https://img.shields.io/badge/Discord-Join%20the%20server-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/c5EBeNRpz2)
 [![Support on Patreon](https://img.shields.io/badge/Patreon-Support%20EmuCore-ff424d?logo=patreon&logoColor=white)](https://www.patreon.com/c/emucore/membership)
 
-EmuCoreA is a PSP emulator and game library for Android. It combines a native Android interface with a vendored [PPSSPP](https://github.com/hrydgard/ppsspp) libretro core. The core is built with the app and does not need a separate download.
+EmuCoreA is a PSP emulator and game library for Android. It combines a native Android interface with a vendored [PPSSPP](https://github.com/hrydgard/ppsspp) core. The core is built with the app and does not need a separate download.
 
 The project is under active development. Use your own legally obtained games. PPSSPP emulates the PSP system without a BIOS file.
 
@@ -45,9 +45,9 @@ The catalogs credit the original sources. Redistributable files are mirrored in 
 
 ## Credits and license
 
-EmuCoreA builds on PPSSPP and the libretro interface. The root [LICENSE.TXT](LICENSE.TXT) is an exact copy of PPSSPP's upstream license file. The vendored core and its dependencies retain their copyright and license notices in `core/`.
+EmuCoreA builds on PPSSPP. The root [LICENSE.TXT](LICENSE.TXT) is an exact copy of PPSSPP's upstream license file. The vendored core and its dependencies retain their copyright and license notices in `core/`.
 
-Thanks to the PPSSPP and libretro contributors and to the RetroAchievements team for rcheevos.
+Thanks to the PPSSPP contributors and to the RetroAchievements team for rcheevos.
 
 EmuCoreA is independent of Sony, PPSSPP, IGDB, Discord, and RetroAchievements. PSP is a trademark of Sony Interactive Entertainment. Game artwork and game data belong to their respective owners.
 
