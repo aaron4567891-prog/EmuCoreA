@@ -6,6 +6,7 @@ import android.util.Log
 import android.util.LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -47,6 +48,13 @@ val LocalGameCoverAspectRatio = androidx.compose.runtime.staticCompositionLocalO
 val GameCoverAspectRatio: Float
     @Composable get() = LocalGameCoverAspectRatio.current
 
+internal fun isGenerated3dCover(coverPath: String?): Boolean =
+    coverPath?.replace('\\', '/')?.let { path ->
+        path.contains("/game-covers/igdb-psp-v13/") && path.endsWith("_3d.webp") ||
+            path.startsWith("https://raw.githubusercontent.com/sashkinbro/EmuCoreA-Covers/") &&
+            path.contains("/covers/3d/") && path.endsWith(".webp")
+    } == true
+
 private val imageLoadingSemaphore = Semaphore(4)
 @Composable
 fun GameCoverArt(
@@ -54,7 +62,8 @@ fun GameCoverArt(
     fallbackTitle: String,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
-    loadEnabled: Boolean = true
+    loadEnabled: Boolean = true,
+    matchImageAspectRatio: Boolean = false
 ) {
     val context = LocalContext.current
     var bitmap by remember(coverPath) { mutableStateOf(coverPath?.let(::getCachedBitmap)) }
@@ -105,16 +114,19 @@ fun GameCoverArt(
     }
 
     val currentBitmap = bitmap
+    val imageModifier = if (matchImageAspectRatio) {
+        modifier.aspectRatio(currentBitmap?.let { it.width.toFloat() / it.height } ?: (16f / 9f))
+    } else modifier
     if (currentBitmap != null) {
         Image(
             bitmap = currentBitmap.asImageBitmap(),
             contentDescription = fallbackTitle,
             contentScale = contentScale,
-            modifier = modifier
+            modifier = imageModifier
         )
     } else {
         Box(
-            modifier = modifier
+            modifier = imageModifier
                 .clip(neonShape(20.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                 .shimmer(showShimmer = isLoading),
@@ -217,11 +229,7 @@ private fun loadBitmap(context: android.content.Context, coverPath: String?): Bi
         }?.let { decoded ->
             // Only our generated cases have the known outer shadow. Flat, custom,
             // and catalogue images retain their complete original canvas.
-            val generatedCase = coverPath.replace('\\', '/').let { path ->
-                path.contains("/game-covers/igdb-psp-v13/") && path.endsWith("_3d.webp") ||
-                    path.startsWith("https://raw.githubusercontent.com/sashkinbro/EmuCoreA-Covers/") &&
-                    path.contains("/covers/3d/") && path.endsWith(".webp")
-            }
+            val generatedCase = isGenerated3dCover(coverPath)
             if (!generatedCase || !decoded.hasAlpha()) return@let decoded
             val pixels = IntArray(decoded.width * decoded.height)
             decoded.getPixels(pixels, 0, decoded.width, 0, 0, decoded.width, decoded.height)

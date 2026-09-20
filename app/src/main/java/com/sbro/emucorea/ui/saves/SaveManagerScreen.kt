@@ -55,7 +55,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -674,9 +673,8 @@ private fun SaveEntryCard(
             ) {
                 Surface(
                     modifier = Modifier
-                        .width(116.dp)
-                        .height(86.dp),
-                    shape = neonShape(14.dp),
+                        .width(152.dp),
+                    shape = neonShape(4.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
                     tonalElevation = 0.dp,
                     shadowElevation = 0.dp
@@ -684,13 +682,9 @@ private fun SaveEntryCard(
                     GameCoverArt(
                         coverPath = previewPath,
                         fallbackTitle = entry.gameTitle,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(neonShape(14.dp))
-                            .then(
-                                if (previewPath != null) Modifier.scale(1.22f) else Modifier
-                            ),
-                        contentScale = ContentScale.Crop
+                        modifier = Modifier.fillMaxWidth(),
+                        contentScale = ContentScale.Fit,
+                        matchImageAspectRatio = true
                     )
                 }
 

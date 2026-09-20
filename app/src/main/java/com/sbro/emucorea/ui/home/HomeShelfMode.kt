@@ -43,6 +43,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.RectangleShape
+import com.sbro.emucorea.ui.common.isGenerated3dCover
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -476,7 +478,7 @@ private fun ShelfCoverCard(
     val debouncedClick = rememberDebouncedClick(onClick = onClick)
     val interactionSource = remember { MutableInteractionSource() }
     val showMenu = remember(game.path) { mutableStateOf(false) }
-    val shape = neonShape(24.dp)
+    val shape = if (isGenerated3dCover(game.coverArtPath)) RectangleShape else neonShape(24.dp)
     val coverAspectRatio = GameCoverAspectRatio
     val horizontalCoverPadding = if (isActive) 6.dp else 8.dp
     val verticalCoverPadding = if (isActive) 6.dp else 4.dp

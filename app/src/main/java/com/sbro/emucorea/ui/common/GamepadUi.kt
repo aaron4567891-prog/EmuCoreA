@@ -36,6 +36,7 @@ enum class GamepadFocusHighlightMode {
 
 fun Modifier.gamepadFocusableCard(
     enabled: Boolean = true,
+    showIdleBorder: Boolean = true,
     shape: Shape? = null,
     interactionSource: MutableInteractionSource? = null,
     addFocusTarget: Boolean = true,
@@ -57,7 +58,7 @@ fun Modifier.gamepadFocusableCard(
     )
     val focusBorder = when {
         shouldShowFocusHighlight -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.95f))
-        else -> BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+        else -> BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = if (showIdleBorder) 0.05f else 0f))
     }
 
     var focusedModifier = if (tvUiEnabled) {

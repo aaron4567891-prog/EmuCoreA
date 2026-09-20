@@ -99,6 +99,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import com.sbro.emucorea.ui.common.isGenerated3dCover
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -1266,12 +1269,13 @@ private fun RecentGameCard(
                     onLongClick = { showMenu = true }
                 )
                 .gamepadFocusableCard(
-                    shape = neonShape(16.dp),
+                    showIdleBorder = !isGenerated3dCover(game.coverArtPath),
+                    shape = if (isGenerated3dCover(game.coverArtPath)) RectangleShape else neonShape(16.dp),
                     interactionSource = interactionSource,
                     addFocusTarget = false
                 ),
-            shape = neonShape(16.dp),
-            color = MaterialTheme.colorScheme.surface,
+            shape = if (isGenerated3dCover(game.coverArtPath)) RectangleShape else neonShape(16.dp),
+            color = if (isGenerated3dCover(game.coverArtPath)) Color.Transparent else MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp
         ) {
@@ -1279,7 +1283,7 @@ private fun RecentGameCard(
                 modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(GameCoverAspectRatio)
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                        .background(if (isGenerated3dCover(game.coverArtPath)) Color.Transparent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
                 ) {
                     if (showCenteredTitlePlaceholder) {
                         GridCoverPlaceholder(
@@ -1380,21 +1384,22 @@ private fun GameCard(
                 onLongClick = { showMenu = true }
             )
             .gamepadFocusableCard(
-                shape = neonShape(16.dp),
+                    showIdleBorder = !isGenerated3dCover(game.coverArtPath),
+                shape = if (isGenerated3dCover(game.coverArtPath)) RectangleShape else neonShape(16.dp),
                 interactionSource = interactionSource,
                 addFocusTarget = false
             ),
-        shape = neonShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
+        shape = if (isGenerated3dCover(game.coverArtPath)) RectangleShape else neonShape(16.dp),
+        color = if (isGenerated3dCover(game.coverArtPath)) Color.Transparent else MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
-        border = gridCardBorder
+        border = if (isGenerated3dCover(game.coverArtPath)) null else gridCardBorder
     ) {
         Box(
             modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(GameCoverAspectRatio)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                    .background(if (isGenerated3dCover(game.coverArtPath)) Color.Transparent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
             ) {
                 if (showCenteredTitlePlaceholder) {
                     GridCoverPlaceholder(
@@ -1510,7 +1515,7 @@ private fun GameListCard(
                     modifier = Modifier
                         .width(52.dp)
                         .aspectRatio(GameCoverAspectRatio)
-                        .clip(neonShape(10.dp))
+                        .clip(if (isGenerated3dCover(game.coverArtPath)) RectangleShape else neonShape(10.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
                 ) {
                     GameCoverArt(
