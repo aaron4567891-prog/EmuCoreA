@@ -10,8 +10,6 @@ import android.util.Log
 import android.view.PixelCopy
 import android.view.Surface
 import com.sbro.emucorea.data.AppPreferences
-import com.sbro.emucorea.network.NetPlaySession
-import com.sbro.emucorea.network.RemotePlaySession
 import com.sbro.emucorea.data.DisplayCrop
 import com.sbro.emucorea.ui.common.invalidateCoverImage
 import kotlinx.coroutines.CoroutineScope
@@ -1428,9 +1426,7 @@ object EmulatorBridge {
     fun setPadButton(padIndex: Int, index: Int, range: Int, pressed: Boolean) {
         if (!isNativeLoaded) return
         try {
-            if (RemotePlaySession.forwardGuestButton(index, range, pressed)) return
-            val mappedPadIndex = NetPlaySession.mapAndSendLocalButton(padIndex, index, range, pressed)
-            NativeApp.setPadButton(mappedPadIndex, index, range, pressed)
+            NativeApp.setPadButton(padIndex, index, range, pressed)
         } catch (_: Exception) { }
     }
 

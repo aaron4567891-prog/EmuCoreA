@@ -172,7 +172,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.browser)
-    implementation(libs.webrtc.android)
     implementation(libs.android.youtube.player.core)
     ksp(libs.androidx.room.compiler)
     discordSdkDirectory?.let { sdkDir ->

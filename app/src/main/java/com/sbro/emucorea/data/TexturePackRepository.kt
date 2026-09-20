@@ -132,15 +132,10 @@ class TexturePackRepository(
                         }
                         val cleanParts = cleanZipPath(entry.name) ?: error("Invalid texture archive path")
                         if (cleanParts.isEmpty()) continue
-                        val isIni = isTexturesIni(cleanParts.last())
+                        val isIni = cleanParts.last().endsWith(".ini", ignoreCase = true)
                         if (!isIni && !isTextureFile(cleanParts.last())) continue
-
-                        val relativeParts = if (isIni) {
-                            listOf("textures.ini")
-                        } else {
-                            textureRelativePath(cleanParts, serialFromParts(cleanParts).orEmpty())
-                        }
-                        if (relativeParts.isEmpty()) continue
+                        // Keep the archive hierarchy until textures.ini identifies the pack root.
+                        val relativeParts = cleanParts
                         val relative = relativeParts.joinToString("/")
                         require(sourceFiles.add(relative)) { "Duplicate texture archive entry" }
                         val stagedTarget = safeChild(sourceRoot, relativeParts)
@@ -162,22 +157,24 @@ class TexturePackRepository(
                 }
             }
 
-            val textureIni = File(sourceRoot, "textures.ini")
-            require(textureIni.isFile) { "PPSSPP texture pack is missing textures.ini" }
-            require(sourceFiles.any { !isTexturesIni(it.substringAfterLast('/')) }) {
+            val layout = resolveTexturePackLayout(sourceFiles)
+            val textureIniPath = layout.entries.single { it.value == "textures.ini" }.key
+            val textureIni = File(sourceRoot, textureIniPath)
+            require(layout.values.any { isTextureFile(it.substringAfterLast('/')) }) {
                 "PPSSPP texture pack contains no texture assets"
             }
             val serials = linkedSetOf<String>().apply {
                 normalizedTargetSerial?.let(::add)
                 if (isEmpty()) addAll(readSerialsFromTexturesIni(textureIni))
+                if (isEmpty()) serialFromParts(textureIniPath.split('/').dropLast(1))?.let(::add)
                 if (isEmpty()) fallbackSerial?.let(::add)
             }
             require(serials.isNotEmpty()) { "Could not determine a PSP disc ID" }
 
             serials.forEach { serial ->
                 val stagedSerialRoot = File(canonicalStagingRoot, gameDirectoryName(serial))
-                sourceFiles.forEach { relative ->
-                    val source = safeChild(sourceRoot, relative.split('/'))
+                layout.forEach { (sourceRelative, relative) ->
+                    val source = safeChild(sourceRoot, sourceRelative.split('/'))
                         ?: error("Invalid staged texture path")
                     val target = safeChild(stagedSerialRoot, relative.split('/'))
                         ?: error("Invalid staged texture path")
@@ -195,13 +192,13 @@ class TexturePackRepository(
                 }
                 TextureImportResult(
                     success = true,
-                    importedFiles = sourceFiles.size * serials.size,
+                    importedFiles = layout.size * serials.size,
                     importedSerials = serials
                 )
             } else {
                 serials.forEach { serial ->
                     val stagedSerialRoot = File(canonicalStagingRoot, gameDirectoryName(serial))
-                    sourceFiles.forEach { relative ->
+                    layout.values.forEach { relative ->
                         val staged = safeChild(stagedSerialRoot, relative.split('/'))
                             ?: error("Invalid staged texture path")
                         val target = safeChild(gameDir(serial), relative.split('/'))
@@ -212,7 +209,7 @@ class TexturePackRepository(
                 }
                 TextureImportResult(
                     success = true,
-                    importedFiles = sourceFiles.size * serials.size,
+                    importedFiles = layout.size * serials.size,
                     importedSerials = serials
                 )
             }
@@ -332,8 +329,6 @@ class TexturePackRepository(
         return name.substringAfterLast('.', "").lowercase(Locale.US) in textureExtensions
     }
 
-    private fun isTexturesIni(name: String): Boolean = name.equals("textures.ini", ignoreCase = true)
-
     private fun readSerialsFromTexturesIni(file: File): Set<String> {
         val gameSection = Regex("^\\s*\\[games\\]\\s*$", RegexOption.IGNORE_CASE)
         val section = Regex("^\\s*\\[[^]]+\\]\\s*$")
@@ -379,25 +374,6 @@ class TexturePackRepository(
         return if ('-' in value) value else "${value.take(4)}-${value.drop(4)}"
     }
 
-    private fun textureRelativePath(parts: List<String>, serial: String): List<String> {
-        val normalizedParts = parts.map { part -> normalizeSerial(part) ?: part }
-        val serialIndex = normalizedParts.indexOfFirst { it.equals(serial, ignoreCase = true) }
-        val markerIndex = normalizedParts.indexOfFirst {
-            it.equals("replacements", ignoreCase = true) || it.equals("textures", ignoreCase = true)
-        }
-        val startIndex = maxOf(serialIndex, markerIndex).let { if (it >= 0) it + 1 else 0 }
-        val relative = parts.drop(startIndex)
-        return if (
-            startIndex == 0 &&
-            relative.size > 1 &&
-            githubCodeloadRootPattern.matches(relative.first())
-        ) {
-            relative.drop(1)
-        } else {
-            relative
-        }
-    }
-
     private fun safeChild(root: File, relativeParts: List<String>): File? {
         val rootCanonical = root.canonicalFile
         val target = relativeParts.fold(rootCanonical) { current, part -> File(current, part) }.canonicalFile
@@ -422,7 +398,6 @@ class TexturePackRepository(
         const val MAX_TEXTURE_FILE_BYTES = 512L * 1024L * 1024L
         const val MAX_ARCHIVE_BYTES = 12L * 1024L * 1024L * 1024L
         const val MIN_FREE_SPACE_BYTES = 512L * 1024L * 1024L
-        val githubCodeloadRootPattern = Regex(".+-[0-9a-fA-F]{40}")
     }
 }
 

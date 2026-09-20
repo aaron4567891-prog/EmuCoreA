@@ -1375,7 +1375,9 @@ bool RecordPresentShaderChain(uint32_t swapchain_index, uint32_t source_width, u
                          VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1,
                          &target_barrier);
 
-    const libra_image_vk_t in = {g_vk.frame_image.create_info.image, VK_FORMAT_R8G8B8A8_UNORM, source_width,
+    // The core presents BGRA on Vulkan. Preserve its declared format rather than
+    // reinterpreting the same bytes as RGBA (which swaps red and blue).
+    const libra_image_vk_t in = {g_vk.frame_image.create_info.image, g_vk.frame_image.create_info.format, source_width,
                                  source_height};
     const libra_image_vk_t out = {g_vk.chain_target_image, VK_FORMAT_R8G8B8A8_UNORM, g_vk.chain_target_width,
                                   g_vk.chain_target_height};
