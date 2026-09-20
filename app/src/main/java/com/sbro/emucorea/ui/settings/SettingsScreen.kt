@@ -4980,7 +4980,6 @@ internal fun CoreOptionSettingsRows(
         val localized = PpssppCoreOptionLocalization.resolve(context, option)
         val title = localized.label
         val help = ppssppCoreOptionHelpRes(option.key)?.let { stringResource(it) }
-            ?: localized.description.takeIf { it.isNotBlank() }
         if (option.isBooleanToggle) {
             ToggleItem(
                 icon = Icons.Rounded.Tune,

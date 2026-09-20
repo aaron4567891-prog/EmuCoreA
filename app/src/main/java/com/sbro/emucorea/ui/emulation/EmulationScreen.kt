@@ -5013,7 +5013,6 @@ private fun CoreOptionRows(
         val localized = PpssppCoreOptionLocalization.resolve(context, option)
         val title = localized.label
         val help = ppssppCoreOptionHelpRes(option.key)?.let { stringResource(it) }
-            ?: localized.description.takeIf { it.isNotBlank() }
         val choiceLabels = localized.choices.map { it.label }
         // Equal-width chips clip long labels; fall back to a horizontally
         // scrollable row whenever the labels cannot fit their share of the row.

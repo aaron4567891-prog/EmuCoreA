@@ -12,7 +12,7 @@ class PpssppOptionLocalizationInstrumentedTest {
     fun allSupportedLanguagesResolveVisibleCoreOptions() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val failures = PpssppCoreOptionLocalization.coverageAll(context.assets).mapNotNull { coverage ->
-            val missing = coverage.untranslatedLabels + coverage.untranslatedDescriptions + coverage.untranslatedChoices
+            val missing = coverage.untranslatedLabels + coverage.untranslatedChoices
             if (missing.isEmpty()) null else "${coverage.language}: ${missing.distinct()}"
         }
         assertTrue(failures.joinToString("\n"), failures.isEmpty())

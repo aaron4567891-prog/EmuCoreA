@@ -41,5 +41,30 @@ fun ppssppCoreOptionHelpRes(key: String): Int? = when {
     key == "ppsspp_port_offset" -> R.string.settings_help_core_port_offset
     key == "ppsspp_minimum_timeout" -> R.string.settings_help_core_minimum_timeout
     key == "ppsspp_forced_first_connect" -> R.string.settings_help_core_forced_first_connect
+    key == "ppsspp_fast_memory" -> R.string.settings_help_core_fast_memory
+    key == "ppsspp_force_lag_sync" -> R.string.settings_help_core_force_lag_sync
+    key == "ppsspp_memstick_inserted" -> R.string.settings_help_core_memstick_inserted
+    key == "ppsspp_language" -> R.string.settings_help_core_language
+    key == "ppsspp_backend" -> R.string.settings_help_core_backend
+    key == "ppsspp_software_rendering" -> R.string.settings_help_core_software_rendering
+    key == "ppsspp_internal_resolution" -> R.string.settings_help_core_internal_resolution
+    key == "ppsspp_mulitsample_level" -> R.string.settings_help_core_mulitsample_level
+    key == "ppsspp_cropto16x9" -> R.string.settings_help_core_cropto16x9
+    key == "ppsspp_frame_duplication" -> R.string.settings_help_core_frame_duplication
+    key == "ppsspp_detect_vsync_swap_interval" -> R.string.settings_help_core_detect_vsync_swap_interval
+    key == "ppsspp_inflight_frames" -> R.string.settings_help_core_inflight_frames
+    key == "ppsspp_analog_deadzone" -> R.string.settings_help_core_analog_deadzone
+    key == "ppsspp_analog_sensitivity" -> R.string.settings_help_core_analog_sensitivity
+    key == "ppsspp_skip_buffer_effects" -> R.string.settings_help_core_skip_buffer_effects
+    key == "ppsspp_skip_gpu_readbacks" -> R.string.settings_help_core_skip_gpu_readbacks
+    key == "ppsspp_lazy_texture_caching" -> R.string.settings_help_core_lazy_texture_caching
+    key == "ppsspp_spline_quality" -> R.string.settings_help_core_spline_quality
+    key == "ppsspp_lower_resolution_for_effects" -> R.string.settings_help_core_lower_resolution_for_effects
+    key == "ppsspp_software_skinning" -> R.string.settings_help_core_software_skinning
+    key == "ppsspp_hardware_tesselation" -> R.string.settings_help_core_hardware_tesselation
+    key == "ppsspp_texture_scaling_level" -> R.string.settings_help_core_texture_scaling_level
+    key == "ppsspp_texture_deposterize" -> R.string.settings_help_core_texture_deposterize
+    key == "ppsspp_texture_shader" -> R.string.settings_help_core_texture_shader
+    key == "ppsspp_smart_2d_texture_filtering" -> R.string.settings_help_core_smart_2d_texture_filtering
     else -> null
 }

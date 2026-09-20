@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap
 object PpssppCoreOptionLocalization {
     data class Text(
         val label: String,
-        val description: String,
         val choices: List<PpssppCoreOptions.Choice>,
     )
 
@@ -29,12 +28,9 @@ object PpssppCoreOptionLocalization {
         val optionCount: Int,
         val labelCount: Int,
         val labelTotal: Int,
-        val descriptionCount: Int,
-        val descriptionTotal: Int,
         val choiceCount: Int,
         val choiceTotal: Int,
         val untranslatedLabels: List<String>,
-        val untranslatedDescriptions: List<String>,
         val untranslatedChoices: List<String>,
     )
 
@@ -105,13 +101,10 @@ object PpssppCoreOptionLocalization {
             ?: specialLabels[normalizedLanguage]?.get(option.key)
             ?: labelCatalog.lookup(alias)?.takeUnless { it == option.label && !isTechnical(option.label) }
             ?: fallbackLabel(normalizedLanguage, labelCatalog, option)
-        val description = if (option.description.isBlank()) "" else {
-            exactDescription(normalizedLanguage, option.key) ?: translateFallback(normalizedLanguage, option.description)
-        }
         val choices = option.choices.map { choice ->
             choice.copy(label = choiceLabel(normalizedLanguage, labelCatalog, choice))
         }
-        return Text(label = normalizeOptionTitle(label, normalizedLanguage), description = description, choices = choices)
+        return Text(label = normalizeOptionTitle(label, normalizedLanguage), choices = choices)
     }
 
     private fun normalizeOptionTitle(label: String, language: String): String {
@@ -129,9 +122,6 @@ object PpssppCoreOptionLocalization {
         val options = PpssppCoreOptions.all()
         val resolved = options.map { it to resolveForLanguage(assets, language, it) }
         val labels = resolved.filter { (option, text) -> text.label != option.label || isTechnical(option.label) }
-        val descriptions = resolved.filter { (option, text) ->
-            option.description.isBlank() || text.description != option.description
-        }
         val choices = resolved.flatMap { (option, text) ->
             option.choices.zip(text.choices).filter { (source, localized) ->
                 localized.label != source.label || isTechnical(source.label)
@@ -139,9 +129,6 @@ object PpssppCoreOptionLocalization {
         }
         val untranslatedLabels = resolved.filter { (option, text) ->
             text.label == option.label && !isTechnical(option.label)
-        }.map { it.first.key }
-        val untranslatedDescriptions = resolved.filter { (option, text) ->
-            option.description.isNotBlank() && text.description == option.description
         }.map { it.first.key }
         val untranslatedChoices = resolved.flatMap { (option, text) ->
             option.choices.zip(text.choices).filter { (source, localized) ->
@@ -153,12 +140,9 @@ object PpssppCoreOptionLocalization {
             optionCount = options.size,
             labelCount = labels.size,
             labelTotal = options.size,
-            descriptionCount = descriptions.sumOf { if (it.first.description.isBlank()) 0 else 1 },
-            descriptionTotal = options.count { it.description.isNotBlank() },
             choiceCount = choices.size,
             choiceTotal = options.sumOf { it.choices.size },
             untranslatedLabels = untranslatedLabels,
-            untranslatedDescriptions = untranslatedDescriptions,
             untranslatedChoices = untranslatedChoices,
         )
     }
@@ -320,9 +304,6 @@ object PpssppCoreOptionLocalization {
         "uk" to mapOf("Percent of FPS" to "Відсоток частоти кадрів", "IP address" to "IP-адреса"),
         "zh" to mapOf("Percent of FPS" to "幀率百分比", "IP address" to "IP 位址"),
     )
-
-    private fun exactDescription(language: String, key: String): String? =
-        PpssppCoreOptionDescriptionTranslations.get(language, key)
 
     private fun normalize(value: String): String =
         value.lowercase(Locale.ROOT).replace(Regex("[^a-z0-9]+"), "")

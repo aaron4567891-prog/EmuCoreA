@@ -12,7 +12,6 @@ object PpssppCoreOptions {
     data class Option(
         val key: String,
         val label: String,
-        val description: String,
         val category: String,
         val choices: List<Choice>,
         val defaultValue: String,
@@ -57,7 +56,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_cpu_core",
             label = "CPU Core",
-            description = "",
             category = "system",
             choices = listOf(
                 Choice("JIT", "Dynarec (JIT)"),
@@ -69,7 +67,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_fast_memory",
             label = "Fast Memory",
-            description = "Unstable.",
             category = "system",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -80,7 +77,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_ignore_bad_memory_access",
             label = "Ignore Bad Memory Accesses",
-            description = "",
             category = "system",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -91,7 +87,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_io_timing_method",
             label = "I/O Timing Method",
-            description = "",
             category = "system",
             choices = listOf(
                 Choice("Fast", "Fast"),
@@ -103,7 +98,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_force_lag_sync",
             label = "Force Real Clock Sync",
-            description = "Slower, less lag.",
             category = "system",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -114,7 +108,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_locked_cpu_speed",
             label = "Locked CPU Speed",
-            description = "",
             category = "system",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -142,7 +135,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_memstick_inserted",
             label = "Memory Stick Inserted",
-            description = "Some games require ejecting/inserting the Memory Stick.",
             category = "system",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -153,7 +145,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_memstick_size",
             label = "Memory Stick size",
-            description = "",
             category = "system",
             choices = listOf(1, 2, 4, 8, 16, 32, 64, 128).map { Choice(it.toString(), "${it}GB") },
             defaultValue = "16",
@@ -161,7 +152,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_cache_iso",
             label = "Cache Full ISO in RAM",
-            description = "",
             category = "system",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -172,7 +162,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_cheats",
             label = "Internal Cheats Support",
-            description = "",
             category = "system",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -183,7 +172,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_language",
             label = "Game Language",
-            description = "'Automatic' will use the frontend language.",
             category = "system",
             choices = listOf(
                 Choice("Automatic", "Automatic"),
@@ -205,7 +193,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_psp_model",
             label = "PSP Model",
-            description = "",
             category = "system",
             choices = listOf(
                 Choice("psp_1000", "PSP-1000"),
@@ -217,7 +204,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_backend",
             label = "Backend",
-            description = "'Automatic' will use the frontend video driver. Core restart required.",
             category = "video",
             choices = listOf(
                 Choice("auto", "Automatic"),
@@ -229,7 +215,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_software_rendering",
             label = "Software Rendering",
-            description = "Slow, accurate. Core restart required.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -240,7 +225,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_internal_resolution",
             label = "Rendering Resolution",
-            description = "Core restart required with Vulkan.",
             category = "video",
             choices = listOf(
                 Choice("480x272", "1x (480x272)"),
@@ -259,7 +243,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_mulitsample_level",
             label = "MSAA Antialiasing",
-            description = "Vulkan only. Core restart required.",
             category = "video",
             choices = listOf(
                 Choice("Disabled", "Disabled"),
@@ -272,7 +255,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_cropto16x9",
             label = "Crop to 16x9",
-            description = "Remove one line from top and bottom to get exact 16:9. Core restart required with Vulkan.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -283,7 +265,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_frameskip",
             label = "Frameskip",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -301,7 +282,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_frameskiptype",
             label = "Frameskip Type",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("Number of frames", "Number of frames"),
@@ -312,7 +292,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_auto_frameskip",
             label = "Auto Frameskip",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -323,7 +302,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_frame_duplication",
             label = "Render Duplicate Frames to 60 Hz",
-            description = "Can make framerate smoother in games that run at lower framerates.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -334,7 +312,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_detect_vsync_swap_interval",
             label = "Detect Frame Rate Changes",
-            description = "Notify frontend.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -345,7 +322,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_inflight_frames",
             label = "Buffer Graphics Commands",
-            description = "GL/Vulkan only, slower, less lag, restart.",
             category = "video",
             choices = listOf(
                 Choice("No buffer", "No buffer"),
@@ -357,7 +333,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_button_preference",
             label = "Confirmation Button",
-            description = "",
             category = "input",
             choices = listOf(
                 Choice("Cross", "Cross"),
@@ -368,7 +343,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_analog_is_circular",
             label = "Analog Circle vs Square Gate Compensation",
-            description = "",
             category = "input",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -379,7 +353,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_analog_deadzone",
             label = "Analog Deadzone",
-            description = "Additional deadzone to apply after frontend input.",
             category = "input",
             choices = listOf(
                 Choice("0.0", "0%"),
@@ -399,7 +372,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_analog_sensitivity",
             label = "Analog Axis Scale",
-            description = "Additional sensitivity factor to apply after frontend input.",
             category = "input",
             choices = listOf(
                 Choice("1.00", "1.00"),
@@ -460,7 +432,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_skip_buffer_effects",
             label = "Skip Buffer Effects",
-            description = "Faster, but nothing may draw in some games.",
             category = "hacks",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -471,7 +442,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_skip_gpu_readbacks",
             label = "Skip GPU Readbacks",
-            description = "Some games require GPU readbacks, so be careful.",
             category = "hacks",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -482,7 +452,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_lazy_texture_caching",
             label = "Lazy Texture Caching (Speedup)",
-            description = "Faster, but can cause text problems in a few games.",
             category = "hacks",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -493,7 +462,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_spline_quality",
             label = "Spline/Bezier Curves Quality",
-            description = "Only used by some games, controls smoothness of curves.",
             category = "hacks",
             choices = listOf(
                 Choice("Low", "Low"),
@@ -505,7 +473,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_lower_resolution_for_effects",
             label = "Lower Resolution for Effects",
-            description = "Reduces artifacts.",
             category = "hacks",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -519,7 +486,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_gpu_hardware_transform",
             label = "Hardware Transform",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -530,7 +496,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_software_skinning",
             label = "Software Skinning",
-            description = "Combine skinned model draws on the CPU, faster in most games.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -541,7 +506,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_hardware_tesselation",
             label = "Hardware Tesselation",
-            description = "Uses hardware to make curves.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -552,7 +516,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_texture_scaling_type",
             label = "Texture Upscale Type",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("xbrz", "xBRZ"),
@@ -565,7 +528,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_texture_scaling_level",
             label = "Texture Upscaling Level",
-            description = "CPU heavy, some scaling may be delayed to avoid stutter.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -579,7 +541,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_texture_deposterize",
             label = "Texture Deposterize",
-            description = "Fixes visual banding glitches in upscaled textures.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -590,7 +551,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_texture_shader",
             label = "Texture Shader",
-            description = "Vulkan only, overrides 'Texture Scaling Type'.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -603,7 +563,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_texture_anisotropic_filtering",
             label = "Anisotropic Filtering",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -617,7 +576,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_texture_filtering",
             label = "Texture Filtering",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("Auto", "Auto"),
@@ -630,7 +588,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_smart_2d_texture_filtering",
             label = "Smart 2D Texture Filtering",
-            description = "Gets rid of some visual artifacts caused by unnecessary texture filtering in some 2D games, by switching to nearest filtering.",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -641,7 +598,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_texture_replacement",
             label = "Texture Replacement",
-            description = "",
             category = "video",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -653,7 +609,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_enable_wlan",
             label = "Enable Networking/WLAN (Beta, may break games)",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -664,7 +619,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address01",
             label = "MAC Address Pt  1: x-:--:--:--:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -689,7 +643,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address02",
             label = "MAC Address Pt  2: -x:--:--:--:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -714,7 +667,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address03",
             label = "MAC Address Pt  3: --:x-:--:--:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -739,7 +691,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address04",
             label = "MAC Address Pt  4: --:-x:--:--:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -764,7 +715,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address05",
             label = "MAC Address Pt  5: --:--:x-:--:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -789,7 +739,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address06",
             label = "MAC Address Pt  6: --:--:-x:--:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -814,7 +763,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address07",
             label = "MAC Address Pt  7: --:--:--:x-:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -839,7 +787,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address08",
             label = "MAC Address Pt  8: --:--:--:-x:--:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -864,7 +811,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address09",
             label = "MAC Address Pt  9: --:--:--:--:x-:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -889,7 +835,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address10",
             label = "MAC Address Pt 10: --:--:--:--:-x:--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -914,7 +859,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address11",
             label = "MAC Address Pt 11: --:--:--:--:--:x-",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -939,7 +883,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_mac_address12",
             label = "MAC Address Pt 12: --:--:--:--:--:-x",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -964,7 +907,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_wlan_channel",
             label = "WLAN Channel",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("Auto", "Auto"),
@@ -977,7 +919,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_enable_builtin_pro_ad_hoc_server",
             label = "Enable Built-in PRO Ad Hoc Server",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -988,7 +929,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_change_pro_ad_hoc_server_address",
             label = "Change PRO Ad Hoc Server IP Address ('localhost' = multiple instances)",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("socom.cc", "socom.cc"),
@@ -1002,7 +942,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address01",
             label = "PRO Ad Hoc Server IP Address Pt  1: x--.---.---.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1021,7 +960,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address02",
             label = "PRO Ad Hoc Server IP Address Pt  2: -x-.---.---.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1040,7 +978,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address03",
             label = "PRO Ad Hoc Server IP Address Pt  3: --x.---.---.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1059,7 +996,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address04",
             label = "PRO Ad Hoc Server IP Address Pt  4: ---.x--.---.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1078,7 +1014,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address05",
             label = "PRO Ad Hoc Server IP Address Pt  5: ---.-x-.---.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1097,7 +1032,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address06",
             label = "PRO Ad Hoc Server IP Address Pt  6: ---.--x.---.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1116,7 +1050,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address07",
             label = "PRO Ad Hoc Server IP Address Pt  7: ---.---.x--.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1135,7 +1068,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address08",
             label = "PRO Ad Hoc Server IP Address Pt  8: ---.---.-x-.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1154,7 +1086,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address09",
             label = "PRO Ad Hoc Server IP Address Pt  9: ---.---.--x.---",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1173,7 +1104,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address10",
             label = "PRO Ad Hoc Server IP Address Pt 10: ---.---.---.x--",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1192,7 +1122,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address11",
             label = "PRO Ad Hoc Server IP Address Pt 11: ---.---.---.-x-",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1211,7 +1140,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_pro_ad_hoc_server_address12",
             label = "PRO Ad Hoc Server IP Address Pt 12: ---.---.---.--x",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1230,7 +1158,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_enable_upnp",
             label = "Enable UPnP (Need a few seconds to detect)",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -1241,7 +1168,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_upnp_use_original_port",
             label = "UPnP Use Original Port ('ON' = PSP compatibility)",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("disabled", "disabled"),
@@ -1252,7 +1178,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_port_offset",
             label = "Port Offset ('0' = PSP compatibility)",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1317,7 +1242,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_minimum_timeout",
             label = "Minimum Timeout (Override in ms, '0' = default)",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("0", "0"),
@@ -1367,7 +1291,6 @@ object PpssppCoreOptions {
         Option(
             key = "ppsspp_forced_first_connect",
             label = "Forced First Connect (Faster connect)",
-            description = "",
             category = "network",
             choices = listOf(
                 Choice("disabled", "disabled"),
