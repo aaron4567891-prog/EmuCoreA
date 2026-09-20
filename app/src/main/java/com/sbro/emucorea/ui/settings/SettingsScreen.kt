@@ -1450,6 +1450,7 @@ private fun SettingsContent(
                                 subtitle = stringResource(R.string.settings_gyro_invert_x_desc),
                                 checked = uiState.gyroInvertX,
                                 onCheckedChange = viewModel::setGyroInvertX,
+                                helpText = stringResource(R.string.settings_help_gyro_invert_x),
                                 onResetToDefault = { viewModel.setGyroInvertX(defaults.gyroInvertX) }
                             )
                             if (uiState.gyroMode == AppPreferences.GYRO_MODE_AIM) {
@@ -1459,6 +1460,7 @@ private fun SettingsContent(
                                     subtitle = stringResource(R.string.settings_gyro_invert_y_desc),
                                     checked = uiState.gyroInvertY,
                                     onCheckedChange = viewModel::setGyroInvertY,
+                                    helpText = stringResource(R.string.settings_help_gyro_invert_y),
                                     onResetToDefault = { viewModel.setGyroInvertY(defaults.gyroInvertY) }
                                 )
                             }
@@ -1719,6 +1721,7 @@ private fun SettingsContent(
                             ),
                             selectedValue = uiState.multitapMode,
                             onSelect = viewModel::setMultitapMode,
+                            helpText = stringResource(R.string.settings_help_multitap_mode),
                             onResetToDefault = { viewModel.setMultitapMode(defaults.multitapMode) }
                         )
                         var coreControlsVersion by remember { mutableIntStateOf(0) }
@@ -1868,6 +1871,7 @@ private fun SettingsContent(
                             onSelect = { key ->
                                 viewModel.setUpscaleMultiplier(upscaleKeyToMultiplier(key))
                             },
+                            helpText = stringResource(R.string.settings_help_upscale),
                             onResetToDefault = {
                                 viewModel.setUpscaleMultiplier(defaults.upscaleMultiplier)
                             }

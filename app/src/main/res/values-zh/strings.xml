@@ -885,6 +885,12 @@
     <string name="settings_help_gyro_mode">“瞄准”将手机的旋转速度转换为射击游戏中的右摇杆来控制视角，并在手机停止移动时自动回中。“转向”将手机的倾斜角度转换为赛车游戏中的左摇杆，并在游戏开始时将当前角度校准为中心点。所选模式仅在游戏运行时生效，并且需要相应的运动传感器。</string>
     <string name="settings_help_gyro_sensitivity">控制手机移动对模拟摇杆产生的偏移强度。由于不同游戏具有不同的视角和转向响应曲线，建议为每个游戏单独设置。</string>
     <string name="settings_help_gyro_smoothing">过滤传感器噪声和手部抖动。数值越低反应越快；数值越高感觉越稳定，但会增加少许延迟。</string>
+    <string name="settings_help_upscale">以更高的內部解析度渲染遊戲，再將畫面縮放至螢幕。數值越高，3D 遊戲越銳利，但 GPU 負載也越大，重度遊戲可能掉幀或過熱。請一邊看著 FPS 計數器一邊逐步調高：原生可獲得最佳效能，2x 在大多數手機上最平衡，更高數值只建議用於高效能裝置或簡單遊戲。</string>
+    <string name="settings_help_gyro_invert_x">反轉陀螺儀的水平軸。若瞄準與手機轉動方向一致，請保持關閉；若左右感覺相反則開啟，有些玩家偏好這樣控制鏡頭。</string>
+    <string name="settings_help_gyro_invert_y">在瞄準模式中反轉陀螺儀的垂直軸。若上下視角與手機傾斜方向相反，請開啟。</string>
+    <string name="settings_help_multitap_mode">共用 PSP 的單一控制組，讓更多玩家在同一台裝置上加入。每位玩家會分配到各自的 PSP 連接埠。若遊戲只檢查該連接埠，保留一個連接埠啟用；不同遊戲使用不同連接埠時啟用兩者；一般單人遊玩則關閉。</string>
+    <string name="emulation_help_auto_save">遊玩時每隔一段時間將目前遊戲狀態存入自動存檔欄位。這能在長時間遊玩中保護進度，但每次存檔都會寫入儲存空間，較慢的裝置可能出現短暫卡頓。若無法經常手動存檔可開啟；若使用一般存檔狀態則保持關閉。</string>
+    <string name="emulation_help_auto_save_interval">設定自動存檔的執行間隔（分鐘，1–999）。間隔越短越能保護進度，但寫入儲存空間越頻繁，可能造成短暫卡頓；間隔越長對裝置與電池越友善，但應用程式突然關閉時可能損失更多進度。</string>
     <string name="settings_gyro_unavailable">此设备未提供所选模式所需的运动传感器。</string>
     <string name="onboarding_games_selected_count">已选择 %1$d 个文件夹。点击以添加其他文件夹。</string>
     <string name="settings_game_folders_count">已选择 %1$d 个文件夹</string>

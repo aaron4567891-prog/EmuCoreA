@@ -884,6 +884,7 @@ private fun GameSettingsTabContent(
                         onSelected = { key ->
                             onDraftChange(draft.copy(upscaleMultiplier = upscaleKeyToMultiplier(key)))
                         },
+                        helpText = stringResource(R.string.settings_help_upscale),
                         onResetToDefault = {
                             onDraftChange(
                                 draft.copy(
@@ -1189,9 +1190,9 @@ private fun GameSettingsTabContent(
                     if (draft.gyroMode != AppPreferences.GYRO_MODE_OFF) {
                         SliderRow(stringResource(R.string.settings_gyro_sensitivity), draft.gyroSensitivity.toFloat(), "${draft.gyroSensitivity}%", 25f..300f, 10, { onDraftChange(draft.copy(gyroSensitivity = it.roundToInt())) }, helpText = stringResource(R.string.settings_help_gyro_sensitivity), onResetToDefault = { onDraftChange(draft.copy(gyroSensitivity = defaultProfile.gyroSensitivity)) })
                         SliderRow(stringResource(R.string.settings_gyro_smoothing), draft.gyroSmoothing.toFloat(), "${draft.gyroSmoothing}%", 0f..90f, 8, { onDraftChange(draft.copy(gyroSmoothing = it.roundToInt())) }, helpText = stringResource(R.string.settings_help_gyro_smoothing), onResetToDefault = { onDraftChange(draft.copy(gyroSmoothing = defaultProfile.gyroSmoothing)) })
-                        ToggleRow(stringResource(R.string.settings_gyro_invert_x), draft.gyroInvertX, { onDraftChange(draft.copy(gyroInvertX = it)) }, onResetToDefault = { onDraftChange(draft.copy(gyroInvertX = defaultProfile.gyroInvertX)) })
+                        ToggleRow(stringResource(R.string.settings_gyro_invert_x), draft.gyroInvertX, { onDraftChange(draft.copy(gyroInvertX = it)) }, helpText = stringResource(R.string.settings_help_gyro_invert_x), onResetToDefault = { onDraftChange(draft.copy(gyroInvertX = defaultProfile.gyroInvertX)) })
                         if (draft.gyroMode == AppPreferences.GYRO_MODE_AIM) {
-                            ToggleRow(stringResource(R.string.settings_gyro_invert_y), draft.gyroInvertY, { onDraftChange(draft.copy(gyroInvertY = it)) }, onResetToDefault = { onDraftChange(draft.copy(gyroInvertY = defaultProfile.gyroInvertY)) })
+                            ToggleRow(stringResource(R.string.settings_gyro_invert_y), draft.gyroInvertY, { onDraftChange(draft.copy(gyroInvertY = it)) }, helpText = stringResource(R.string.settings_help_gyro_invert_y), onResetToDefault = { onDraftChange(draft.copy(gyroInvertY = defaultProfile.gyroInvertY)) })
                         }
                     }
                     ToggleRow(
@@ -1244,6 +1245,7 @@ private fun GameSettingsTabContent(
                         ),
                         selectedValue = draft.multitapMode,
                         onSelected = { onDraftChange(draft.copy(multitapMode = it)) },
+                        helpText = stringResource(R.string.settings_help_multitap_mode),
                         onResetToDefault = { onDraftChange(draft.copy(multitapMode = defaultProfile.multitapMode)) }
                     )
                     CoreOptionManagerRows(

@@ -3148,6 +3148,10 @@ private fun EmulationSidebarMenu(
                                             overflow = TextOverflow.Ellipsis
                                         )
                                     }
+                                    SettingHelpButton(
+                                        title = stringResource(R.string.emulation_auto_save_title),
+                                        description = stringResource(R.string.emulation_help_auto_save)
+                                    )
                                     Switch(
                                         checked = uiState.autoSaveEnabled,
                                         onCheckedChange = onSetAutoSaveEnabled,
@@ -3165,6 +3169,10 @@ private fun EmulationSidebarMenu(
                                             text = stringResource(R.string.emulation_auto_save_interval_label),
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        SettingHelpButton(
+                                            title = stringResource(R.string.emulation_auto_save_interval_label),
+                                            description = stringResource(R.string.emulation_help_auto_save_interval)
                                         )
                                         OutlinedTextField(
                                             value = autoSaveIntervalText,
@@ -3656,6 +3664,7 @@ private fun EmulationSidebarMenu(
                             title = stringResource(R.string.settings_audio_mute),
                             checked = uiState.audioMuted,
                             onCheckedChange = onSetAudioMuted,
+                            helpText = stringResource(R.string.settings_help_audio_mute),
                             onResetToDefault = { onSetAudioMuted(globalDefaults.audioMuted) }
                         )
 
@@ -3666,6 +3675,7 @@ private fun EmulationSidebarMenu(
                             range = AudioDefaults.VOLUME_MIN.toFloat()..AudioDefaults.VOLUME_MAX.toFloat(),
                             steps = 0,
                             onValueChange = { onSetAudioVolume(it.toInt()) },
+                            helpText = stringResource(R.string.settings_help_audio_volume),
                             onResetToDefault = { onSetAudioVolume(globalDefaults.audioVolume) }
                         )
                         }
@@ -3753,6 +3763,7 @@ private fun EmulationSidebarMenu(
                             onValueChange = { onSetUpscale(upscaleKeyToMultiplier(it)) },
                             allowWrap = false,
                             horizontalScrolling = true,
+                            helpText = stringResource(R.string.settings_help_upscale),
                             onResetToDefault = { onSetUpscale(globalDefaults.upscaleMultiplier) }
                         )
 
