@@ -208,6 +208,7 @@ import com.sbro.emucorea.ui.common.tvFocusGroup
 import com.sbro.emucorea.ui.settings.ControlsEditorScreen
 import com.sbro.emucorea.ui.settings.toControlsEditorState
 import com.sbro.emucorea.core.PpssppCoreOptions
+import com.sbro.emucorea.core.ppssppCoreOptionHelpRes
 import com.sbro.emucorea.core.PpssppCoreOptionLocalization
 import com.sbro.emucorea.data.AchievementItem
 import com.sbro.emucorea.data.RetroAchievementsEvent
@@ -5011,7 +5012,8 @@ private fun CoreOptionRows(
         val currentIndex = values.indexOf(current).let { if (it >= 0) it else 0 }
         val localized = PpssppCoreOptionLocalization.resolve(context, option)
         val title = localized.label
-        val help = localized.description.takeIf { it.isNotBlank() }
+        val help = ppssppCoreOptionHelpRes(option.key)?.let { stringResource(it) }
+            ?: localized.description.takeIf { it.isNotBlank() }
         val choiceLabels = localized.choices.map { it.label }
         // Equal-width chips clip long labels; fall back to a horizontally
         // scrollable row whenever the labels cannot fit their share of the row.

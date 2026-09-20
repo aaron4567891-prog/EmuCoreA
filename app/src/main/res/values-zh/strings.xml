@@ -886,6 +886,14 @@
     <string name="settings_help_gyro_sensitivity">控制手机移动对模拟摇杆产生的偏移强度。由于不同游戏具有不同的视角和转向响应曲线，建议为每个游戏单独设置。</string>
     <string name="settings_help_gyro_smoothing">过滤传感器噪声和手部抖动。数值越低反应越快；数值越高感觉越稳定，但会增加少许延迟。</string>
     <string name="settings_help_upscale">以更高的內部解析度渲染遊戲，再將畫面縮放至螢幕。數值越高，3D 遊戲越銳利，但 GPU 負載也越大，重度遊戲可能掉幀或過熱。請一邊看著 FPS 計數器一邊逐步調高：原生可獲得最佳效能，2x 在大多數手機上最平衡，更高數值只建議用於高效能裝置或簡單遊戲。</string>
+    <string name="settings_help_core_frameskip">跳過最多所選數量的每秒繪製幀。跳幀可讓吃力的遊戲反應更快，但動作會變得卡頓，對時序敏感的遊戲可能加速或出現異常。除非遊戲無法達到全速且其他加速方式不足，否則請保持關閉。</string>
+    <string name="settings_help_core_frameskiptype">選擇跳幀的計算方式。「幀數」跳過固定數量，而「FPS 百分比」跳過目前幀率的一定比例，在速度變化時更能適應。若跳幀感覺不均勻，請使用「FPS 百分比」。</string>
+    <string name="settings_help_core_auto_frameskip">讓模擬器自動跳幀以維持目標速度。這能讓較慢裝置上的不穩定遊戲更順暢，但自動跳幀可能使動畫不均勻。僅在遊戲難以達到全速時開啟；高效能裝置請保持關閉。</string>
+    <string name="settings_help_core_gpu_hardware_transform">在 GPU 而非 CPU 上計算頂點變換。通常能提升 3D 遊戲效能並降低 CPU 負載；若遊戲出現破損、拉伸或消失的模型請關閉。預設保持開啟，僅對有問題的遊戲關閉。</string>
+    <string name="settings_help_core_texture_scaling_type">選擇啟用 CPU 紋理放大時使用的演算法。xBRZ 讓 2D 畫面邊緣最銳利，Hybrid 在銳利度與柔和陰影間取得平衡，Bicubic 選項則使用標準平滑縮放。較重的類型更耗 CPU，請選擇效果不錯且最快的一種。</string>
+    <string name="settings_help_core_texture_anisotropic_filtering">提升斜視紋理（如道路與地板）的銳利度至所選等級。在大多數 GPU 上效能成本極低，因此地面模糊時 8x 或 16x 都很安全。只有想保留原始柔和外觀時才關閉。</string>
+    <string name="settings_help_core_texture_filtering">設定紋理縮放時的取樣方式。Auto 適合大多數遊戲，Nearest 保留銳利的像素畫，Linear 讓紋理平滑，Auto max quality 以少量 GPU 成本套用裝置支援的最佳濾鏡。想要更銳利的 2D 或更平滑的 3D 時可調整。</string>
+    <string name="settings_help_core_texture_replacement">從遊戲的紋理資料夾載入替代紋理包，而非原始圖像。只有在為該遊戲安裝相容紋理包時才有效。使用 HD 紋理包時開啟；若紋理包導致崩潰或你偏好原始外觀則關閉。</string>
     <string name="settings_help_gyro_invert_x">反轉陀螺儀的水平軸。若瞄準與手機轉動方向一致，請保持關閉；若左右感覺相反則開啟，有些玩家偏好這樣控制鏡頭。</string>
     <string name="settings_help_gyro_invert_y">在瞄準模式中反轉陀螺儀的垂直軸。若上下視角與手機傾斜方向相反，請開啟。</string>
     <string name="settings_help_multitap_mode">共用 PSP 的單一控制組，讓更多玩家在同一台裝置上加入。每位玩家會分配到各自的 PSP 連接埠。若遊戲只檢查該連接埠，保留一個連接埠啟用；不同遊戲使用不同連接埠時啟用兩者；一般單人遊玩則關閉。</string>

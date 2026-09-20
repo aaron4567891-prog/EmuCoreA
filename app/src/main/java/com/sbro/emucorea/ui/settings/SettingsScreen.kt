@@ -189,6 +189,7 @@ import com.sbro.emucorea.core.buildUpscaleOptions
 import com.sbro.emucorea.core.upscaleKeyToMultiplier
 import com.sbro.emucorea.core.upscaleMultiplierKey
 import com.sbro.emucorea.core.PpssppCoreOptions
+import com.sbro.emucorea.core.ppssppCoreOptionHelpRes
 import com.sbro.emucorea.core.PpssppCoreOptionLocalization
 import com.sbro.emucorea.core.LocalTvUiEnvironment
 import com.sbro.emucorea.core.PerformanceProfiles
@@ -4978,7 +4979,8 @@ internal fun CoreOptionSettingsRows(
         val current = NativeApp.getCoreOption(option.key) ?: option.defaultValue
         val localized = PpssppCoreOptionLocalization.resolve(context, option)
         val title = localized.label
-        val help = localized.description.takeIf { it.isNotBlank() }
+        val help = ppssppCoreOptionHelpRes(option.key)?.let { stringResource(it) }
+            ?: localized.description.takeIf { it.isNotBlank() }
         if (option.isBooleanToggle) {
             ToggleItem(
                 icon = Icons.Rounded.Tune,
