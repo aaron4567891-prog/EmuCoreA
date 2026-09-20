@@ -146,7 +146,7 @@
     <string name="settings_about_website">Официальный сайт</string>
     <string name="settings_about_website_desc">Откройте официальный сайт EmuCoreA: новости, руководства и последние обновления проекта.</string>
     <string name="settings_about_website_link">Открыть официальный сайт</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">Вибрация геймпада</string>
     <string name="settings_pad_vibration_desc">Включить вибрацию в поддерживаемых играх и на поддерживаемых устройствах.</string>
     <string name="settings_show_fps">Показывать счетчик FPS</string>
@@ -762,9 +762,9 @@
     <string name="settings_about_app_source_link">Открыть EmuCoreA на GitHub</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">Ядро эмуляции</string>
-    <string name="settings_about_core_source_desc">На основе PPSSPP — ядра эмулятора PSP для libretro.</string>
+    <string name="settings_about_core_source_desc">На основе PPSSPP — ядра эмулятора PSP.</string>
     <string name="settings_about_core_source_link">Посмотреть исходный код ядра на GitHub</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_touch_haptics_strength">Сила тактильной отдачи</string>
     <string name="settings_touch_haptics_test">Проверка тактильной отдачи</string>
     <string name="settings_touch_haptics_test_desc">Запускает короткую вибрацию с текущей силой тактильной отдачи.</string>

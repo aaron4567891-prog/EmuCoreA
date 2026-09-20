@@ -313,9 +313,9 @@
     <string name="settings_about_app_source_link">Buka EmuCoreA di GitHub</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">Inti Emulasi</string>
-    <string name="settings_about_core_source_desc">Berdasarkan PPSSPP, inti emulator PSP untuk libretro.</string>
+    <string name="settings_about_core_source_desc">Berdasarkan PPSSPP, inti emulator PSP.</string>
     <string name="settings_about_core_source_link">Lihat sumber inti di GitHub</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_about_support_project">Dukung Proyek</string>
     <string name="settings_about_support_project_desc">Dukung pengembangan berkelanjutan dan pembaruan masa depan untuk EmuCoreA.</string>
     <string name="settings_about_support_project_link">Dukung proyek ini</string>
@@ -327,7 +327,7 @@
     <string name="settings_about_website">Situs web resmi</string>
     <string name="settings_about_website_desc">Buka situs web resmi EmuCoreA untuk berita, panduan, dan pembaruan proyek terbaru.</string>
     <string name="settings_about_website_link">Buka situs web resmi</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">Getaran pad</string>
     <string name="settings_pad_vibration_desc">Aktifkan getaran di game yang didukung dan di perangkat yang didukung.</string>
     <string name="settings_pad_vibration_strength">Kekuatan getaran</string>

@@ -322,9 +322,9 @@
     <string name="settings_about_app_source_link">Otevřít EmuCoreA na GitHubu</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">Emulační jádro</string>
-    <string name="settings_about_core_source_desc">Založeno na PPSSPP, jádru emulátoru PSP pro libretro.</string>
+    <string name="settings_about_core_source_desc">Založeno na PPSSPP, jádru emulátoru PSP.</string>
     <string name="settings_about_core_source_link">Zobrazit zdroj jádra na GitHub</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_about_support_project">Podpořit projekt</string>
     <string name="settings_about_support_project_desc">Podpořte probíhající vývoj a budoucí aktualizace EmuCoreA.</string>
     <string name="settings_about_support_project_link">Podpořit projekt</string>
@@ -336,7 +336,7 @@
     <string name="settings_about_website">Oficiální web</string>
     <string name="settings_about_website_desc">Otevřete oficiální web EmuCoreA s novinkami, návody a nejnovějšími aktualizacemi projektu.</string>
     <string name="settings_about_website_link">Otevřít oficiální web</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">Vibrace ovladače</string>
     <string name="settings_pad_vibration_desc">Povolit vibrace v podporovaných hrách a na podporovaných zařízeních.</string>
     <string name="settings_pad_vibration_strength">Intenzita vibrací</string>

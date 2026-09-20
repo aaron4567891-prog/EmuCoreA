@@ -531,6 +531,7 @@ private fun ShelfCoverCard(
                 onLongClick = { showMenu.value = true }
             )
             .gamepadFocusableCard(
+                showIdleBorder = false,
                 shape = shape,
                 interactionSource = interactionSource,
                 addFocusTarget = false

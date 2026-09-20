@@ -145,7 +145,7 @@
     <string name="settings_about_website">官方网站</string>
     <string name="settings_about_website_desc">打开 EmuCoreA 官方网站，查看新闻、指南和最新项目动态。</string>
     <string name="settings_about_website_link">打开官方网站</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">手把震動</string>
     <string name="settings_pad_vibration_desc">在支援的遊戲和支援的裝置上啟用震動。</string>
     <string name="settings_show_fps">顯示 FPS 計數器</string>
@@ -762,9 +762,9 @@
     <string name="settings_about_app_source_link">在 GitHub 上打开 EmuCoreA</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">模擬核心</string>
-    <string name="settings_about_core_source_desc">基於 libretro 的 PSP 模擬器核心 PPSSPP。</string>
+    <string name="settings_about_core_source_desc">基於 PPSSPP 的 PSP 模擬器核心。</string>
     <string name="settings_about_core_source_link">在 GitHub 上檢視核心原始碼</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_touch_haptics_strength">触摸震动强度</string>
     <string name="settings_touch_haptics_test">测试触摸震动</string>
     <string name="settings_touch_haptics_test_desc">使用当前的触摸震动强度播放短促的震动。</string>

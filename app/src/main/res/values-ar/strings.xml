@@ -224,7 +224,7 @@
     <string name="settings_about_website">الموقع الرسمي</string>
     <string name="settings_about_website_desc">افتح موقع EmuCoreA الرسمي للاطلاع على الأخبار والأدلة وأحدث تحديثات المشروع.</string>
     <string name="settings_about_website_link">فتح الموقع الرسمي</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">اهتزاز وحدة التحكم</string>
     <string name="settings_pad_vibration_desc">تمكين الاهتزاز في الألعاب المدعومة وعلى الأجهزة المدعومة.</string>
     <string name="settings_pad_vibration_strength">قوة الاهتزاز</string>
@@ -760,9 +760,9 @@
     <string name="settings_about_app_source_link">افتح EmuCoreA على GitHub</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">نواة المحاكية</string>
-    <string name="settings_about_core_source_desc">مبني على PPSSPP، نواة محاكي PSP الخاصة بـ libretro.</string>
+    <string name="settings_about_core_source_desc">مبني على PPSSPP، نواة محاكي PSP.</string>
     <string name="settings_about_core_source_link">عرض مصدر النواة على GitHub</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_touch_haptics_strength">قوة استجابة اللمس</string>
     <string name="settings_touch_haptics_test">اختبار استجابة اللمس</string>
     <string name="settings_touch_haptics_test_desc">يشغل نبضة قصيرة باستخدام قوة استجابة اللمس الحالية.</string>

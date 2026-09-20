@@ -224,7 +224,7 @@
     <string name="settings_about_website">公式サイト</string>
     <string name="settings_about_website_desc">EmuCoreA の公式サイトでニュース、ガイド、最新のプロジェクト情報をご覧ください。</string>
     <string name="settings_about_website_link">公式サイトを開く</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">パッドの振動</string>
     <string name="settings_pad_vibration_desc">対応するゲームおよびデバイスでの振動を有効にします。</string>
     <string name="settings_pad_vibration_strength">振動の強さ</string>
@@ -760,9 +760,9 @@
     <string name="settings_about_app_source_link">GitHubでEmuCoreAを開く</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">エミュレーションコア</string>
-    <string name="settings_about_core_source_desc">libretro向けのPSPエミュレーターコア、PPSSPPをベースにしています。</string>
+    <string name="settings_about_core_source_desc">PSPエミュレーターコアのPPSSPPをベースにしています。</string>
     <string name="settings_about_core_source_link">GitHubでコアのソースを表示</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_touch_haptics_strength">タッチハプティクスの強度</string>
     <string name="settings_touch_haptics_test">タッチハプティクスをテスト</string>
     <string name="settings_touch_haptics_test_desc">現在のタッチハプティクスの強度を使用して短い振動を再生します。</string>

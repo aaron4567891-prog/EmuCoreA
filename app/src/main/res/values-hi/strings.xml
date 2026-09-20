@@ -194,7 +194,7 @@
     <string name="settings_about_website">आधिकारिक वेबसाइट</string>
     <string name="settings_about_website_desc">समाचार, गाइड और परियोजना के नवीनतम अपडेट के लिए आधिकारिक EmuCoreA वेबसाइट खोलें।</string>
     <string name="settings_about_website_link">आधिकारिक वेबसाइट खोलें</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">पैड वाइब्रेशन</string>
     <string name="settings_pad_vibration_desc">समर्थित गेम्स और समर्थित उपकरणों पर वाइब्रेशन सक्षम करें।</string>
     <string name="settings_show_fps">FPS काउंटर दिखाएं</string>
@@ -760,9 +760,9 @@
     <string name="settings_about_app_source_link">GitHub पर EmuCoreA खोलें</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">एमुलेशन कोर</string>
-    <string name="settings_about_core_source_desc">PPSSPP पर आधारित, libretro के लिए PSP एमुलेटर कोर।</string>
+    <string name="settings_about_core_source_desc">PPSSPP पर आधारित PSP एमुलेटर कोर।</string>
     <string name="settings_about_core_source_link">GitHub पर कोर स्रोत देखें</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_touch_haptics_strength">टच हैप्टिक की शक्ति</string>
     <string name="settings_touch_haptics_test">टच हैप्टिक्स का परीक्षण करें</string>
     <string name="settings_touch_haptics_test_desc">वर्तमान टच हैप्टिक शक्ति का उपयोग करके एक छोटा टिक प्ले करता है।</string>

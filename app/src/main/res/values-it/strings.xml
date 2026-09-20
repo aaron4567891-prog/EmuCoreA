@@ -194,7 +194,7 @@
     <string name="settings_about_website">Sito ufficiale</string>
     <string name="settings_about_website_desc">Apri il sito ufficiale di EmuCoreA per notizie, guide e gli ultimi aggiornamenti del progetto.</string>
     <string name="settings_about_website_link">Apri il sito ufficiale</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">Vibrazione pad</string>
     <string name="settings_pad_vibration_desc">Abilita la vibrazione nei giochi supportati e sui dispositivi compatibili.</string>
     <string name="settings_show_fps">Mostra contatore FPS</string>
@@ -760,9 +760,9 @@
     <string name="settings_about_app_source_link">Apri EmuCoreA su GitHub</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">Core di emulazione</string>
-    <string name="settings_about_core_source_desc">Basato su PPSSPP, il core dell\'emulatore PSP per libretro.</string>
+    <string name="settings_about_core_source_desc">Basato su PPSSPP, il core dell\'emulatore PSP.</string>
     <string name="settings_about_core_source_link">Visualizza il sorgente del core su GitHub</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_touch_haptics_strength">Intensità feedback aptico</string>
     <string name="settings_touch_haptics_test">Testa feedback aptico</string>
     <string name="settings_touch_haptics_test_desc">Riproduce una breve vibrazione utilizzando l\'attuale intensità del feedback aptico.</string>

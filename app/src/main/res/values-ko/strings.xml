@@ -224,7 +224,7 @@
     <string name="settings_about_website">공식 웹사이트</string>
     <string name="settings_about_website_desc">뉴스, 가이드 및 최신 프로젝트 업데이트를 보려면 EmuCoreA 공식 웹사이트를 여세요.</string>
     <string name="settings_about_website_link">공식 웹사이트 열기</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">패드 진동</string>
     <string name="settings_pad_vibration_desc">지원되는 게임 및 기기에서 진동을 활성화합니다.</string>
     <string name="settings_pad_vibration_strength">진동 세기</string>
@@ -760,9 +760,9 @@
     <string name="settings_about_app_source_link">GitHub에서 EmuCoreA 열기</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">에뮬레이션 코어</string>
-    <string name="settings_about_core_source_desc">libretro용 PSP 에뮬레이터 코어인 PPSSPP을 기반으로 합니다.</string>
+    <string name="settings_about_core_source_desc">PSP 에뮬레이터 코어인 PPSSPP을 기반으로 합니다.</string>
     <string name="settings_about_core_source_link">GitHub에서 코어 소스 보기</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_touch_haptics_strength">터치 햅틱 강도</string>
     <string name="settings_touch_haptics_test">터치 햅틱 테스트</string>
     <string name="settings_touch_haptics_test_desc">현재 터치 햅틱 강도를 사용하여 짧은 진동을 재생합니다.</string>

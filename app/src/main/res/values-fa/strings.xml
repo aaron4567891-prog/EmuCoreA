@@ -313,9 +313,9 @@
     <string name="settings_about_app_source_link">باز کردن EmuCoreA در GitHub</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">هسته شبیه‌سازی</string>
-    <string name="settings_about_core_source_desc">بر پایه PPSSPP، هسته شبیه‌ساز PSP برای libretro.</string>
+    <string name="settings_about_core_source_desc">بر پایه PPSSPP، هسته شبیه‌ساز PSP.</string>
     <string name="settings_about_core_source_link">مشاهده کد منبع هسته در GitHub</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_about_support_project">حمایت از پروژه</string>
     <string name="settings_about_support_project_desc">حمایت از توسعه مداوم و به‌روزرسانی‌های آینده برای EmuCoreA.</string>
     <string name="settings_about_support_project_link">حمایت از پروژه</string>
@@ -327,7 +327,7 @@
     <string name="settings_about_website">وب‌سایت رسمی</string>
     <string name="settings_about_website_desc">وب‌سایت رسمی EmuCoreA را برای اخبار، راهنماها و آخرین به‌روزرسانی‌های پروژه باز کنید.</string>
     <string name="settings_about_website_link">باز کردن وب‌سایت رسمی</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">لرزش دسته بازی</string>
     <string name="settings_pad_vibration_desc">لرزش را در بازی‌های پشتیبانی شده و در دستگاه‌های پشتیبانی شده فعال کنید.</string>
     <string name="settings_pad_vibration_strength">قدرت لرزش</string>

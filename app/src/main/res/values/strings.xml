@@ -324,9 +324,9 @@
     <string name="settings_about_app_source_link">Open EmuCoreA on GitHub</string>
     <string name="settings_about_app_source_url">https://github.com/sashkinbro/EmuCoreA</string>
     <string name="settings_about_core_source">Emulation Core</string>
-    <string name="settings_about_core_source_desc">Based on PPSSPP, the libretro PSP emulator core.</string>
+    <string name="settings_about_core_source_desc">Based on PPSSPP, the PSP emulator core.</string>
     <string name="settings_about_core_source_link">View core source on GitHub</string>
-    <string name="settings_about_core_source_url">https://github.com/sashkinbro/EmuCoreA</string>
+    <string name="settings_about_core_source_url">https://github.com/hrydgard/ppsspp</string>
     <string name="settings_about_support_project">Support The Project</string>
     <string name="settings_about_support_project_desc">Support ongoing development and future updates for EmuCoreA.</string>
     <string name="settings_about_support_project_link">Support the project</string>
@@ -338,7 +338,7 @@
     <string name="settings_about_website">Official Website</string>
     <string name="settings_about_website_desc">Open the official EmuCoreA website for news, guides and the latest project updates.</string>
     <string name="settings_about_website_link">Open the official website</string>
-    <string name="settings_about_website_url">https://emucorer.web.app/</string>
+    <string name="settings_about_website_url">https://emucorea.web.app/</string>
     <string name="settings_pad_vibration">Pad vibration</string>
     <string name="settings_pad_vibration_desc">Enable vibration in supported games and on supported devices.</string>
     <string name="settings_pad_vibration_strength">Vibration strength</string>
