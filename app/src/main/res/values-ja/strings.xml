@@ -902,6 +902,17 @@
     <string name="settings_help_core_psp_model">エミュレートする PSP のハードウェアリビジョンを選びます。PSP-2000/3000 はほとんどの端末に合い、既定として最適です。PSP-1000 は 64 MB ではなく 32 MB の RAM を提供し、一部の初期ゲームがこれを期待します。ゲームが本体を誤認識したり誤動作する場合のみ変更してください。</string>
     <string name="settings_help_core_button_preference">PSP ゲーム内のメニューをどのフェイスボタンで決定するかを選びます。欧米のゲームは×、日本のゲームは○を使うことが多いので、自分のゲームに合う方を選んでください。変わるのはゲーム内のボタン割り当てだけで、エミュレーター自体のメニューには影響しません。</string>
     <string name="settings_help_core_analog_is_circular">物理ゲームパッド使用時に、丸型と四角型のアナログスティックのゲートの違いを補正します。ゲーム内の移動が斜めに偏る、またはスティックが角に届かない場合にオンにしてください。PSP のゲートにすでに合っているタッチ操作ではオフのままにしてください。</string>
+    <string name="settings_help_core_enable_wlan">エミュレートする PSP の Wi-Fi アダプターを有効にし、ゲームがローカル ad-hoc 対戦やオンライン機能を使えるようにします。この機能はベータ版で、ゲームによってはクラッシュ、読み込み時の停止、接続切れが起きます。対応する対戦ゲームを使うときだけオンにし、シングルプレイではオフにしてください。</string>
+    <string name="settings_help_core_mac_address">エミュレートする PSP の MAC アドレスの 16 進数 1 桁を編集します。一部のゲームや ad-hoc グループは特定のアドレスを期待したり、既定値を無効とみなします。ゲームやサーバーが既定値を拒否した場合のみ変更し、元の値を控えておいてください。</string>
+    <string name="settings_help_core_wlan_channel">ad-hoc プレイで使う仮想 Wi-Fi チャンネルを設定します。Auto は実際の接続に従い、最適な既定値です。2 人のプレイヤーが互いに見えない場合は全端末で同じチャンネルにするか、周囲のネットワークと重ならない 1、6、11 を選んでください。</string>
+    <string name="settings_help_core_enable_builtin_pro_ad_hoc_server">PPSSPP 内蔵の PRO ad-hoc サーバーをアプリ内で起動し、同じネットワークのプレイヤーが別サーバーなしで見つけられるようにします。手軽なローカル対戦に使ってください。既存のコミュニティサーバーに参加する場合はオフのままにします。</string>
+    <string name="settings_help_core_change_pro_ad_hoc_server_address">ゲームが接続する PRO ad-hoc サーバーのアドレスを選びます。一覧のコミュニティサーバーはほとんどのオンライン ad-hoc プレイに使え、localhost は 1 台で複数インスタンスを動かす用、IP address は下の部分で設定した独自アドレスを使います。</string>
+    <string name="settings_help_core_pro_ad_hoc_server_address">独自の PRO ad-hoc サーバー IP アドレスの 1 桁を設定します。PRO Ad Hoc サーバー IP アドレスを変更が IP address のときだけ使われます。変更前にサーバー管理者へ正確なアドレスを確認してください。</string>
+    <string name="settings_help_core_enable_upnp">必要なポートを手動で転送する代わりに、UPnP でルーターに自動で開かせます。ネットワークは正常なのにオンライン ad-hoc が接続できないときに有効にしてください。ルーターの検出には数秒かかります。ルーターが UPnP 非対応ならオフにします。</string>
+    <string name="settings_help_core_upnp_use_original_port">UPnP がルーターのポートを開くとき、PSP 本来のポート番号を保ちます。PSP と一致し、ほとんどのコミュニティで機能します。同じルーター配下の複数プレイヤーが別々のポート範囲を必要とする場合のみオフにしてください。</string>
+    <string name="settings_help_core_port_offset">ad-hoc 通信に使うポート番号に選んだオフセットを加えます。0 は PSP 互換を保ち、ほぼすべてのゲームで正解です。同じルーター配下の 2 人が競合する場合のみ別の値を使い、全端末で同じオフセットにしてください。</string>
+    <string name="settings_help_core_minimum_timeout">最小ネットワークタイムアウトをミリ秒で上書きします。0 は既定値を使い、通常は最適です。増やすと不安定・高遅延の接続に役立つことがあり、減らすと切断されたプレイヤーを早く検出できますが、誤切断が起きることがあります。</string>
+    <string name="settings_help_core_forced_first_connect">起動時に最初のゲーム要求を待たず、エミュレートする PSP をすぐ ad-hoc ネットワークへ接続します。ロビーの待ち時間を短縮できますが、ゲームが想定するより早く接続があると誤動作する場合があります。接続が遅くなければオフのままにしてください。</string>
     <string name="settings_help_gyro_invert_x">ジャイロの水平軸を反転します。エイムがスマートフォンと同じ向きに回るならオフのままにし、左右が逆に感じるならオンにします。カメラ操作で好む人もいます。</string>
     <string name="settings_help_gyro_invert_y">エイムモードでジャイロの垂直軸を反転します。見上げる・見下ろす動きがスマートフォンの傾きと逆になる場合にオンにします。</string>
     <string name="settings_help_multitap_mode">PSP の 1 組のコントロールを共有し、1 台の端末でより多くのプレイヤーが参加できます。各プレイヤーには個別の PSP ポートが割り当てられます。ゲームがそのポートだけを確認する場合は 1 つのポートを有効にし、ゲームごとに使うポートが違う場合は両方を有効にし、通常のシングルプレイではオフにします。</string>
