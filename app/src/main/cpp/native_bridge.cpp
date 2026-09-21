@@ -74,8 +74,7 @@ constexpr int kOpenGl = 2;
 
 namespace {
 
-constexpr size_t kAudioRingCapacityFrames = 48000;  // ~1.1s at the core's 44.1 kHz.
-constexpr int32_t kAudioDeclickFrames = 48;
+constexpr size_t kAudioRingCapacityFrames = 8192;  // ~186ms at 44.1 kHz; PPSSPP uses 4096.
 // The libretro core mixes at a fixed rate and the AAudio stream may run at the
 // device rate, so the output callback resamples between the two.
 constexpr double kCoreSampleRateHz = 44100.0;
@@ -181,7 +180,6 @@ struct FrontendState {
     size_t audio_write_frame = 0;
     uint64_t audio_generation = 0;
     std::atomic<double> audio_playback_rate{1.0};
-    std::atomic<int32_t> audio_declick_frames{0};
 
     // AAudio output configuration, applied when the next stream is opened.
     std::atomic<int> audio_output_latency_ms{30};
@@ -332,7 +330,6 @@ bool LoadCoreLocked() {
     return true;
 }
 
-void AudioRingEnsureCapacity(size_t additional_frames);
 void RetroLogCallback(enum retro_log_level level, const char* fmt, ...);
 bool EnvironmentCallback(unsigned cmd, void* data);
 void RetroVideoRefresh(const void* data, unsigned width, unsigned height, size_t pitch);
@@ -626,28 +623,29 @@ struct AudioOutput {
 };
 
 void UpdatePacingTarget(AudioOutput* output) {
-    // Post-callback cushion the converter holds in the ring. PPSSPP uses
-    // (device frames per buffer + one block); the floor covers the core's
-    // bursty per-frame pushes, which are coarser than PPSSPP's 64-frame blocks.
+    // The app's "Output latency" setting sizes the mixer cushion, mirroring
+    // PPSSPP's StereoResampler target (40 ms by default, 80 ms with extra audio
+    // buffering). It is a queue target, not a device buffer size.
+    const int latency_ms = g_frontend.audio_output_latency_ms.load();
+    const int32_t target =
+        static_cast<int32_t>(static_cast<int64_t>(latency_ms) * output->sample_rate / 1000);
     output->pacing_high_water_frames =
-        std::clamp(output->device_buffer_frames + 1024, 1536, 4096);
-}
-
-void AudioRingEnsureCapacity(size_t additional_frames) {
-    const size_t capacity = kAudioRingCapacityFrames;
-    size_t occupied = (g_frontend.audio_write_frame + capacity - g_frontend.audio_read_frame) % capacity;
-    if (occupied + additional_frames < capacity) return;
-    const size_t drop = occupied + additional_frames - (capacity - 1);
-    g_frontend.audio_read_frame = (g_frontend.audio_read_frame + drop) % capacity;
-    g_frontend.audio_declick_frames.store(kAudioDeclickFrames);
+        std::clamp(target, 1024, static_cast<int32_t>(kAudioRingCapacityFrames / 2));
 }
 
 void RetroAudioSampleBatch(const int16_t* data, size_t frames) {
     if (data == nullptr || frames == 0) return;
     if (g_frontend.time_control.load() == 2) return;
     std::lock_guard<std::mutex> lock(g_frontend.audio_mutex);
-    AudioRingEnsureCapacity(frames);
     const size_t capacity = kAudioRingCapacityFrames;
+    const size_t occupied =
+        (g_frontend.audio_write_frame + capacity - g_frontend.audio_read_frame) % capacity;
+    if (occupied + frames >= capacity) {
+        // PPSSPP's StereoResampler drops the incoming push when the queue is
+        // full instead of trimming what is already queued: the mixer then
+        // drains toward the target without a click, and latency stays bounded.
+        return;
+    }
     for (size_t i = 0; i < frames; i++) {
         const size_t slot = g_frontend.audio_write_frame;
         g_frontend.audio_ring[slot * 2 + 0] = data[i * 2 + 0];
@@ -678,7 +676,6 @@ aaudio_data_callback_result_t AudioDataCallback(AAudioStream*, void* user_data, 
     // ratio. PPSSPP's StereoResampler does the same with its output rate.
     const double base_ratio = (kCoreSampleRateHz / static_cast<double>(output->sample_rate)) *
         g_frontend.audio_playback_rate.load();
-    int32_t declick = g_frontend.audio_declick_frames.exchange(0);
     size_t sourced = 0;
 
     {
@@ -694,15 +691,9 @@ aaudio_data_callback_result_t AudioDataCallback(AAudioStream*, void* user_data, 
             static_cast<size_t>(output->pacing_high_water_frames),
             out, static_cast<size_t>(num_frames), base_ratio);
         for (size_t i = 0; i < static_cast<size_t>(num_frames); i++) {
-            float frame_gain = gain;
-            if (declick > 0) {
-                frame_gain *= 1.0f - static_cast<float>(declick) / static_cast<float>(kAudioDeclickFrames);
-                declick--;
-            }
-            out[i * 2 + 0] = static_cast<int16_t>(out[i * 2 + 0] * frame_gain);
-            out[i * 2 + 1] = static_cast<int16_t>(out[i * 2 + 1] * frame_gain);
+            out[i * 2 + 0] = static_cast<int16_t>(out[i * 2 + 0] * gain);
+            out[i * 2 + 1] = static_cast<int16_t>(out[i * 2 + 1] * gain);
         }
-        g_frontend.audio_declick_frames.store(declick);
     }
 
     output->callback_frames.fetch_add(num_frames);
@@ -1773,7 +1764,6 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_resetAudioQueue(JNIEnv*, jobject) {
     g_frontend.audio_read_frame = 0;
     g_frontend.audio_write_frame = 0;
     ++g_frontend.audio_generation;
-    g_frontend.audio_declick_frames.store(0);
 }
 
 JNIEXPORT jlong JNICALL
@@ -1867,7 +1857,6 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_startAudioOutput(JNIEnv*, jobject, 
         if (set_result != AAUDIO_OK) {
             LOGW("AAudio setBufferSizeInFrames(%d) failed: %d", desired, static_cast<int>(set_result));
         }
-        LOGI("AAudio buffer after start: requested %d, actual %d", desired, output->device_buffer_frames);
     }
     output->started.store(true);
     output->state.store(1);
@@ -1906,7 +1895,6 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_flushAudioOutput(JNIEnv*, jobject, 
         g_frontend.audio_read_frame = 0;
         g_frontend.audio_write_frame = 0;
         ++g_frontend.audio_generation;
-        g_frontend.audio_declick_frames.store(0);
     }
     return 0;
 }

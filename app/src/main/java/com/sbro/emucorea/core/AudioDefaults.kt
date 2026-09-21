@@ -29,13 +29,12 @@ object AudioDefaults {
     const val BUFFER_MS_MIN = 10
     const val BUFFER_MS_MAX = 500
 
-    // Capacity ceiling for the shared-mode AAudio buffer. Emulation frames are
-    // not isochronous (shader compilation, GC, DVFS), so the stable shared-mode
-    // baseline with a comfortable margin beats a tight low-latency stream that
-    // crackles under load. The native layer still sizes the stream from the
-    // device burst. The separate time-stretch buffer is unchanged.
-    const val OUTPUT_LATENCY_MS_DEFAULT = 120
-    const val OUTPUT_LATENCY_MS_MIN = 1
+    // Mixer queue target, matching PPSSPP's StereoResampler cushion: 40 ms by
+    // default (PPSSPP's bExtraAudioBuffering doubles it to 80 ms). Larger values
+    // absorb more frame-time jitter at the cost of audio latency; the ring is
+    // sized so the target can go up to half of it.
+    const val OUTPUT_LATENCY_MS_DEFAULT = 40
+    const val OUTPUT_LATENCY_MS_MIN = 10
     const val OUTPUT_LATENCY_MS_MAX = 500
     // Do not request the platform's low latency path by default; the smaller
     // device buffer it produces leaves no room for frame-time spikes.

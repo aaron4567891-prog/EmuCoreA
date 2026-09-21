@@ -883,7 +883,6 @@ internal object CoreRuntime {
         var contentFrameRate = VBLANK_RATE_HZ
         var lastEmulatedUs = 0L
         var metricsEmulatedUs = 0L
-        var lastEmulatedStepUs = 0L
         try {
             while (running) {
                 // Owns the thread-affine EGL context, so any queued save/load
@@ -980,7 +979,6 @@ internal object CoreRuntime {
                             if (stepUs in 1L..MAX_EMULATED_FRAME_STEP_US) {
                                 lastStepUs = stepUs
                                 emulatedStepUs = stepUs
-                                lastEmulatedStepUs = stepUs
                             } else if (stepUs != 0L) {
                                 // The clock jumped: restart the schedule from now.
                                 framePacer.reset()
@@ -1059,11 +1057,10 @@ internal object CoreRuntime {
                     publishPerformanceMetrics(fps, metricsFrames, metricsFrameTotalNanos,
                         output.stats(), cpuLoad, speed, targetFps)
                     if (com.sbro.emucorea.BuildConfig.DEBUG) {
-                        Log.d(TAG, "pacing fps=%.1f core=%.1fms queue=%d high=%d silence=%d maxInterval=%.1fms maxCore=%.1fms step=%.1fms rate=%.1f".format(
+                        Log.d(TAG, "pacing fps=%.1f core=%.1fms queue=%d high=%d silence=%d maxInterval=%.1fms maxCore=%.1fms".format(
                             Locale.US, fps, metricsFrameTotalNanos / metricsFrames / 1_000_000.0,
                             output.bufferedFrames(), output.pacingHighWaterFrames(), output.stats()?.getOrNull(7) ?: 0L,
-                            metricsMaxIntervalNanos / 1_000_000.0, metricsMaxCoreNanos / 1_000_000.0,
-                            lastEmulatedStepUs / 1000.0, contentFrameRate))
+                            metricsMaxIntervalNanos / 1_000_000.0, metricsMaxCoreNanos / 1_000_000.0))
                     }
                     metricsMaxIntervalNanos = 0L
                     metricsMaxCoreNanos = 0L
