@@ -145,6 +145,8 @@ class NativeCoreBridge {
     external fun setAudioLowLatency(enabled: Boolean)
     /** Frontend presentation frame skip (0..4). */
     external fun setFrameSkip(frames: Int)
+    /** VSync on presents with FIFO; off uses immediate presentation. */
+    external fun setVSyncEnabled(enabled: Boolean)
     /** Display crop in source pixels, applied before aspect-ratio scaling. */
     external fun setDisplayCrop(left: Int, top: Int, right: Int, bottom: Int)
 

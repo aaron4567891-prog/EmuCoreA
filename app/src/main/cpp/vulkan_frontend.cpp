@@ -36,6 +36,8 @@ namespace {
 constexpr uint32_t kPreferredQueueFamilyNone = UINT32_MAX;
 constexpr uint64_t kFenceWaitTimeoutNs = 2'000'000'000ull;
 constexpr int kMaxSwapchainFailures = 3;
+// PPSSPP rebuilds the swapchain after a few suboptimal presents.
+constexpr int kMaxSuboptimalFrames = 2;
 // One submission slot per core output image. Two slots let the core emulate the
 // next frame while the GPU still blits/presents the previous one; the core's
 // wait_sync_index() blocks only when it wants to reuse an image we are reading.
@@ -109,6 +111,10 @@ struct State {
     std::vector<VkFramebuffer> swapchain_framebuffers;
     std::vector<bool> swapchain_initialized;
     int swapchain_failures = 0;
+    // Consecutive SUBOPTIMAL acquires/presents; PPSSPP rebuilds the swapchain
+    // after a few of them, otherwise a stale surface (rotation, resize) keeps
+    // presenting frames the display has to rescale.
+    int suboptimal_frames = 0;
 
     VkRenderPass effect_render_pass = VK_NULL_HANDLE;
     VkDescriptorSetLayout effect_descriptor_layout = VK_NULL_HANDLE;
@@ -166,6 +172,10 @@ struct State {
 State g_vk;
 std::mutex g_queue_mutex;
 std::atomic<int> g_shader_effect{0};
+// VSync defaults on, matching PPSSPP's bVSync. Changing it needs a new
+// swapchain, which the frame thread performs on the next presented frame.
+std::atomic<bool> g_vsync_enabled{true};
+std::atomic<bool> g_swapchain_settings_dirty{false};
 
 template <typename T>
 T LoadInstanceFunction(const char* name) {
@@ -915,17 +925,17 @@ bool CreateSwapchain() {
     }
     std::vector<VkPresentModeKHR> modes(mode_count);
     g_vk.pfn_surface_present_modes(g_vk.physical_device, g_vk.surface, &mode_count, modes.data());
-    // Mailbox hands the newest finished frame to the display instead of
-    // queueing behind the previous one, which shortens the path between the
-    // emulated frame and the panel. FIFO is the fallback and the only mode
-    // the specification guarantees, so it stays the default when mailbox is
-    // not advertised.
+    // VSync on presents with FIFO, which is PPSSPP's default (bVSync = true):
+    // the present waits for the display, so frame delivery is locked to the
+    // panel. With VSync off PPSSPP uses immediate presentation when available.
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
-    for (VkPresentModeKHR mode : modes) {
-        if (mode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            present_mode = mode;
-            break;
-        }
+    if (!g_vsync_enabled.load() &&
+        std::find(modes.begin(), modes.end(), VK_PRESENT_MODE_IMMEDIATE_KHR) != modes.end()) {
+        present_mode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+    }
+    if (std::find(modes.begin(), modes.end(), present_mode) == modes.end()) {
+        // The specification guarantees FIFO; stay defensive for odd drivers.
+        present_mode = modes.front();
     }
 
     if ((capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT) == 0) {
@@ -1509,6 +1519,13 @@ void SetShaderEffect(int effect) {
     g_shader_effect.store(effect, std::memory_order_relaxed);
 }
 
+void SetVSync(bool enabled) {
+    if (g_vsync_enabled.exchange(enabled) != enabled) {
+        // Present mode is a swapchain property; the frame thread rebuilds it.
+        g_swapchain_settings_dirty.store(true);
+    }
+}
+
 void SetDisplayCrop(int left, int top, int right, int bottom) {
     const auto clamp = [](int value) {
         if (value < 0) return 0;
@@ -1571,6 +1588,13 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     }
     if (source_width == 0 || source_height == 0) return false;
 
+    if (g_swapchain_settings_dirty.exchange(false)) {
+        // A changed present mode needs a new swapchain; dropping one frame is
+        // cheaper than rebuilding it from whichever thread changed the setting.
+        RecreateSwapchain();
+        return false;
+    }
+
 #if defined(EMUCOREA_HAVE_LIBRASHADER)
     const bool want_chain = shader_chain::IsEnabled() && !shader_chain::PresetPath().empty();
 #else
@@ -1602,15 +1626,16 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     VkResult result = g_vk.pfn_acquire(g_vk.device, g_vk.swapchain, UINT64_MAX, g_vk.acquire_semaphores[slot],
                                        VK_NULL_HANDLE, &swapchain_index);
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        g_vk.suboptimal_frames = 0;
         RecreateSwapchain();
         return false;
     }
-    // A swapchain whose preTransform differs from the surface's current
-    // transform reports SUBOPTIMAL_KHR on every present while still presenting
-    // correctly; rebuilding it there just burns a full swapchain per frame.
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         VK_LOGW("vkAcquireNextImageKHR failed (0x%x)", result);
         return false;
+    }
+    if (result == VK_SUBOPTIMAL_KHR) {
+        ++g_vk.suboptimal_frames;
     }
     if (swapchain_index >= g_vk.swapchain_images.size()) return false;
 
@@ -1688,10 +1713,21 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     g_vk.sync_index = (slot + 1) % kInflightSlots;
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        g_vk.suboptimal_frames = 0;
         RecreateSwapchain();
-    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+    } else if (result == VK_SUBOPTIMAL_KHR) {
+        ++g_vk.suboptimal_frames;
+    } else if (result != VK_SUCCESS) {
         VK_LOGW("vkQueuePresentKHR failed (0x%x)", result);
         return false;
+    } else {
+        g_vk.suboptimal_frames = 0;
+    }
+    // PPSSPP rebuilds the swapchain after a few suboptimal presents; a stale
+    // surface (rotation, resize) otherwise keeps costing a composition rescale.
+    if (g_vk.suboptimal_frames > kMaxSuboptimalFrames) {
+        g_vk.suboptimal_frames = 0;
+        RecreateSwapchain();
     }
     // The GPU keeps working on this slot while the core fills the other one;
     // wait_sync_index() only blocks when the core wants this image back.

@@ -1,13 +1,24 @@
 package com.sbro.emucorea.core
 
+import android.content.Context
 import kotlin.math.roundToInt
 
 const val UPSCALE_MIN = 1.0f
-// Fresh installs start at 2x: the PSP panel's native 480x272 looks soft on
-// modern tablet screens, and the devices this runs on handle 2x comfortably.
+// Reset-to-default value; PPSSPP's Android default is 2x on large screens.
 const val UPSCALE_DEFAULT = 2.0f
 // The bundled PPSSPP option table tops out at 4800x2720 (10x).
 const val UPSCALE_MAX = 10.0f
+
+/**
+ * Fresh-install default, matching PPSSPP's Android default (Config.cpp
+ * DefaultInternalResolution): 2x when the display's longest side is at least
+ * 1000 pixels, 1x on smaller screens.
+ */
+fun defaultUpscaleMultiplier(context: Context): Float {
+    val metrics = context.resources.displayMetrics
+    val longestSide = maxOf(metrics.widthPixels, metrics.heightPixels)
+    return if (longestSide >= 1000) 2.0f else 1.0f
+}
 
 private const val UPSCALE_STEP = 1.0f
 private const val UPSCALE_NATIVE_MULTIPLIER = 1.0f

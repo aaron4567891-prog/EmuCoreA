@@ -79,6 +79,10 @@ constexpr int32_t kAudioDeclickFrames = 48;
 // The libretro core mixes at a fixed rate and the AAudio stream may run at the
 // device rate, so the output callback resamples between the two.
 constexpr double kCoreSampleRateHz = 44100.0;
+// Shared-mode AAudio hands out capacity/2 as the callback size when no buffer
+// size is applied, so the capacity itself stays small; PPSSPP feeds its mixer
+// from OpenSL buffers of at most 512 frames.
+constexpr int32_t kAudioCapacityFrames = 2048;
 
 // ---------------------------------------------------------------------------
 // Core loader.
@@ -183,6 +187,8 @@ struct FrontendState {
     std::atomic<int> audio_output_latency_ms{30};
     std::atomic<bool> audio_low_latency{false};
     std::atomic<float> audio_gain{1.0f};
+    // PPSSPP's VSync default; the Vulkan swapchain present mode follows it.
+    std::atomic<bool> vsync_enabled{true};
 
     std::atomic<int> frame_skip{0};
 
@@ -619,6 +625,14 @@ struct AudioOutput {
     std::mutex mutex;
 };
 
+void UpdatePacingTarget(AudioOutput* output) {
+    // Post-callback cushion the converter holds in the ring. PPSSPP uses
+    // (device frames per buffer + one block); the floor covers the core's
+    // bursty per-frame pushes, which are coarser than PPSSPP's 64-frame blocks.
+    output->pacing_high_water_frames =
+        std::clamp(output->device_buffer_frames + 1024, 1536, 4096);
+}
+
 void AudioRingEnsureCapacity(size_t additional_frames) {
     const size_t capacity = kAudioRingCapacityFrames;
     size_t occupied = (g_frontend.audio_write_frame + capacity - g_frontend.audio_read_frame) % capacity;
@@ -902,6 +916,9 @@ bool EnsureHardwareContext() {
         }
         if (window == nullptr) return false;
         const bool ready = vulkan::EnsureContext(window, generation);
+        // Keeps the swapchain present mode in sync with the app setting, and
+        // re-applies it after a session restart created a fresh swapchain.
+        vulkan::SetVSync(g_frontend.vsync_enabled.load());
         ANativeWindow_release(window);
         return ready;
     }
@@ -1271,6 +1288,7 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_runFrame(JNIEnv* env, jobject, jlon
         const auto now = std::chrono::steady_clock::now();
         if (now - last_rewind >= std::chrono::milliseconds(500)) {
             const bool queued = g_core.rewind_step();
+            (void)queued;
             LOGI("Rewind step queued=%d", queued ? 1 : 0);
             last_rewind = now;
         }
@@ -1717,6 +1735,13 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_setFrameSkip(JNIEnv*, jobject, jint
 }
 
 JNIEXPORT void JNICALL
+Java_com_sbro_emucorea_core_NativeCoreBridge_setVSyncEnabled(JNIEnv*, jobject, jboolean enabled) {
+    const bool value = enabled == JNI_TRUE;
+    g_frontend.vsync_enabled.store(value);
+    vulkan::SetVSync(value);
+}
+
+JNIEXPORT void JNICALL
 Java_com_sbro_emucorea_core_NativeCoreBridge_setDisplayCrop(JNIEnv*, jobject, jint left, jint top,
                                                             jint right, jint bottom) {
     const int l = std::clamp(static_cast<int>(left), 0, 64);
@@ -1765,9 +1790,12 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_createAudioOutput(JNIEnv*, jobject)
     AAudioStreamBuilder_setFormat(builder, AAUDIO_FORMAT_PCM_I16);
     AAudioStreamBuilder_setChannelCount(builder, 2);
     AAudioStreamBuilder_setSampleRate(builder, output->sample_rate);
-    const int latency_ms = g_frontend.audio_output_latency_ms.load();
-    const int32_t capacity_frames = latency_ms * output->sample_rate / 1000;
-    AAudioStreamBuilder_setBufferCapacityInFrames(builder, std::max(capacity_frames, 512));
+    // Keep the shared-mode stream small, like PPSSPP's OpenSL buffer: a large
+    // capacity makes AAudio hand out capacity/2 as the callback size (60 ms at
+    // the default settings), and a callback that big can only be fed if the
+    // frame loop never jitters. 2048 frames bounds the callback at ~23 ms even
+    // when setBufferSizeInFrames() is ignored.
+    AAudioStreamBuilder_setBufferCapacityInFrames(builder, kAudioCapacityFrames);
     AAudioStreamBuilder_setPerformanceMode(builder,
         g_frontend.audio_low_latency.load() ? AAUDIO_PERFORMANCE_MODE_LOW_LATENCY
                                             : AAUDIO_PERFORMANCE_MODE_NONE);
@@ -1789,17 +1817,16 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_createAudioOutput(JNIEnv*, jobject)
     output->sample_rate = AAudioStream_getSampleRate(output->stream);
     const int32_t burst = AAudioStream_getFramesPerBurst(output->stream);
     output->burst_frames = burst;
-    int32_t device_buffer = std::clamp(burst * 2, 512, 1024);
+    // PPSSPP keeps its device buffer at (frames per burst * 2), capped at 512,
+    // so callbacks stay small and the mixer cushion can be short.
+    int32_t device_buffer = std::clamp(burst * 2, 256, 512);
     const int32_t stream_capacity = AAudioStream_getBufferCapacityInFrames(output->stream);
     if (stream_capacity > 0) device_buffer = std::min(device_buffer, stream_capacity);
+    output->device_buffer_frames = device_buffer;
     AAudioStream_setBufferSizeInFrames(output->stream, device_buffer);
     const int32_t actual_buffer = AAudioStream_getBufferSizeInFrames(output->stream);
-    if (actual_buffer > 0) device_buffer = actual_buffer;
-    output->device_buffer_frames = device_buffer;
-    // Post-callback cushion the converter holds in the ring. PPSSPP uses
-    // (device frames per buffer + one block); the floor here covers the core's
-    // bursty per-frame pushes, which are coarser than PPSSPP's 64-frame blocks.
-    output->pacing_high_water_frames = std::clamp(device_buffer + 512, 1536, 4096);
+    if (actual_buffer > 0) output->device_buffer_frames = actual_buffer;
+    UpdatePacingTarget(output);
     LOGI("AAudio output created: %d Hz, buffer %d frames, high water %d", output->sample_rate,
          output->device_buffer_frames, output->pacing_high_water_frames);
     return reinterpret_cast<jlong>(output);
@@ -1828,6 +1855,19 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_startAudioOutput(JNIEnv*, jobject, 
     if (result != AAUDIO_OK) {
         output->last_error.store(static_cast<int>(result));
         return -2;
+    }
+    // Shared-mode AAudio may ignore a pre-start buffer request and hand out
+    // capacity/2 instead; applying it once the stream runs keeps callbacks small.
+    const int32_t desired = output->device_buffer_frames;
+    if (desired > 0) {
+        const aaudio_result_t set_result = AAudioStream_setBufferSizeInFrames(output->stream, desired);
+        const int32_t actual = AAudioStream_getBufferSizeInFrames(output->stream);
+        if (actual > 0) output->device_buffer_frames = actual;
+        UpdatePacingTarget(output);
+        if (set_result != AAUDIO_OK) {
+            LOGW("AAudio setBufferSizeInFrames(%d) failed: %d", desired, static_cast<int>(set_result));
+        }
+        LOGI("AAudio buffer after start: requested %d, actual %d", desired, output->device_buffer_frames);
     }
     output->started.store(true);
     output->state.store(1);

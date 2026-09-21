@@ -785,6 +785,12 @@ internal object CoreRuntime {
             bridge.setRewindEnabled(enabled)
             return true
         }
+        if ((section == "EmuCoreA" || section == "EmuCoreA/GS") && key == "VsyncEnable") {
+            val enabled = value.toBooleanStrictOrNull() ?: return false
+            settings["$section:$key"] = value
+            bridge.setVSyncEnabled(enabled)
+            return true
+        }
         settings["$section:$key"] = value
         forwardCoreSetting(section, key, value)
         return true

@@ -250,7 +250,16 @@ object NativeApp {
     @JvmStatic fun setFrameSkip(frames: Int) {
         val clamped = frames.coerceIn(0, 4)
         CoreRuntime.updateSetting("EmuCoreA/GS", "FrameSkip", clamped.toString())
-        runCatching { CoreRuntime.bridge.setFrameSkip(clamped) }
+        // PPSSPP's frameskip skips GPU draw work, which is what actually saves
+        // frame time. The frontend present-drop counter stays at zero so the two
+        // mechanisms cannot stack.
+        runCatching { CoreRuntime.bridge.setFrameSkip(0) }
+        runCatching {
+            CoreRuntime.bridge.nativeSetOption(
+                "ppsspp_frameskip",
+                if (clamped == 0) "disabled" else clamped.toString()
+            )
+        }
     }
     @JvmStatic fun setDisplayCrop(crop: com.sbro.emucorea.data.DisplayCrop) {
         val value = crop.sanitized()

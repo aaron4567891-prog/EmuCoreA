@@ -284,7 +284,7 @@ data class SettingsUiState(
     val appUpdate: AppUpdateUiState = AppUpdateUiState(),
     val frameLimitEnabled: Boolean = true,
     val rewindEnabled: Boolean = false,
-    val vSyncEnabled: Boolean = false,
+    val vSyncEnabled: Boolean = true,
     val fastForwardSpeed: Float = AppPreferences.DEFAULT_FAST_FORWARD_SPEED,
     val targetFps: Int = 0,
     val ntscFramerate: Float = AppPreferences.DEFAULT_NTSC_FRAMERATE,

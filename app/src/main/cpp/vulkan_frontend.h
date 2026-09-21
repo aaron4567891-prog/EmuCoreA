@@ -34,6 +34,9 @@ bool IsActive();
 void NotifyContextDestroy();
 void SetShaderEffect(int effect);
 void SetDisplayCrop(int left, int top, int right, int bottom);
+// VSync on presents with FIFO (PPSSPP's default); off uses immediate present
+// when the driver supports it. Takes effect on the next presented frame.
+void SetVSync(bool enabled);
 
 bool EnsureContext(ANativeWindow* window, uint32_t window_generation);
 bool Present(uint32_t source_width, uint32_t source_height, double display_aspect, bool stretch,

@@ -20,6 +20,7 @@ import com.sbro.emucorea.core.PerformancePresets
 import com.sbro.emucorea.core.RendererDefaults
 import com.sbro.emucorea.core.TvInterfaceMode
 import com.sbro.emucorea.core.UPSCALE_DEFAULT
+import com.sbro.emucorea.core.defaultUpscaleMultiplier
 import com.sbro.emucorea.core.normalizeUpscale
 import com.sbro.emucorea.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.Flow
@@ -254,7 +255,7 @@ data class SettingsSnapshot(
     val customDriverPath: String? = null,
     val frameLimitEnabled: Boolean = true,
     val rewindEnabled: Boolean = false,
-    val vSyncEnabled: Boolean = false,
+    val vSyncEnabled: Boolean = true,
     val fastForwardSpeed: Float = AppPreferences.DEFAULT_FAST_FORWARD_SPEED,
     val targetFps: Int = 0,
     val ntscFramerate: Float = AppPreferences.DEFAULT_NTSC_FRAMERATE,
@@ -1259,7 +1260,7 @@ class AppPreferences(private val context: Context) {
     }
 
     val vSyncEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
-        prefs[VSYNC_ENABLED] ?: false
+        prefs[VSYNC_ENABLED] ?: true
     }
 
     suspend fun setVSyncEnabled(enabled: Boolean) {
@@ -1820,7 +1821,7 @@ class AppPreferences(private val context: Context) {
                 customDriverPath = prefs[CUSTOM_DRIVER_PATH],
                 frameLimitEnabled = prefs[FRAME_LIMIT_ENABLED] ?: true,
                 rewindEnabled = prefs[REWIND_ENABLED] ?: false,
-                vSyncEnabled = prefs[VSYNC_ENABLED] ?: false,
+                vSyncEnabled = prefs[VSYNC_ENABLED] ?: true,
                 fastForwardSpeed = sanitizeFastForwardSpeed(prefs[FAST_FORWARD_SPEED]),
                 targetFps = prefs[TARGET_FPS] ?: 0,
                 ntscFramerate = sanitizeRegionFramerate(prefs[NTSC_FRAMERATE], DEFAULT_NTSC_FRAMERATE),
@@ -2782,7 +2783,7 @@ class AppPreferences(private val context: Context) {
     }
 
     val textureReplacementsEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
-        prefs[TEXTURE_REPLACEMENTS_ENABLED] ?: false
+        prefs[TEXTURE_REPLACEMENTS_ENABLED] ?: true
     }
 
     suspend fun setTextureReplacementsEnabled(enabled: Boolean) {
@@ -4073,7 +4074,7 @@ class AppPreferences(private val context: Context) {
             put("texturePreloading", GsHackDefaults.coerceTexturePreloading(
                 prefs[TEXTURE_PRELOADING] ?: GsHackDefaults.TEXTURE_PRELOADING_DEFAULT
             ))
-            put("textureReplacementsEnabled", prefs[TEXTURE_REPLACEMENTS_ENABLED] ?: false)
+            put("textureReplacementsEnabled", prefs[TEXTURE_REPLACEMENTS_ENABLED] ?: true)
             put("textureReplacementsAsync", prefs[TEXTURE_REPLACEMENTS_ASYNC] ?: true)
             put("textureReplacementsPrecache", prefs[TEXTURE_REPLACEMENTS_PRECACHE] ?: false)
             put("textureDumpingEnabled", prefs[TEXTURE_DUMPING_ENABLED] ?: false)
@@ -4147,7 +4148,7 @@ class AppPreferences(private val context: Context) {
             put("customDriverPath", prefs[CUSTOM_DRIVER_PATH])
             put("frameLimitEnabled", prefs[FRAME_LIMIT_ENABLED] ?: true)
             put("rewindEnabled", prefs[REWIND_ENABLED] ?: false)
-            put("vSyncEnabled", prefs[VSYNC_ENABLED] ?: false)
+            put("vSyncEnabled", prefs[VSYNC_ENABLED] ?: true)
             put("fastForwardSpeed", sanitizeFastForwardSpeed(prefs[FAST_FORWARD_SPEED]).toDouble())
             put("targetFps", prefs[TARGET_FPS] ?: 0)
             put("ntscFramerate", sanitizeRegionFramerate(prefs[NTSC_FRAMERATE], DEFAULT_NTSC_FRAMERATE).toDouble())
@@ -4467,7 +4468,7 @@ class AppPreferences(private val context: Context) {
             prefs[TEXTURE_PRELOADING] = GsHackDefaults.coerceTexturePreloading(
                 json.optInt("texturePreloading", GsHackDefaults.TEXTURE_PRELOADING_DEFAULT)
             )
-            prefs[TEXTURE_REPLACEMENTS_ENABLED] = json.optBoolean("textureReplacementsEnabled", false)
+            prefs[TEXTURE_REPLACEMENTS_ENABLED] = json.optBoolean("textureReplacementsEnabled", true)
             prefs[TEXTURE_REPLACEMENTS_ASYNC] = json.optBoolean("textureReplacementsAsync", true)
             prefs[TEXTURE_REPLACEMENTS_PRECACHE] = json.optBoolean("textureReplacementsPrecache", false)
             prefs[TEXTURE_DUMPING_ENABLED] = json.optBoolean("textureDumpingEnabled", false)
@@ -4561,7 +4562,7 @@ class AppPreferences(private val context: Context) {
             json.optString("customDriverPath").takeIf { it.isNotBlank() }?.let { prefs[CUSTOM_DRIVER_PATH] = it } ?: prefs.remove(CUSTOM_DRIVER_PATH)
             prefs[FRAME_LIMIT_ENABLED] = json.optBoolean("frameLimitEnabled", true)
             prefs[REWIND_ENABLED] = json.optBoolean("rewindEnabled", false)
-            prefs[VSYNC_ENABLED] = json.optBoolean("vSyncEnabled", false)
+            prefs[VSYNC_ENABLED] = json.optBoolean("vSyncEnabled", true)
             prefs[FAST_FORWARD_SPEED] = sanitizeFastForwardSpeed(json.optDouble("fastForwardSpeed", DEFAULT_FAST_FORWARD_SPEED.toDouble()).toFloat())
             prefs[TARGET_FPS] = json.optInt("targetFps", 0).let { if (it <= 0) 0 else it.coerceIn(20, 120) }
             prefs[NTSC_FRAMERATE] = sanitizeRegionFramerate(json.optDouble("ntscFramerate", DEFAULT_NTSC_FRAMERATE.toDouble()).toFloat(), DEFAULT_NTSC_FRAMERATE)
@@ -4609,7 +4610,7 @@ class AppPreferences(private val context: Context) {
     private fun readUpscale(prefs: Preferences): Float {
         return (prefs[UPSCALE]
             ?: prefs[UPSCALE_LEGACY]?.toFloat()
-            ?: UPSCALE_DEFAULT).let(::normalizeUpscale)
+            ?: defaultUpscaleMultiplier(context)).let(::normalizeUpscale)
     }
 
     private fun sanitizeRegionFramerate(value: Float?, fallback: Float): Float {
