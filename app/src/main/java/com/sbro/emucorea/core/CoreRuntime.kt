@@ -340,6 +340,9 @@ internal object CoreRuntime {
         }
         session = handle
         activeCoreRenderer = coreRenderer
+        // Rewind capture is opt-in (like PPSSPP). retro_init/load_game reset the
+        // core config, so the preference is applied only after the core is up.
+        bridge.setRewindEnabled(settings["EmuCoreA/GS:RewindEnabled"]?.toBooleanStrictOrNull() ?: false)
         true
     }
 
@@ -774,6 +777,12 @@ internal object CoreRuntime {
             val renderer = value.toIntOrNull() ?: return false
             requestedRenderer = RendererDefaults.normalizeAndroidRenderer(renderer)
             settings["$section:$key"] = value
+            return true
+        }
+        if ((section == "EmuCoreA" || section == "EmuCoreA/GS") && key == "RewindEnabled") {
+            val enabled = value.toBooleanStrictOrNull() ?: return false
+            settings["$section:$key"] = value
+            bridge.setRewindEnabled(enabled)
             return true
         }
         settings["$section:$key"] = value

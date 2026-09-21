@@ -1983,6 +1983,8 @@
     <string name="ss_core_choice_trace">跟踪</string>
     <string name="settings_frame_limit">幀率限制</string>
     <string name="settings_frame_limit_desc">將模擬限制在主機的刷新率。關閉後以裝置允許的最高速度運行。</string>
+    <string name="settings_rewind">倒帶</string>
+    <string name="settings_rewind_desc">長按倒帶控制即可回退。每隔幾秒儲存一次完整狀態快照，會額外耗用 CPU。</string>
     <string name="settings_target_fps">目標幀率</string>
     <string name="settings_target_fps_desc">自動使用 PPSSPP 回報的影格率。手動數值設定模擬速度；遊戲實際顯示的影格可能較少。</string>
     <string name="settings_vertical_refresh_ntsc">NTSC 刷新率</string>

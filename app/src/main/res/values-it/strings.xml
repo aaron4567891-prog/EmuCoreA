@@ -1982,6 +1982,8 @@
     <string name="ss_core_choice_trace">Traccia</string>
     <string name="settings_frame_limit">Limite fotogrammi</string>
     <string name="settings_frame_limit_desc">Limita l\'emulazione alla frequenza di aggiornamento della console. Disattivalo per andare il più veloce possibile.</string>
+    <string name="settings_rewind">Riavvolgimento</string>
+    <string name="settings_rewind_desc">Tieni premuto il comando di riavvolgimento per tornare indietro. Ogni pochi secondi viene salvata un\'istantanea completa, con un costo CPU extra.</string>
     <string name="settings_target_fps">Frequenza fotogrammi target</string>
     <string name="settings_target_fps_desc">Auto usa la frequenza dei fotogrammi indicata da PPSSPP. Un valore manuale imposta la velocità di emulazione; il gioco può mostrare meno fotogrammi.</string>
     <string name="settings_vertical_refresh_ntsc">Frequenza di aggiornamento NTSC</string>

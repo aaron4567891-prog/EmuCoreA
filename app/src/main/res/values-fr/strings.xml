@@ -1984,6 +1984,8 @@
     <string name="ss_core_choice_trace">Trace</string>
     <string name="settings_frame_limit">Limite d\'images</string>
     <string name="settings_frame_limit_desc">Limite l\'émulation au taux de rafraîchissement de la console. Désactivez pour aller aussi vite que l\'appareil le permet.</string>
+    <string name="settings_rewind">Retour arrière</string>
+    <string name="settings_rewind_desc">Maintenez la commande de retour arrière pour revenir en arrière. Un instantané complet est enregistré toutes les quelques secondes, ce qui consomme du CPU.</string>
     <string name="settings_target_fps">Fréquence d\'images cible</string>
     <string name="settings_target_fps_desc">Auto utilise la fréquence d’images indiquée par PPSSPP. Une valeur manuelle règle le rythme de l’émulation ; le jeu peut afficher moins d’images.</string>
     <string name="settings_vertical_refresh_ntsc">Fréquence de rafraîchissement NTSC</string>

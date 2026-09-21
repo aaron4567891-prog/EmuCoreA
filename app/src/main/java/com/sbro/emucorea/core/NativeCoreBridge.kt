@@ -50,6 +50,8 @@ class NativeCoreBridge {
     external fun runFrame(handle: Long): Long
     /** 0 normal, 1 fast forward, 2 rewind. */
     external fun setTimeControl(mode: Int)
+    /** Enables/disables periodic rewind snapshots (off by default, like PPSSPP). */
+    external fun setRewindEnabled(enabled: Boolean)
     /**
      * Creates/rebinds the hardware renderer context on the calling thread.
      * Must be invoked from the frame worker so GL state stays thread-affine.

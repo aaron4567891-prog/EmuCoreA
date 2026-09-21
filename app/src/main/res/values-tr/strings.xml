@@ -1982,6 +1982,8 @@
     <string name="ss_core_choice_trace">İzleme</string>
     <string name="settings_frame_limit">Kare sınırı</string>
     <string name="settings_frame_limit_desc">Emülasyonu konsolun yenileme hızıyla sınırlar. Cihazın izin verdiği kadar hızlı çalışması için kapatın.</string>
+    <string name="settings_rewind">Geri sarma</string>
+    <string name="settings_rewind_desc">Geri gitmek için geri sarma düğmesini basılı tutun. Birkaç saniyede bir tam durum anlık görüntüsü kaydedilir; bu ek CPU kullanır.</string>
     <string name="settings_target_fps">Hedef kare hızı</string>
     <string name="settings_target_fps_desc">Otomatik, PPSSPP tarafından bildirilen kare hızını kullanır. Elle seçilen değer emülasyon hızını belirler; oyun daha az kare gösterebilir.</string>
     <string name="settings_vertical_refresh_ntsc">NTSC yenileme hızı</string>

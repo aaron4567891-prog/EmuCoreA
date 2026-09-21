@@ -153,6 +153,8 @@ object NativeApp {
     @JvmStatic fun setAudioLowLatency(enabled: Boolean) = runCatching {
         CoreRuntime.bridge.setAudioLowLatency(enabled)
     }
+    @JvmStatic fun setRewindEnabled(enabled: Boolean) =
+        CoreRuntime.updateSetting("EmuCoreA/GS", "RewindEnabled", enabled.toString())
     @JvmStatic fun queueGsDump(frames: Int) = Unit
     @JvmStatic @Synchronized fun setPadButton(padIndex: Int, index: Int, range: Int, pressed: Boolean) {
         if (padIndex !in 0..1) return

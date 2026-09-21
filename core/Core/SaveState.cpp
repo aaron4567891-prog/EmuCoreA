@@ -256,6 +256,10 @@ int g_screenshotFailures;
 		return !rewindStates.Empty();
 	}
 
+	void ClearRewind() {
+		rewindStates.Clear();
+	}
+
 	// Slot utilities
 
 	std::string AppendSlotTitle(const std::string &filename, const std::string &title) {

@@ -1984,6 +1984,8 @@
     <string name="ss_core_choice_trace">Trace</string>
     <string name="settings_frame_limit">Bildratenlimit</string>
     <string name="settings_frame_limit_desc">Begrenzt die Emulation auf die Bildwiederholrate der Konsole. Ausschalten, um so schnell wie das Gerät läuft.</string>
+    <string name="settings_rewind">Zurückspulen</string>
+    <string name="settings_rewind_desc">Zum Zurückspulen die Taste gedrückt halten. Alle paar Sekunden wird ein kompletter Zustand gespeichert, was zusätzliche CPU kostet.</string>
     <string name="settings_target_fps">Ziel-Bildrate</string>
     <string name="settings_target_fps_desc">Automatisch verwendet die von PPSSPP gemeldete Bildrate. Ein manueller Wert bestimmt das Emulationstempo; ein Spiel kann weniger Bilder darstellen.</string>
     <string name="settings_vertical_refresh_ntsc">NTSC-Bildwiederholrate</string>

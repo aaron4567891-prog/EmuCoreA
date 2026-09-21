@@ -1987,6 +1987,8 @@
     <string name="ss_core_choice_trace">Трасування</string>
     <string name="settings_frame_limit">Обмеження кадрів</string>
     <string name="settings_frame_limit_desc">Обмежує емуляцію частотою оновлення консолі. Вимкніть, щоб працювати так швидко, як дозволяє пристрій.</string>
+    <string name="settings_rewind">Перемотування назад</string>
+    <string name="settings_rewind_desc">Утримуйте кнопку перемотування, щоб відкотитися назад. Кожні кілька секунд зберігається повний знімок стану, що додатково навантажує CPU.</string>
     <string name="settings_target_fps">Цільова частота кадрів</string>
     <string name="settings_target_fps_desc">«Авто» використовує частоту кадрів, яку повідомляє PPSSPP. Ручне значення задає темп емуляції; гра може показувати менше кадрів.</string>
     <string name="settings_vertical_refresh_ntsc">Частота оновлення NTSC</string>

@@ -36,6 +36,10 @@ namespace {
 constexpr uint32_t kPreferredQueueFamilyNone = UINT32_MAX;
 constexpr uint64_t kFenceWaitTimeoutNs = 2'000'000'000ull;
 constexpr int kMaxSwapchainFailures = 3;
+// One submission slot per core output image. Two slots let the core emulate the
+// next frame while the GPU still blits/presents the previous one; the core's
+// wait_sync_index() blocks only when it wants to reuse an image we are reading.
+constexpr uint32_t kInflightSlots = 2;
 
 // User-requested source-pixel crop.
 struct CropRect {
@@ -130,11 +134,11 @@ struct State {
     uint32_t chain_target_height = 0;
 #endif
 
-    VkCommandPool command_pool = VK_NULL_HANDLE;
-    VkCommandBuffer command_buffer = VK_NULL_HANDLE;
-    VkSemaphore acquire_semaphore = VK_NULL_HANDLE;
+    VkCommandPool command_pools[kInflightSlots] = {};
+    VkCommandBuffer command_buffers[kInflightSlots] = {};
+    VkSemaphore acquire_semaphores[kInflightSlots] = {};
+    VkFence frame_fences[kInflightSlots] = {};
     std::vector<VkSemaphore> present_semaphores;
-    VkFence frame_fence = VK_NULL_HANDLE;
 
     ANativeWindow* preparation_window = nullptr;
     uint32_t window_generation = 0;
@@ -157,7 +161,6 @@ struct State {
     retro_vulkan_image frame_image = {};
     bool has_frame_image = false;
     uint32_t sync_index = 0;
-    uint32_t submitted_sync_index = UINT32_MAX;
 };
 
 State g_vk;
@@ -386,34 +389,39 @@ bool CreateDevice() {
     pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     pool_info.queueFamilyIndex = g_vk.queue_family;
-    if (vkCreateCommandPool(g_vk.device, &pool_info, nullptr, &g_vk.command_pool) != VK_SUCCESS) {
-        VK_LOGE("vkCreateCommandPool failed");
-        return false;
-    }
-
-    VkCommandBufferAllocateInfo buffer_info{};
-    buffer_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    buffer_info.commandPool = g_vk.command_pool;
-    buffer_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    buffer_info.commandBufferCount = 1;
-    if (vkAllocateCommandBuffers(g_vk.device, &buffer_info, &g_vk.command_buffer) != VK_SUCCESS) {
-        VK_LOGE("vkAllocateCommandBuffers failed");
-        return false;
-    }
 
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    if (vkCreateSemaphore(g_vk.device, &semaphore_info, nullptr, &g_vk.acquire_semaphore) != VK_SUCCESS) {
-        VK_LOGE("vkCreateSemaphore failed");
-        return false;
-    }
-
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    // Signaled so the first wait on a fresh slot returns immediately.
     fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-    if (vkCreateFence(g_vk.device, &fence_info, nullptr, &g_vk.frame_fence) != VK_SUCCESS) {
-        VK_LOGE("vkCreateFence failed");
-        return false;
+
+    for (uint32_t slot = 0; slot < kInflightSlots; ++slot) {
+        if (vkCreateCommandPool(g_vk.device, &pool_info, nullptr, &g_vk.command_pools[slot]) != VK_SUCCESS) {
+            VK_LOGE("vkCreateCommandPool failed");
+            return false;
+        }
+
+        VkCommandBufferAllocateInfo buffer_info{};
+        buffer_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        buffer_info.commandPool = g_vk.command_pools[slot];
+        buffer_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        buffer_info.commandBufferCount = 1;
+        if (vkAllocateCommandBuffers(g_vk.device, &buffer_info, &g_vk.command_buffers[slot]) != VK_SUCCESS) {
+            VK_LOGE("vkAllocateCommandBuffers failed");
+            return false;
+        }
+
+        if (vkCreateSemaphore(g_vk.device, &semaphore_info, nullptr, &g_vk.acquire_semaphores[slot]) != VK_SUCCESS) {
+            VK_LOGE("vkCreateSemaphore failed");
+            return false;
+        }
+
+        if (vkCreateFence(g_vk.device, &fence_info, nullptr, &g_vk.frame_fences[slot]) != VK_SUCCESS) {
+            VK_LOGE("vkCreateFence failed");
+            return false;
+        }
     }
 
     VkSamplerCreateInfo sampler_info{};
@@ -1077,11 +1085,14 @@ uint32_t GetSyncIndexMask(void*) {
 void SetCommandBuffers(void*, uint32_t, const VkCommandBuffer*) {}
 
 void WaitSyncIndex(void*) {
-    if (g_vk.device == VK_NULL_HANDLE || g_vk.frame_fence == VK_NULL_HANDLE) return;
-    // Present waits for the preceding submission before reusing its command
-    // buffer. With alternating core images, only the latest image can be in use.
-    if (g_vk.sync_index != g_vk.submitted_sync_index) return;
-    vkWaitForFences(g_vk.device, 1, &g_vk.frame_fence, VK_TRUE, kFenceWaitTimeoutNs);
+    if (g_vk.device == VK_NULL_HANDLE || g_vk.failed) return;
+    // The core is about to render into core image `sync_index`, which our last
+    // submission read from; that submission must be done before it is reused.
+    // Waiting here is the boundary that keeps CPU emulation and GPU work
+    // overlapped without tearing: it only blocks when two frames are in flight.
+    const uint32_t slot = g_vk.sync_index % kInflightSlots;
+    if (g_vk.frame_fences[slot] == VK_NULL_HANDLE) return;
+    vkWaitForFences(g_vk.device, 1, &g_vk.frame_fences[slot], VK_TRUE, kFenceWaitTimeoutNs);
 }
 
 void LockQueue(void*) {
@@ -1130,9 +1141,8 @@ struct PresentPushConstants {
     float pad;
 };
 
-bool RecordPresentBlit(uint32_t swapchain_index, uint32_t source_width, uint32_t source_height,
-                       const PresentRect& dst, const CropRect& crop) {
-    VkCommandBuffer command_buffer = g_vk.command_buffer;
+bool RecordPresentBlit(VkCommandBuffer command_buffer, uint32_t swapchain_index, uint32_t source_width,
+                       uint32_t source_height, const PresentRect& dst, const CropRect& crop) {
     vkResetCommandBuffer(command_buffer, 0);
 
     VkCommandBufferBeginInfo begin_info{};
@@ -1205,12 +1215,11 @@ bool RecordPresentBlit(uint32_t swapchain_index, uint32_t source_width, uint32_t
 }
 
 #if !defined(EMUCOREA_HAVE_LIBRASHADER)
-bool RecordPresentEffect(uint32_t swapchain_index, uint32_t source_width, uint32_t source_height,
-                         const PresentRect& dst, const CropRect& crop, int effect) {
+bool RecordPresentEffect(VkCommandBuffer command_buffer, uint32_t swapchain_index, uint32_t source_width,
+                         uint32_t source_height, const PresentRect& dst, const CropRect& crop, int effect) {
     if (!EnsureEffectPipeline()) return false;
     if (swapchain_index >= g_vk.swapchain_framebuffers.size()) return false;
 
-    VkCommandBuffer command_buffer = g_vk.command_buffer;
     vkResetCommandBuffer(command_buffer, 0);
 
     VkCommandBufferBeginInfo begin_info{};
@@ -1334,12 +1343,11 @@ bool RecordPresentEffect(uint32_t swapchain_index, uint32_t source_width, uint32
 #endif  // !EMUCOREA_HAVE_LIBRASHADER
 
 #if defined(EMUCOREA_HAVE_LIBRASHADER)
-bool RecordPresentShaderChain(uint32_t swapchain_index, uint32_t source_width, uint32_t source_height,
-                              const PresentRect& dst) {
+bool RecordPresentShaderChain(VkCommandBuffer command_buffer, uint32_t swapchain_index, uint32_t source_width,
+                              uint32_t source_height, const PresentRect& dst) {
     if (g_vk.shader_chain == nullptr || g_vk.chain_target_image == VK_NULL_HANDLE) return false;
     if (swapchain_index >= g_vk.swapchain_images.size()) return false;
 
-    VkCommandBuffer command_buffer = g_vk.command_buffer;
     vkResetCommandBuffer(command_buffer, 0);
 
     VkCommandBufferBeginInfo begin_info{};
@@ -1563,13 +1571,35 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     }
     if (source_width == 0 || source_height == 0) return false;
 
-    if (vkWaitForFences(g_vk.device, 1, &g_vk.frame_fence, VK_TRUE, kFenceWaitTimeoutNs) != VK_SUCCESS) {
-        VK_LOGW("Vulkan frame fence timed out");
-        return false;
+#if defined(EMUCOREA_HAVE_LIBRASHADER)
+    const bool want_chain = shader_chain::IsEnabled() && !shader_chain::PresetPath().empty();
+#else
+    constexpr bool want_chain = false;
+#endif
+
+    // Submission slot for this core image. PPSSPP keeps two frames in flight
+    // (iInflightFrames); waiting only on this slot's fence lets the core emulate
+    // the next frame on the CPU while the GPU still works on the previous one.
+    // A shader chain owns a single intermediate image, so it stays serialized.
+    const uint32_t slot = g_vk.sync_index % kInflightSlots;
+    if (want_chain) {
+        for (uint32_t i = 0; i < kInflightSlots; ++i) {
+            if (g_vk.frame_fences[i] == VK_NULL_HANDLE) continue;
+            if (vkWaitForFences(g_vk.device, 1, &g_vk.frame_fences[i], VK_TRUE, kFenceWaitTimeoutNs) != VK_SUCCESS) {
+                VK_LOGW("Vulkan frame fence (slot %u) timed out", i);
+                return false;
+            }
+        }
+    } else {
+        if (g_vk.frame_fences[slot] == VK_NULL_HANDLE ||
+            vkWaitForFences(g_vk.device, 1, &g_vk.frame_fences[slot], VK_TRUE, kFenceWaitTimeoutNs) != VK_SUCCESS) {
+            VK_LOGW("Vulkan frame fence (slot %u) timed out", slot);
+            return false;
+        }
     }
 
     uint32_t swapchain_index = 0;
-    VkResult result = g_vk.pfn_acquire(g_vk.device, g_vk.swapchain, UINT64_MAX, g_vk.acquire_semaphore,
+    VkResult result = g_vk.pfn_acquire(g_vk.device, g_vk.swapchain, UINT64_MAX, g_vk.acquire_semaphores[slot],
                                        VK_NULL_HANDLE, &swapchain_index);
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         RecreateSwapchain();
@@ -1584,11 +1614,6 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     }
     if (swapchain_index >= g_vk.swapchain_images.size()) return false;
 
-#if defined(EMUCOREA_HAVE_LIBRASHADER)
-    const bool want_chain = shader_chain::IsEnabled() && !shader_chain::PresetPath().empty();
-#else
-    constexpr bool want_chain = false;
-#endif
     // Shader chains sample the whole frame image (no sub-rect input), so the
     // crop applies only to the direct present paths.
     const CropRect crop = want_chain
@@ -1608,11 +1633,11 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     bool recorded = false;
 #if defined(EMUCOREA_HAVE_LIBRASHADER)
     if (want_chain && EnsureShaderChain() && EnsureShaderChainTarget(dst.width, dst.height)) {
-        recorded = RecordPresentShaderChain(swapchain_index, source_width, source_height, dst);
+        recorded = RecordPresentShaderChain(g_vk.command_buffers[slot], swapchain_index, source_width, source_height, dst);
         if (!recorded) VK_LOGW("librashader chain frame failed; falling back to blit");
     }
     if (!recorded) {
-        recorded = RecordPresentBlit(swapchain_index, source_width, source_height, dst, crop);
+        recorded = RecordPresentBlit(g_vk.command_buffers[slot], swapchain_index, source_width, source_height, dst, crop);
     }
 #else
     int effect = g_shader_effect.load(std::memory_order_relaxed);
@@ -1620,11 +1645,11 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
         effect = 5; // Fallback to Bilinear shader quad for reliable linear upscaling
     }
     if (effect != 0) {
-        recorded = RecordPresentEffect(swapchain_index, source_width, source_height, dst, crop, effect);
+        recorded = RecordPresentEffect(g_vk.command_buffers[slot], swapchain_index, source_width, source_height, dst, crop, effect);
         if (!recorded) VK_LOGW("Vulkan shader effect path failed; falling back to blit");
     }
     if (!recorded) {
-        recorded = RecordPresentBlit(swapchain_index, source_width, source_height, dst, crop);
+        recorded = RecordPresentBlit(g_vk.command_buffers[slot], swapchain_index, source_width, source_height, dst, crop);
     }
 #endif
     if (!recorded) {
@@ -1636,15 +1661,15 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     VkSubmitInfo submit_info{};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.waitSemaphoreCount = 1;
-    submit_info.pWaitSemaphores = &g_vk.acquire_semaphore;
+    submit_info.pWaitSemaphores = &g_vk.acquire_semaphores[slot];
     submit_info.pWaitDstStageMask = &wait_stage;
     submit_info.commandBufferCount = 1;
-    submit_info.pCommandBuffers = &g_vk.command_buffer;
+    submit_info.pCommandBuffers = &g_vk.command_buffers[slot];
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &g_vk.present_semaphores[swapchain_index];
     std::unique_lock<std::mutex> queue_lock(g_queue_mutex);
-    vkResetFences(g_vk.device, 1, &g_vk.frame_fence);
-    if (vkQueueSubmit(g_vk.queue, 1, &submit_info, g_vk.frame_fence) != VK_SUCCESS) {
+    vkResetFences(g_vk.device, 1, &g_vk.frame_fences[slot]);
+    if (vkQueueSubmit(g_vk.queue, 1, &submit_info, g_vk.frame_fences[slot]) != VK_SUCCESS) {
         g_vk.failed = true;
         VK_LOGW("vkQueueSubmit failed");
         return false;
@@ -1660,8 +1685,7 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
     result = g_vk.pfn_queue_present(g_vk.present_queue, &present_info);
     queue_lock.unlock();
     g_vk.swapchain_initialized[swapchain_index] = true;
-    g_vk.submitted_sync_index = g_vk.sync_index;
-    g_vk.sync_index = (g_vk.sync_index + 1) % 2;
+    g_vk.sync_index = (slot + 1) % kInflightSlots;
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         RecreateSwapchain();
@@ -1669,7 +1693,8 @@ bool Present(uint32_t source_width, uint32_t source_height, double display_aspec
         VK_LOGW("vkQueuePresentKHR failed (0x%x)", result);
         return false;
     }
-    // The next core frame uses the other image while this submission finishes.
+    // The GPU keeps working on this slot while the core fills the other one;
+    // wait_sync_index() only blocks when the core wants this image back.
     return true;
 }
 
@@ -1680,10 +1705,14 @@ void Destroy() {
 #if defined(EMUCOREA_HAVE_LIBRASHADER)
         DestroyShaderChain();
 #endif
-        if (g_vk.command_pool != VK_NULL_HANDLE) vkDestroyCommandPool(g_vk.device, g_vk.command_pool, nullptr);
-        if (g_vk.acquire_semaphore != VK_NULL_HANDLE)
-            vkDestroySemaphore(g_vk.device, g_vk.acquire_semaphore, nullptr);
-        if (g_vk.frame_fence != VK_NULL_HANDLE) vkDestroyFence(g_vk.device, g_vk.frame_fence, nullptr);
+        for (uint32_t slot = 0; slot < kInflightSlots; ++slot) {
+            if (g_vk.command_pools[slot] != VK_NULL_HANDLE)
+                vkDestroyCommandPool(g_vk.device, g_vk.command_pools[slot], nullptr);
+            if (g_vk.acquire_semaphores[slot] != VK_NULL_HANDLE)
+                vkDestroySemaphore(g_vk.device, g_vk.acquire_semaphores[slot], nullptr);
+            if (g_vk.frame_fences[slot] != VK_NULL_HANDLE)
+                vkDestroyFence(g_vk.device, g_vk.frame_fences[slot], nullptr);
+        }
         if (g_vk.effect_descriptor_pool != VK_NULL_HANDLE)
             vkDestroyDescriptorPool(g_vk.device, g_vk.effect_descriptor_pool, nullptr);
         if (g_vk.effect_pipeline_layout != VK_NULL_HANDLE)

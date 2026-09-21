@@ -109,6 +109,9 @@ namespace SaveState {
 	// Returns true if there are rewind snapshots available.
 	bool CanRewind();
 
+	// Drops every stored rewind snapshot and frees their memory.
+	void ClearRewind();
+
 	// Returns true if a savestate has been used during this session.
 	bool HasLoadedState();
 

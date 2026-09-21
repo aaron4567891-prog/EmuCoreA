@@ -110,6 +110,7 @@ struct CoreApi {
     bool (*load_game)(const retro_game_info*) = nullptr;
     void (*unload_game)() = nullptr;
     bool (*rewind_step)() = nullptr;
+    void (*set_rewind_enabled)(bool) = nullptr;
     uint64_t (*emulated_time_us)() = nullptr;
     bool (*disc_achievement_hash)(const char*, char*) = nullptr;
     int (*game_asset)(const char*, int, uint8_t*, size_t) = nullptr;
@@ -310,6 +311,7 @@ bool LoadCoreLocked() {
     g_core.load_game = reinterpret_cast<bool (*)(const retro_game_info*)>(resolve("retro_load_game"));
     g_core.unload_game = reinterpret_cast<void (*)()>(resolve("retro_unload_game"));
     g_core.rewind_step = reinterpret_cast<bool (*)()>(resolve("emucorea_rewind_step"));
+    g_core.set_rewind_enabled = reinterpret_cast<void (*)(bool)>(resolve("emucorea_set_rewind_enabled"));
     g_core.emulated_time_us = reinterpret_cast<uint64_t (*)()>(resolve("emucorea_emulated_time_us"));
 
     if (g_core.set_environment == nullptr || g_core.init == nullptr || g_core.load_game == nullptr ||
@@ -1298,6 +1300,13 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_setTimeControl(JNIEnv*, jobject, ji
     const int safe_mode = mode >= 0 && mode <= 2 ? mode : 0;
     g_frontend.time_control.store(safe_mode);
     LOGI("Time control mode=%d", safe_mode);
+}
+
+JNIEXPORT void JNICALL
+Java_com_sbro_emucorea_core_NativeCoreBridge_setRewindEnabled(JNIEnv*, jobject, jboolean enabled) {
+    if (g_core.set_rewind_enabled != nullptr) {
+        g_core.set_rewind_enabled(enabled == JNI_TRUE);
+    }
 }
 
 JNIEXPORT jboolean JNICALL

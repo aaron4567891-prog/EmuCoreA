@@ -253,6 +253,7 @@ data class SettingsSnapshot(
     val mediatekAngleOpenGl: Boolean = false,
     val customDriverPath: String? = null,
     val frameLimitEnabled: Boolean = true,
+    val rewindEnabled: Boolean = false,
     val vSyncEnabled: Boolean = false,
     val fastForwardSpeed: Float = AppPreferences.DEFAULT_FAST_FORWARD_SPEED,
     val targetFps: Int = 0,
@@ -683,6 +684,7 @@ class AppPreferences(private val context: Context) {
         private val MEDIATEK_ANGLE_OPENGL = booleanPreferencesKey("mediatek_angle_opengl")
         private val CUSTOM_DRIVER_PATH = stringPreferencesKey("custom_driver_path")
         private val FRAME_LIMIT_ENABLED = booleanPreferencesKey("frame_limit_enabled")
+        private val REWIND_ENABLED = booleanPreferencesKey("rewind_enabled")
         private val VSYNC_ENABLED = booleanPreferencesKey("vsync_enabled")
         private val FAST_FORWARD_SPEED = floatPreferencesKey("fast_forward_speed")
         private val TARGET_FPS = intPreferencesKey("target_fps")
@@ -1160,6 +1162,10 @@ class AppPreferences(private val context: Context) {
         prefs[FRAME_LIMIT_ENABLED] ?: true
     }
 
+    val rewindEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[REWIND_ENABLED] ?: false
+    }
+
     val audioVolume: Flow<Int> = context.dataStore.data.map { prefs ->
         AudioDefaults.coerceVolume(prefs[AUDIO_VOLUME] ?: AudioDefaults.VOLUME_DEFAULT)
     }
@@ -1243,6 +1249,12 @@ class AppPreferences(private val context: Context) {
     suspend fun setFrameLimitEnabled(enabled: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[FRAME_LIMIT_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setRewindEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[REWIND_ENABLED] = enabled
         }
     }
 
@@ -1807,6 +1819,7 @@ class AppPreferences(private val context: Context) {
                 mediatekAngleOpenGl = prefs[MEDIATEK_ANGLE_OPENGL] ?: false,
                 customDriverPath = prefs[CUSTOM_DRIVER_PATH],
                 frameLimitEnabled = prefs[FRAME_LIMIT_ENABLED] ?: true,
+                rewindEnabled = prefs[REWIND_ENABLED] ?: false,
                 vSyncEnabled = prefs[VSYNC_ENABLED] ?: false,
                 fastForwardSpeed = sanitizeFastForwardSpeed(prefs[FAST_FORWARD_SPEED]),
                 targetFps = prefs[TARGET_FPS] ?: 0,
@@ -4133,6 +4146,7 @@ class AppPreferences(private val context: Context) {
             put("gpuDriverType", prefs[GPU_DRIVER_TYPE] ?: 0)
             put("customDriverPath", prefs[CUSTOM_DRIVER_PATH])
             put("frameLimitEnabled", prefs[FRAME_LIMIT_ENABLED] ?: true)
+            put("rewindEnabled", prefs[REWIND_ENABLED] ?: false)
             put("vSyncEnabled", prefs[VSYNC_ENABLED] ?: false)
             put("fastForwardSpeed", sanitizeFastForwardSpeed(prefs[FAST_FORWARD_SPEED]).toDouble())
             put("targetFps", prefs[TARGET_FPS] ?: 0)
@@ -4546,6 +4560,7 @@ class AppPreferences(private val context: Context) {
             prefs[GPU_DRIVER_TYPE] = json.optInt("gpuDriverType", 0)
             json.optString("customDriverPath").takeIf { it.isNotBlank() }?.let { prefs[CUSTOM_DRIVER_PATH] = it } ?: prefs.remove(CUSTOM_DRIVER_PATH)
             prefs[FRAME_LIMIT_ENABLED] = json.optBoolean("frameLimitEnabled", true)
+            prefs[REWIND_ENABLED] = json.optBoolean("rewindEnabled", false)
             prefs[VSYNC_ENABLED] = json.optBoolean("vSyncEnabled", false)
             prefs[FAST_FORWARD_SPEED] = sanitizeFastForwardSpeed(json.optDouble("fastForwardSpeed", DEFAULT_FAST_FORWARD_SPEED.toDouble()).toFloat())
             prefs[TARGET_FPS] = json.optInt("targetFps", 0).let { if (it <= 0) 0 else it.coerceIn(20, 120) }

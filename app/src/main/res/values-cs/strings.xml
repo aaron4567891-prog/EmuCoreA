@@ -2003,6 +2003,8 @@
     <string name="ss_core_choice_trace">Trasování</string>
     <string name="settings_frame_limit">Limit snímků</string>
     <string name="settings_frame_limit_desc">Omezuje emulaci na obnovovací frekvenci konzole. Vypnutím poběží tak rychle, jak zařízení dovolí.</string>
+    <string name="settings_rewind">Převíjení</string>
+    <string name="settings_rewind_desc">Podržením převíjení se vrátíte zpět. Každých pár sekund se ukládá úplný snímek stavu, což spotřebovává CPU navíc.</string>
     <string name="settings_target_fps">Cílová frekvence snímků</string>
     <string name="settings_target_fps_desc">Automaticky se použije snímková frekvence hlášená PPSSPP. Ruční hodnota určuje rychlost emulace; hra může vykreslovat méně snímků.</string>
     <string name="settings_vertical_refresh_ntsc">Obnovovací frekvence NTSC</string>

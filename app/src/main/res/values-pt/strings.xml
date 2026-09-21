@@ -1984,6 +1984,8 @@
     <string name="ss_core_choice_trace">Rastreamento</string>
     <string name="settings_frame_limit">Limite de quadros</string>
     <string name="settings_frame_limit_desc">Limita a emulação à taxa de atualização do console. Desative para rodar o mais rápido que o dispositivo permitir.</string>
+    <string name="settings_rewind">Rebobinar</string>
+    <string name="settings_rewind_desc">Mantenha o controlo de rebobinar para voltar atrás. É guardado um instantâneo completo a cada poucos segundos, o que consome CPU extra.</string>
     <string name="settings_target_fps">Taxa de quadros alvo</string>
     <string name="settings_target_fps_desc">Auto usa a taxa de quadros informada pelo PPSSPP. Um valor manual define o ritmo da emulação; o jogo pode exibir menos quadros.</string>
     <string name="settings_vertical_refresh_ntsc">Taxa de atualização NTSC</string>

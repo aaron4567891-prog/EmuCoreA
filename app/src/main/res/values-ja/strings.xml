@@ -1981,6 +1981,8 @@
     <string name="ss_core_choice_trace">トレース</string>
     <string name="settings_frame_limit">フレーム制限</string>
     <string name="settings_frame_limit_desc">エミュレーションを本体のリフレッシュレートに制限します。オフにするとデバイスの性能に応じて高速に動作します。</string>
+    <string name="settings_rewind">巻き戻し</string>
+    <string name="settings_rewind_desc">巻き戻しボタンを長押しすると前に戻ります。数秒ごとに完全なステートを保存するため、CPUを余分に使用します。</string>
     <string name="settings_target_fps">目標フレームレート</string>
     <string name="settings_target_fps_desc">自動ではPPSSPPが報告するフレームレートを使用します。手動の値はエミュレーション速度を設定しますが、ゲームの描画枚数は少ない場合があります。</string>
     <string name="settings_vertical_refresh_ntsc">NTSC リフレッシュレート</string>

@@ -283,6 +283,7 @@ data class SettingsUiState(
     val customDriverPath: String? = null,
     val appUpdate: AppUpdateUiState = AppUpdateUiState(),
     val frameLimitEnabled: Boolean = true,
+    val rewindEnabled: Boolean = false,
     val vSyncEnabled: Boolean = false,
     val fastForwardSpeed: Float = AppPreferences.DEFAULT_FAST_FORWARD_SPEED,
     val targetFps: Int = 0,
@@ -563,6 +564,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             mediatekAngleOpenGl = snapshot.mediatekAngleOpenGl,
             customDriverPath = snapshot.customDriverPath,
             frameLimitEnabled = snapshot.frameLimitEnabled,
+            rewindEnabled = snapshot.rewindEnabled,
             vSyncEnabled = snapshot.vSyncEnabled,
             fastForwardSpeed = snapshot.fastForwardSpeed,
             targetFps = snapshot.targetFps,
@@ -1564,6 +1566,13 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             preferences.setFrameLimitEnabled(enabled)
             EmulatorBridge.setFrameLimitEnabled(enabled)
+        }
+    }
+
+    fun setRewindEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferences.setRewindEnabled(enabled)
+            EmulatorBridge.setRewindEnabled(enabled)
         }
     }
 

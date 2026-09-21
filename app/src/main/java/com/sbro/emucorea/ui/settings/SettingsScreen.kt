@@ -1960,6 +1960,15 @@ private fun SettingsContent(
                             helpText = stringResource(R.string.settings_frame_limit_desc),
                             onResetToDefault = { viewModel.setFrameLimitEnabled(defaults.frameLimitEnabled) }
                         )
+                        ToggleItem(
+                            icon = Icons.Rounded.Restore,
+                            title = stringResource(R.string.settings_rewind),
+                            subtitle = stringResource(R.string.settings_rewind_desc),
+                            checked = uiState.rewindEnabled,
+                            onCheckedChange = viewModel::setRewindEnabled,
+                            helpText = stringResource(R.string.settings_rewind_desc),
+                            onResetToDefault = { viewModel.setRewindEnabled(defaults.rewindEnabled) }
+                        )
                         ChoiceSection(
                             title = stringResource(R.string.settings_target_fps),
                             options = listOf(

@@ -1984,6 +1984,8 @@
     <string name="ss_core_choice_trace">Traza</string>
     <string name="settings_frame_limit">Límite de fotogramas</string>
     <string name="settings_frame_limit_desc">Limita la emulación a la frecuencia de actualización de la consola. Desactívalo para ir tan rápido como permita el dispositivo.</string>
+    <string name="settings_rewind">Rebobinar</string>
+    <string name="settings_rewind_desc">Mantén el control de rebobinado para retroceder. Se guarda una instantánea completa cada pocos segundos, lo que consume CPU adicional.</string>
     <string name="settings_target_fps">Frecuencia de fotogramas objetivo</string>
     <string name="settings_target_fps_desc">Auto usa la frecuencia de fotogramas indicada por PPSSPP. Un valor manual fija el ritmo de emulación; el juego puede mostrar menos fotogramas.</string>
     <string name="settings_vertical_refresh_ntsc">Frecuencia de refresco NTSC</string>

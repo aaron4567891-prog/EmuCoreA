@@ -1254,8 +1254,6 @@ void retro_init(void)
 
    g_Config.Load("", "");
    g_Config.iInternalResolution = 0;
-   // Keep a short rolling history for the frontend's hold-to-rewind control.
-   g_Config.iRewindSnapshotInterval = 2;
 
    // Log levels must be set after g_Config.Load
 #ifdef NDEBUG
@@ -1396,10 +1394,16 @@ unsigned retro_api_version(void) { return RETRO_API_VERSION; }
 
 namespace Libretro {
    bool useEmuThread = false;
+   // Set from the frontend thread, consumed on the emulation thread in EmuFrame().
+   std::atomic<bool> clearRewindRequested{false};
    std::atomic<EmuThreadState> emuThreadState(EmuThreadState::DISABLED);
 
    static std::thread emuThread;
    static void EmuFrame() {
+      // Dropping the rewind history touches the ring buffer and its compressor,
+      // so it runs here on the emulation thread instead of the caller's thread.
+      if (clearRewindRequested.exchange(false))
+         SaveState::ClearRewind();
       // The standalone PPSSPP UI processes queued rewind operations and
       // captures periodic rewind snapshots here. The libretro frame loop
       // must do the same or CanRewind() remains false forever.
@@ -1632,10 +1636,18 @@ void retro_unload_game(void) {
 }
 
 extern "C" bool emucorea_rewind_step(void) {
-   if (!PSP_IsInited() || !SaveState::CanRewind())
+   if (!PSP_IsInited() || g_Config.iRewindSnapshotInterval <= 0 || !SaveState::CanRewind())
       return false;
    SaveState::Rewind();
    return true;
+}
+
+// Rewind capture serializes the whole machine state every interval, so it stays
+// off until the frontend enables it, matching PPSSPP's default (no rewind).
+extern "C" void emucorea_set_rewind_enabled(bool enabled) {
+   g_Config.iRewindSnapshotInterval = enabled ? 2 : 0;
+   if (!enabled)
+      Libretro::clearRewindRequested.store(true);
 }
 
 // Emulated clock in microseconds, sampled by the frontend around each frame so

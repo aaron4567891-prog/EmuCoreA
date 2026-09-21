@@ -1982,6 +1982,8 @@
     <string name="ss_core_choice_trace">ट्रेस</string>
     <string name="settings_frame_limit">फ़्रेम सीमा</string>
     <string name="settings_frame_limit_desc">एमुलेशन को कंसोल की रिफ्रेश दर तक सीमित करता है। डिवाइस की अधिकतम गति से चलाने के लिए इसे बंद करें।</string>
+    <string name="settings_rewind">रीवाइंड</string>
+    <string name="settings_rewind_desc">पीछे जाने के लिए रीवाइंड नियंत्रण दबाए रखें। हर कुछ सेकंड में पूरा स्टेट स्नैपशॉट सहेजा जाता है, जिससे अतिरिक्त CPU लगता है।</string>
     <string name="settings_target_fps">लक्ष्य फ़्रेम दर</string>
     <string name="settings_target_fps_desc">ऑटो PPSSPP द्वारा बताई गई फ़्रेम दर का उपयोग करता है। मैन्युअल मान एमुलेशन की गति तय करता है; गेम कम फ़्रेम दिखा सकता है।</string>
     <string name="settings_vertical_refresh_ntsc">NTSC रिफ्रेश दर</string>

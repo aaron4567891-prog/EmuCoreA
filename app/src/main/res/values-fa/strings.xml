@@ -1997,6 +1997,8 @@
     <string name="ss_core_choice_trace">ردیابی</string>
     <string name="settings_frame_limit">محدودیت فریم</string>
     <string name="settings_frame_limit_desc">شبیه‌سازی را به نرخ نوسازی کنسول محدود می‌کند. برای اجرا با بیشترین سرعت دستگاه، آن را خاموش کنید.</string>
+    <string name="settings_rewind">عقب‌گرد</string>
+    <string name="settings_rewind_desc">برای بازگشت، دکمه عقب‌گرد را نگه دارید. هر چند ثانیه یک تصویر کامل از وضعیت ذخیره می‌شود که پردازنده بیشتری مصرف می‌کند.</string>
     <string name="settings_target_fps">نرخ فریم هدف</string>
     <string name="settings_target_fps_desc">حالت خودکار از نرخ فریم گزارش‌شده توسط PPSSPP استفاده می‌کند. مقدار دستی سرعت شبیه‌سازی را تعیین می‌کند؛ بازی ممکن است فریم‌های کمتری نمایش دهد.</string>
     <string name="settings_vertical_refresh_ntsc">نرخ تازه‌سازی NTSC</string>

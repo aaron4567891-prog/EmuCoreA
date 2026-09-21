@@ -1981,6 +1981,8 @@
     <string name="ss_core_choice_trace">추적</string>
     <string name="settings_frame_limit">프레임 제한</string>
     <string name="settings_frame_limit_desc">에뮬레이션을 콘솔의 주사율로 제한합니다. 끄면 기기가 허용하는 만큼 빠르게 실행됩니다.</string>
+    <string name="settings_rewind">되감기</string>
+    <string name="settings_rewind_desc">되감기 버튼을 길게 누르면 뒤로 이동합니다. 몇 초마다 전체 상태 스냅샷을 저장하므로 CPU를 추가로 사용합니다.</string>
     <string name="settings_target_fps">목표 프레임 속도</string>
     <string name="settings_target_fps_desc">자동은 PPSSPP가 보고한 프레임 속도를 사용합니다. 수동 값은 에뮬레이션 속도를 정하며, 게임은 더 적은 프레임을 표시할 수 있습니다.</string>
     <string name="settings_vertical_refresh_ntsc">NTSC 주사율</string>

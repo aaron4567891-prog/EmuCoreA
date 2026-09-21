@@ -2003,6 +2003,8 @@
     <string name="ss_core_choice_trace">Śledzenie</string>
     <string name="settings_frame_limit">Limit klatek</string>
     <string name="settings_frame_limit_desc">Ogranicza emulację do częstotliwości odświeżania konsoli. Wyłącz, aby działać tak szybko, jak pozwala urządzenie.</string>
+    <string name="settings_rewind">Przewijanie</string>
+    <string name="settings_rewind_desc">Przytrzymaj przewijanie, aby cofnąć. Co kilka sekund zapisywany jest pełny stan, co zużywa dodatkowy CPU.</string>
     <string name="settings_target_fps">Docelowa liczba klatek</string>
     <string name="settings_target_fps_desc">Auto używa liczby klatek zgłaszanej przez PPSSPP. Wartość ręczna ustala tempo emulacji; gra może wyświetlać mniej klatek.</string>
     <string name="settings_vertical_refresh_ntsc">Częstotliwość odświeżania NTSC</string>

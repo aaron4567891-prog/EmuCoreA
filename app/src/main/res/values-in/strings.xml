@@ -1996,6 +1996,8 @@
     <string name="ss_core_choice_trace">Jejak</string>
     <string name="settings_frame_limit">Batas bingkai</string>
     <string name="settings_frame_limit_desc">Membatasi emulasi ke laju penyegaran konsol. Matikan agar berjalan secepat perangkat.</string>
+    <string name="settings_rewind">Mundur</string>
+    <string name="settings_rewind_desc">Tahan kontrol mundur untuk kembali. Snapshot status penuh disimpan tiap beberapa detik, yang memakai CPU ekstra.</string>
     <string name="settings_target_fps">Laju bingkai target</string>
     <string name="settings_target_fps_desc">Otomatis memakai laju bingkai yang dilaporkan PPSSPP. Nilai manual mengatur kecepatan emulasi; game dapat menampilkan lebih sedikit bingkai.</string>
     <string name="settings_vertical_refresh_ntsc">Laju penyegaran NTSC</string>

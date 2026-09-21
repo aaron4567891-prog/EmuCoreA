@@ -1990,6 +1990,8 @@
     <string name="ss_core_choice_trace">تتبع</string>
     <string name="settings_frame_limit">حد الإطارات</string>
     <string name="settings_frame_limit_desc">يحد من المحاكاة بمعدل تحديث وحدة التحكم. أوقفه للتشغيل بأقصى سرعة يسمح بها الجهاز.</string>
+    <string name="settings_rewind">إرجاع</string>
+    <string name="settings_rewind_desc">استمر في الضغط على زر الإرجاع للرجوع للخلف. تُحفظ لقطة كاملة للحالة كل بضع ثوانٍ، ما يستهلك معالجًا إضافيًا.</string>
     <string name="settings_target_fps">معدل الإطارات المستهدف</string>
     <string name="settings_target_fps_desc">يستخدم الوضع التلقائي معدل الإطارات الذي يبلّغ عنه PPSSPP. تحدد القيمة اليدوية سرعة المحاكاة؛ وقد تعرض اللعبة إطارات أقل.</string>
     <string name="settings_vertical_refresh_ntsc">معدل تحديث NTSC</string>

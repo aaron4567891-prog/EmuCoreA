@@ -581,6 +581,7 @@ object EmulatorBridge {
         val prefs = AppPreferences(context)
         val effectiveEnableCheats = enableCheats
         val effectiveFrameLimitEnabled = frameLimitEnabled
+        val rewindEnabled = prefs.rewindEnabled.first()
         val padVibrationEnabled = prefs.padVibration.first()
         val textureReplacementsEnabled = prefs.textureReplacementsEnabled.first()
         val textureReplacementsAsync = prefs.textureReplacementsAsync.first()
@@ -677,6 +678,7 @@ object EmulatorBridge {
                 add(settingOp("EmuCoreA/Speedhacks", "EECycleRate", "int", eeCycleRate.toString()))
                 add(settingOp("EmuCoreA/Speedhacks", "EECycleSkip", "int", eeCycleSkip.toString()))
                 add(settingOp("EmuCoreA/GS", "FrameLimitEnable", "bool", effectiveFrameLimitEnabled.toString()))
+                add(settingOp("EmuCoreA/GS", "RewindEnabled", "bool", rewindEnabled.toString()))
                 add(settingOp("EmuCoreA/GS", "VsyncEnable", "bool", vSyncEnabled.toString()))
                 addAll(targetFpsOps(targetFps, ntscFramerate, palFramerate))
                 add(settingOp("Framerate", "NominalScalar", "float", "1.0"))
@@ -1390,6 +1392,17 @@ object EmulatorBridge {
         if (settingsCache[cacheKey] == value) return
         runSerial {
             NativeApp.setFrameLimitEnabled(enabled)
+        }
+        settingsCache[cacheKey] = value
+    }
+
+    suspend fun setRewindEnabled(enabled: Boolean) {
+        if (!isNativeLoaded) return
+        val value = enabled.toString()
+        val cacheKey = "EmuCoreA/GS:RewindEnabled"
+        if (settingsCache[cacheKey] == value) return
+        runSerial {
+            NativeApp.setRewindEnabled(enabled)
         }
         settingsCache[cacheKey] = value
     }
