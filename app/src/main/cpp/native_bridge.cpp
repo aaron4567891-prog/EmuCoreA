@@ -107,6 +107,7 @@ struct CoreApi {
     bool (*load_game)(const retro_game_info*) = nullptr;
     void (*unload_game)() = nullptr;
     bool (*rewind_step)() = nullptr;
+    uint64_t (*emulated_time_us)() = nullptr;
     bool (*disc_achievement_hash)(const char*, char*) = nullptr;
     int (*game_asset)(const char*, int, uint8_t*, size_t) = nullptr;
     int (*game_asset_fd)(int, int, uint8_t*, size_t) = nullptr;
@@ -306,6 +307,7 @@ bool LoadCoreLocked() {
     g_core.load_game = reinterpret_cast<bool (*)(const retro_game_info*)>(resolve("retro_load_game"));
     g_core.unload_game = reinterpret_cast<void (*)()>(resolve("retro_unload_game"));
     g_core.rewind_step = reinterpret_cast<bool (*)()>(resolve("emucorea_rewind_step"));
+    g_core.emulated_time_us = reinterpret_cast<uint64_t (*)()>(resolve("emucorea_emulated_time_us"));
 
     if (g_core.set_environment == nullptr || g_core.init == nullptr || g_core.load_game == nullptr ||
         g_core.run == nullptr || g_core.get_system_info == nullptr) {
@@ -1252,16 +1254,19 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_reset(JNIEnv*, jobject, jlong handl
     return 0;
 }
 
-JNIEXPORT void JNICALL
+// Returns the emulated clock in microseconds after the frame, or 0 when the
+// frame did not advance emulation. The Kotlin frame loop paces itself by the
+// step between consecutive samples.
+JNIEXPORT jlong JNICALL
 Java_com_sbro_emucorea_core_NativeCoreBridge_runFrame(JNIEnv* env, jobject, jlong handle) {
     if (g_frontend.shutdown_requested.load()) {
         const char* detail = g_core.boot_error ? g_core.boot_error() : nullptr;
         env->ThrowNew(env->FindClass("java/lang/IllegalStateException"),
                       detail && *detail ? detail : "PPSSPP requested shutdown");
-        return;
+        return 0;
     }
-    if (handle == 0 || !g_frontend.core_initialized.load()) return;
-    if (!EnsureHardwareContext()) return;
+    if (handle == 0 || !g_frontend.core_initialized.load()) return 0;
+    if (!EnsureHardwareContext()) return 0;
     if (g_frontend.time_control.load() == 2 && g_core.rewind_step != nullptr) {
         static auto last_rewind = std::chrono::steady_clock::time_point{};
         const auto now = std::chrono::steady_clock::now();
@@ -1277,16 +1282,18 @@ Java_com_sbro_emucorea_core_NativeCoreBridge_runFrame(JNIEnv* env, jobject, jlon
     if (g_frontend.av_info_refresh_pending.exchange(false) &&
         !vulkan::IsRequested() && !CreatePresentFramebuffer()) {
         g_frontend.av_info_refresh_pending.store(true);
-        return;
+        return 0;
     }
     if (g_core.run != nullptr) g_core.run();
     if (g_frontend.shutdown_requested.load()) {
         const char* detail = g_core.boot_error ? g_core.boot_error() : nullptr;
         env->ThrowNew(env->FindClass("java/lang/IllegalStateException"),
                       detail && *detail ? detail : "PPSSPP requested shutdown");
-        return;
+        return 0;
     }
     EmuCoreAAchievementsOnFrame();
+    return g_core.emulated_time_us != nullptr
+        ? static_cast<jlong>(g_core.emulated_time_us()) : 0;
 }
 
 JNIEXPORT void JNICALL

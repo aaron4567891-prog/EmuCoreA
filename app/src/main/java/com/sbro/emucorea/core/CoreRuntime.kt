@@ -370,6 +370,12 @@ internal object CoreRuntime {
         settings["EmuCoreA/GS:LoadTextureReplacements"]?.toBooleanStrictOrNull()?.let { replacements ->
             bridge.nativeSetOption("ppsspp_texture_replacement", if (replacements) "enabled" else "disabled")
         }
+        // The libretro core defaults duplicate frames to on, unlike PPSSPP
+        // standalone, so a 30 fps game would present 60 duplicated frames. The
+        // frame loop paces by the content rate either way; this only trades
+        // present work for smoother motion on 60 Hz displays.
+        bridge.nativeSetOption("ppsspp_frame_duplication",
+            coreOptionValue("ppsspp_frame_duplication") ?: "disabled")
         // Explicit user choices from the settings / game manager / in-game menu
         // win over every derived default.
         PpssppCoreOptions.all().forEach { option ->
@@ -817,11 +823,10 @@ internal object CoreRuntime {
     }
 
     private fun publishPerformanceMetrics(fps: Double, frames: Int, frameNanos: Long,
-                                          audioStats: LongArray?, cpuLoadPercent: Double) {
+                                          audioStats: LongArray?, cpuLoadPercent: Double,
+                                          speed: Double, targetFps: Double) {
         if (frames <= 0 || !performanceMetricsEnabled) return
         val softwareRenderer = activeCoreRenderer == RendererDefaults.CORE_SOFTWARE
-        val targetFps = 59.94
-        val speed = fps / targetFps * 100.0
         val renderer = RendererDefaults.coreRendererName(activeCoreRenderer)
         val frameMs = frameNanos / frames / 1_000_000.0
         val gpuLoad = if (detailedPerformanceMetrics) GpuLoadReader.loadPercent() else null
@@ -856,6 +861,11 @@ internal object CoreRuntime {
         var metricsMaxIntervalNanos = 0L
         var metricsMaxCoreNanos = 0L
         var resetMetrics = true
+        // Content frame rate implied by the emulated time the last frame
+        // advanced, and the clock sample it is derived from.
+        var contentFrameRate = 59.94
+        var lastEmulatedUs = 0L
+        var metricsEmulatedUs = 0L
         try {
             while (running) {
                 // Owns the thread-affine EGL context, so any queued save/load
@@ -873,15 +883,16 @@ internal object CoreRuntime {
                 val frameLimitEnabled = settings["EmuCoreA/GS:FrameLimitEnable"]?.toBooleanStrictOrNull() ?: true
                 if (frameLimitEnabled) {
                     val timeMode = timeControlMode
-                    val coreFrameRate = bridge.getFrameRate(session).takeIf { it > 1.0 } ?: 59.94
-                    // A manual target rate overrides the console's reported one.
+                    // Pace by the content rate the core actually advanced, not by
+                    // the AV info, which always reports the 59.94 Hz vblank clock.
+                    // A manual target can only slow the content down, never double it.
                     val manualTargetFps = settings["EmuCoreA/GS:TargetFps"]?.toIntOrNull() ?: 0
                     val frameRate = if (manualTargetFps in 20..120) {
-                        manualTargetFps.toDouble()
+                        minOf(contentFrameRate, manualTargetFps.toDouble())
                     } else {
-                        coreFrameRate
+                        contentFrameRate
                     }
-                    bridge.setAudioPlaybackRate(frameRate / coreFrameRate)
+                    bridge.setAudioPlaybackRate(frameRate / contentFrameRate)
                     if (frameRate > 1.0) {
                         val pacedRate = when (timeMode) {
                             1 -> frameRate * 3.0
@@ -901,6 +912,7 @@ internal object CoreRuntime {
                 }
                 val t0 = System.nanoTime()
                 var skippedPausedFrame = false
+                var emulatedStepUs = 0L
                 val coreNanos = sessionLock.withLock {
                     if (!running || session == 0L) null else if (paused) {
                         skippedPausedFrame = true
@@ -933,8 +945,19 @@ internal object CoreRuntime {
                         frameStartNanos = System.nanoTime()
                         framePacer.frameStarted(frameStartNanos)
                         val coreStartNanos = System.nanoTime()
-                        bridge.runFrame(session)
+                        val emulatedUs = bridge.runFrame(session)
                         val elapsed = System.nanoTime() - coreStartNanos
+                        if (emulatedUs > 0L) {
+                            // Savestate loads and rewinds move the emulated clock
+                            // to another point in time; only ordinary frame
+                            // steps say anything about the content rate.
+                            val stepUs = if (lastEmulatedUs > 0L) emulatedUs - lastEmulatedUs else 0L
+                            lastEmulatedUs = emulatedUs
+                            if (stepUs in 1L..MAX_EMULATED_FRAME_STEP_US) {
+                                contentFrameRate = frameRateFromEmulatedStep(stepUs, contentFrameRate)
+                                emulatedStepUs = stepUs
+                            }
+                        }
                         bridge.getDisplayRect(session)
                             ?.takeIf { it.size == 4 && it[2] > 0 && it[3] > 0 }
                             ?.let {
@@ -961,6 +984,7 @@ internal object CoreRuntime {
                     previousFrameStartNanos = frameStartNanos
                     metricsFrames = 0
                     metricsFrameTotalNanos = 0L
+                    metricsEmulatedUs = emulatedStepUs
                     metricsMaxIntervalNanos = 0L
                     metricsMaxCoreNanos = 0L
                     metricsStartCpuMs = android.os.Process.getElapsedCpuTime()
@@ -972,15 +996,30 @@ internal object CoreRuntime {
                 previousFrameStartNanos = frameStartNanos
                 metricsFrames++
                 metricsFrameTotalNanos += frameNanos
+                metricsEmulatedUs += emulatedStepUs
                 val now = frameStartNanos
                 if (!performanceMetricsEnabled) {
                     metricsStartNanos = now
                     metricsFrames = 0
                     metricsFrameTotalNanos = 0L
+                    metricsEmulatedUs = 0L
                     metricsStartCpuMs = android.os.Process.getElapsedCpuTime()
                 } else if (now - metricsStartNanos >= 1_000_000_000L) {
                     val elapsed = now - metricsStartNanos
                     val fps = metricsFrames * 1_000_000_000.0 / elapsed
+                    // Emulated seconds per real second, which is what PPSSPP's
+                    // speed percentage means; the frame count alone says 50% for
+                    // a 30 fps game even when it runs at full speed.
+                    val speed = if (elapsed > 0L) {
+                        metricsEmulatedUs * 100_000.0 / elapsed
+                    } else {
+                        0.0
+                    }
+                    val targetFps = if (metricsEmulatedUs > 0L) {
+                        metricsFrames * 1_000_000.0 / metricsEmulatedUs
+                    } else {
+                        contentFrameRate
+                    }
                     val cpuNowMs = android.os.Process.getElapsedCpuTime()
                     val cpuDeltaMs = (cpuNowMs - metricsStartCpuMs).coerceAtLeast(0L)
                     val cores = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
@@ -990,7 +1029,7 @@ internal object CoreRuntime {
                         0.0
                     }
                     publishPerformanceMetrics(fps, metricsFrames, metricsFrameTotalNanos,
-                        output.stats(), cpuLoad)
+                        output.stats(), cpuLoad, speed, targetFps)
                     if (com.sbro.emucorea.BuildConfig.DEBUG) {
                         Log.d(TAG, "pacing fps=%.1f core=%.1fms queue=%d high=%d silence=%d maxInterval=%.1fms maxCore=%.1fms".format(
                             Locale.US, fps, metricsFrameTotalNanos / metricsFrames / 1_000_000.0,
@@ -1003,6 +1042,7 @@ internal object CoreRuntime {
                     metricsStartCpuMs = cpuNowMs
                     metricsFrames = 0
                     metricsFrameTotalNanos = 0L
+                    metricsEmulatedUs = 0L
                 }
             }
         } catch (error: InterruptedException) {

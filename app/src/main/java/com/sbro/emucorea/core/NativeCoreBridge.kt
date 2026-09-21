@@ -42,8 +42,12 @@ class NativeCoreBridge {
     external fun loadDisc(handle: Long, path: String): Int
     external fun reset(handle: Long): Int
 
-    /** Runs one guest frame; audio is pulled by the output stream callback. */
-    external fun runFrame(handle: Long)
+    /**
+     * Runs one guest frame; audio is pulled by the output stream callback.
+     * Returns the emulated clock in microseconds after the frame, or 0 when the
+     * frame did not advance emulation.
+     */
+    external fun runFrame(handle: Long): Long
     /** 0 normal, 1 fast forward, 2 rewind. */
     external fun setTimeControl(mode: Int)
     /**

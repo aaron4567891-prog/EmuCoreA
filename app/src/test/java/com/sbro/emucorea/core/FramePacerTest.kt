@@ -58,6 +58,19 @@ class FramePacerTest {
         assertTrue(pacer.remainingNanos(32_000_000, 60.0) >= 8_333_333L)
     }
 
+    @Test fun contentRateFollowsEmulatedFrameStep() {
+        // One vblank per frame: 60 fps content, duplicated or not.
+        assertEquals(59.94, frameRateFromEmulatedStep(16_683, 60.0), 0.01)
+        // Two vblanks per frame: a 30 fps game must not be paced at 60.
+        assertEquals(29.97, frameRateFromEmulatedStep(33_367, 60.0), 0.01)
+    }
+
+    @Test fun stateJumpsKeepThePreviousContentRate() {
+        assertEquals(59.94, frameRateFromEmulatedStep(0, 59.94), 0.0)
+        assertEquals(59.94, frameRateFromEmulatedStep(-33_367, 59.94), 0.0)
+        assertEquals(59.94, frameRateFromEmulatedStep(MAX_EMULATED_FRAME_STEP_US + 1, 59.94), 0.0)
+    }
+
     @Test fun periodicWorkDoesNotPermanentlySlowEmulation() {
         val pacer = FramePacer()
         var now = 0L

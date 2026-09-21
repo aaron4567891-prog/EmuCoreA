@@ -1638,6 +1638,13 @@ extern "C" bool emucorea_rewind_step(void) {
    return true;
 }
 
+// Emulated clock in microseconds, sampled by the frontend around each frame so
+// it can pace the loop by the content's own frame duration rather than the
+// fixed vblank rate that retro_get_system_av_info reports.
+extern "C" uint64_t emucorea_emulated_time_us(void) {
+   return CoreTiming::GetGlobalTimeUs();
+}
+
 void retro_reset(void) {
    PSP_Shutdown(true);
 

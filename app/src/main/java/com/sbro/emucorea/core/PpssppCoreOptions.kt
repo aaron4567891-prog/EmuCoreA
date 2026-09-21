@@ -307,7 +307,7 @@ object PpssppCoreOptions {
                 Choice("disabled", "disabled"),
                 Choice("enabled", "enabled"),
             ),
-            defaultValue = "enabled",
+            defaultValue = "disabled",
         ),
         Option(
             key = "ppsspp_detect_vsync_swap_interval",
