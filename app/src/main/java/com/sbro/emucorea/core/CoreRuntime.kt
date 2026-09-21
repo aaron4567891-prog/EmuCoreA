@@ -870,11 +870,14 @@ internal object CoreRuntime {
         var metricsMaxIntervalNanos = 0L
         var metricsMaxCoreNanos = 0L
         var resetMetrics = true
-        // Content frame rate implied by the emulated time the last frame
-        // advanced, and the clock sample it is derived from.
-        var contentFrameRate = 59.94
+        // Emulated time the previous frame advanced. PPSSPP schedules by whole
+        // emulated vblanks (Core/HLE/sceDisplay.cpp DoFrameTiming), so pace by
+        // the vblank count of the last step instead of a measured frame rate.
+        var lastStepUs = VBLANK_NANOS / 1000
+        var contentFrameRate = VBLANK_RATE_HZ
         var lastEmulatedUs = 0L
         var metricsEmulatedUs = 0L
+        var lastEmulatedStepUs = 0L
         try {
             while (running) {
                 // Owns the thread-affine EGL context, so any queued save/load
@@ -892,25 +895,32 @@ internal object CoreRuntime {
                 val frameLimitEnabled = settings["EmuCoreA/GS:FrameLimitEnable"]?.toBooleanStrictOrNull() ?: true
                 if (frameLimitEnabled) {
                     val timeMode = timeControlMode
-                    // Pace by the content rate the core actually advanced, not by
-                    // the AV info, which always reports the 59.94 Hz vblank clock.
-                    // A manual target can only slow the content down, never double it.
+                    // A frame is one or more emulated vblanks; the AV info only
+                    // reports the 59.94 Hz vblank clock. A manual target can only
+                    // slow the content down, never double it.
+                    contentFrameRate = VBLANK_RATE_HZ / vblankCount(lastStepUs)
                     val manualTargetFps = settings["EmuCoreA/GS:TargetFps"]?.toIntOrNull() ?: 0
                     val frameRate = if (manualTargetFps in 20..120) {
                         minOf(contentFrameRate, manualTargetFps.toDouble())
                     } else {
                         contentFrameRate
                     }
-                    bridge.setAudioPlaybackRate(frameRate / contentFrameRate)
-                    if (frameRate > 1.0) {
-                        val pacedRate = when (timeMode) {
-                            1 -> frameRate * 3.0
-                            2 -> 2.0
-                            else -> frameRate
+                    val speedFactor = frameRate / contentFrameRate
+                    bridge.setAudioPlaybackRate(speedFactor)
+                    if (speedFactor > 0.0) {
+                        val pacedSpeed = when (timeMode) {
+                            1 -> speedFactor * 3.0
+                            2 -> speedFactor * 2.0
+                            else -> speedFactor
                         }
+                        // PPSSPP schedules the next frame by the vblanks the last
+                        // one advanced; hold until that deadline so skipped vblanks
+                        // (loads) and 30 fps content still run at real speed.
+                        val deadlineNanos =
+                            framePacer.nextFrameDeadlineNanos(System.nanoTime(), lastStepUs, pacedSpeed)
                         while (running && !paused) {
                             drainFrameTasks()
-                            val remainingNanos = framePacer.remainingNanos(System.nanoTime(), pacedRate)
+                            val remainingNanos = deadlineNanos - System.nanoTime()
                             if (remainingNanos <= 0L) break
                             if (remainingNanos > FRAME_PACING_SPIN_NANOS) Thread.sleep(1)
                         }
@@ -952,7 +962,6 @@ internal object CoreRuntime {
                             )
                         }
                         frameStartNanos = System.nanoTime()
-                        framePacer.frameStarted(frameStartNanos)
                         val coreStartNanos = System.nanoTime()
                         val emulatedUs = bridge.runFrame(session)
                         val elapsed = System.nanoTime() - coreStartNanos
@@ -963,8 +972,12 @@ internal object CoreRuntime {
                             val stepUs = if (lastEmulatedUs > 0L) emulatedUs - lastEmulatedUs else 0L
                             lastEmulatedUs = emulatedUs
                             if (stepUs in 1L..MAX_EMULATED_FRAME_STEP_US) {
-                                contentFrameRate = frameRateFromEmulatedStep(stepUs, contentFrameRate)
+                                lastStepUs = stepUs
                                 emulatedStepUs = stepUs
+                                lastEmulatedStepUs = stepUs
+                            } else if (stepUs != 0L) {
+                                // The clock jumped: restart the schedule from now.
+                                framePacer.reset()
                             }
                         }
                         bridge.getDisplayRect(session)
@@ -1040,10 +1053,11 @@ internal object CoreRuntime {
                     publishPerformanceMetrics(fps, metricsFrames, metricsFrameTotalNanos,
                         output.stats(), cpuLoad, speed, targetFps)
                     if (com.sbro.emucorea.BuildConfig.DEBUG) {
-                        Log.d(TAG, "pacing fps=%.1f core=%.1fms queue=%d high=%d silence=%d maxInterval=%.1fms maxCore=%.1fms".format(
+                        Log.d(TAG, "pacing fps=%.1f core=%.1fms queue=%d high=%d silence=%d maxInterval=%.1fms maxCore=%.1fms step=%.1fms rate=%.1f".format(
                             Locale.US, fps, metricsFrameTotalNanos / metricsFrames / 1_000_000.0,
                             output.bufferedFrames(), output.pacingHighWaterFrames(), output.stats()?.getOrNull(7) ?: 0L,
-                            metricsMaxIntervalNanos / 1_000_000.0, metricsMaxCoreNanos / 1_000_000.0))
+                            metricsMaxIntervalNanos / 1_000_000.0, metricsMaxCoreNanos / 1_000_000.0,
+                            lastEmulatedStepUs / 1000.0, contentFrameRate))
                     }
                     metricsMaxIntervalNanos = 0L
                     metricsMaxCoreNanos = 0L
