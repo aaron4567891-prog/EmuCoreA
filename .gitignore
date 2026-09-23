@@ -54,9 +54,11 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 
-# Firebase project files (local deployment config, never committed)
+# Firebase project files (local deployment config and rules, never committed)
 .firebaserc
 firebase.json
+firestore.rules
+firestore.indexes.json
 
 # Firebase client configuration for this app
 /app/google-services.json
