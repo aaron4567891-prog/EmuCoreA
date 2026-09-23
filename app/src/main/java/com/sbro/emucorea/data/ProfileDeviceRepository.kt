@@ -55,8 +55,9 @@ object ProfileDeviceInfoProvider {
     private const val DEVICE_ID = "device_id"
 
     /** Reported in profiles and cloud backups; follows the active native core. */
-    val CORE_VERSION: String
-        get() = NativeApp.getCoreVersion().orEmpty().takeIf { it.isNotBlank() } ?: "PPSSPP"
+    val CORE_VERSION: String by lazy {
+        NativeApp.getCoreVersion().orEmpty().takeIf { it.isNotBlank() } ?: "PPSSPP"
+    }
 
     fun current(context: Context, isPublic: Boolean = false): PlayerDevice {
         val appContext = context.applicationContext

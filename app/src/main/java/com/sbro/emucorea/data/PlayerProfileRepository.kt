@@ -968,7 +968,7 @@ class PlayerProfileRepository(context: Context) {
         private const val ACTIVITY_HISTORY_DAYS = 120L
         private const val MAX_FAVORITE_GAMES = 3
         private const val MAX_DAILY_GAMES = 100
-        private const val PLAYER_TAG_PREFIX = "EX-"
+        private const val PLAYER_TAG_PREFIX = "EA-"
         private const val PROFILE_SCHEMA_VERSION = 2
         private const val MAX_DISPLAY_NAME_LENGTH = 32
         private const val MAX_GAME_TITLE_LENGTH = 120
