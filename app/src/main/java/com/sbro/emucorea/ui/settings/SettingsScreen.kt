@@ -561,6 +561,7 @@ fun SettingsScreen(
                 selectedTab = selectedTab,
                 context = context,
                 launchGamePicker = launchGamePicker,
+                launchDiagnosticExport = { filename -> diagnosticLogExporter.launch(filename) },
                 openEmulatorDataLocationDialog = openEmulatorDataLocationDialog,
                 launchHomeBackgroundPicker = {
                     homeBackgroundPicker.launch(arrayOf("image/*", "video/*"))
@@ -1048,6 +1049,7 @@ private fun SettingsContent(
     searchQuery: String,
     context: android.content.Context,
     launchGamePicker: () -> Unit,
+    launchDiagnosticExport: (String) -> Unit,
     openEmulatorDataLocationDialog: () -> Unit,
     launchHomeBackgroundPicker: () -> Unit,
     launchSideArtworkPicker: () -> Unit,
@@ -2153,7 +2155,7 @@ private fun SettingsContent(
                                     "yyyy-MM-dd-HHmmss",
                                     Locale.US
                                 ).format(java.util.Date())
-                                diagnosticLogExporter.launch("EmuCoreA-Diagnostics-$timestamp.txt")
+                                launchDiagnosticExport("EmuCoreA-Diagnostics-$timestamp.txt")
                             }
                         )
                         AboutNote(
