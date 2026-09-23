@@ -1,6 +1,7 @@
 # Build outputs
 /build/
 /app/build/
+/app/release/
 /app/.cxx/
 /app/.externalNativeBuild/
 /core/build/
@@ -56,8 +57,9 @@ ui-debug.log
 # Firebase project files (local deployment config, never committed)
 .firebaserc
 firebase.json
-firestore.rules
-firestore.indexes.json
+
+# Firebase client configuration for this app
+/app/google-services.json
 
 # NOTE about core/: its upstream .gitignore also ignores FFmpeg static libraries
 # and a shader asset required by this build. These are force-added individually.
