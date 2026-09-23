@@ -3,3 +3,9 @@ x64
 ARM64
 ARM
 SDL3
+
+# ARM implementation sources are not build output.
+!libpng17/arm/
+!libpng17/arm/**
+!armips/Archs/ARM/
+!armips/Archs/ARM/**

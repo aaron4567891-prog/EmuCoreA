@@ -28,3 +28,7 @@ Makefile
 # Random OS stuff
 .DS_Store
 ._*
+
+# Vendored source helpers required by CMake, not generated build files.
+!/parse_version.cmake
+!/ChooseMSVCCRT.cmake
