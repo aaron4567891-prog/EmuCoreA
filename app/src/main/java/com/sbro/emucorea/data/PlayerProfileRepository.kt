@@ -13,7 +13,6 @@ import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
@@ -123,23 +122,29 @@ data class PlayerPlayTimeDelta(
 class PlayerProfileRepository(context: Context) {
 
     private val appContext = context.applicationContext
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseServices.auth
+    private val firestore by lazy { FirebaseServices.firestore() }
     private val coverArtRepository = CoverArtRepository(appContext)
 
     fun observeAuthState(): Flow<PlayerAccount?> = callbackFlow {
+        val auth = auth
+        if (auth == null) {
+            trySend(null)
+            close()
+            return@callbackFlow
+        }
         val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             trySend(firebaseAuth.currentUser?.toPlayerAccount())
         }
         auth.addAuthStateListener(listener)
-        trySend(auth.currentUser?.toPlayerAccount())
+        trySend(auth?.currentUser?.toPlayerAccount())
         awaitClose { auth.removeAuthStateListener(listener) }
     }
 
-    fun hasSignedInUser(): Boolean = auth.currentUser != null
+    fun hasSignedInUser(): Boolean = auth?.currentUser != null
 
     suspend fun ensureCurrentUserProfile() {
-        auth.currentUser?.let { user ->
+        auth?.currentUser?.let { user ->
             runCatching { removeLegacyAutotestProfileEntries(user.uid) }
                 .onFailure { error -> Log.e(TAG, "Legacy autotest profile cleanup failed", error) }
             ensureUserProfile(
@@ -152,6 +157,11 @@ class PlayerProfileRepository(context: Context) {
     }
 
     fun observeProfile(uid: String): Flow<PlayerProfile?> = callbackFlow {
+        if (auth == null) {
+            trySend(null)
+            close()
+            return@callbackFlow
+        }
         val registration = firestore.collection(USERS_COLLECTION)
             .document(uid)
             .addSnapshotListener { snapshot, error ->
@@ -289,7 +299,7 @@ class PlayerProfileRepository(context: Context) {
     }
 
     suspend fun loadPlayerActivity(limit: Long = ACTIVITY_HISTORY_DAYS): List<PlayerActivityDay> {
-        val uid = auth.currentUser?.uid ?: return emptyList()
+        val uid = auth?.currentUser?.uid ?: return emptyList()
         return firestore.collection(USERS_COLLECTION)
             .document(uid)
             .collection(ACTIVITY_COLLECTION)
@@ -310,7 +320,7 @@ class PlayerProfileRepository(context: Context) {
     }
 
     suspend fun updateProProfile(profileAccent: String, favoriteGameKeys: List<String>) {
-        val user = auth.currentUser ?: return
+        val user = auth?.currentUser ?: return
         val accent = profileAccent.takeIf { it in PROFILE_ACCENTS } ?: DEFAULT_PROFILE_ACCENT
         val favorites = favoriteGameKeys.distinct().take(MAX_FAVORITE_GAMES)
         val profilePatch = mapOf(
@@ -332,7 +342,7 @@ class PlayerProfileRepository(context: Context) {
     }
 
     suspend fun updateProMembership(enabled: Boolean) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth?.currentUser?.uid ?: return
         val patch = mapOf(
             FIELD_PROFILE_SCHEMA_VERSION to PROFILE_SCHEMA_VERSION,
             FIELD_PRO_MEMBER to enabled,
@@ -345,13 +355,15 @@ class PlayerProfileRepository(context: Context) {
     }
 
     suspend fun signIn(email: String, password: String) {
+        val auth = FirebaseServices.requireAuth()
         auth.signInWithEmailAndPassword(email.trim(), password).await()
-        auth.currentUser?.let { user ->
+        auth?.currentUser?.let { user ->
             ensureUserProfile(user.uid, user.email, user.displayName.cleanDisplayName(user.email), user.bestPhotoUrl())
         }
     }
 
     suspend fun signInWithGoogle(activity: Activity) {
+        val auth = FirebaseServices.requireAuth()
         val provider = OAuthProvider.newBuilder(GoogleAuthProvider.PROVIDER_ID)
             .addCustomParameter("prompt", "select_account")
             .build()
@@ -362,6 +374,7 @@ class PlayerProfileRepository(context: Context) {
     }
 
     suspend fun createAccount(email: String, password: String, displayName: String) {
+        val auth = FirebaseServices.requireAuth()
         val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
         val user = result.user ?: return
         val cleanName = displayName.cleanDisplayName(user.email)
@@ -374,11 +387,12 @@ class PlayerProfileRepository(context: Context) {
     }
 
     suspend fun sendPasswordReset(email: String) {
+        val auth = FirebaseServices.requireAuth()
         auth.sendPasswordResetEmail(email.trim()).await()
     }
 
     suspend fun updateDisplayName(displayName: String) {
-        val user = auth.currentUser ?: return
+        val user = auth?.currentUser ?: return
         val cleanName = displayName.cleanDisplayName(user.email)
         user.updateProfile(
             UserProfileChangeRequest.Builder()
@@ -399,11 +413,11 @@ class PlayerProfileRepository(context: Context) {
     }
 
     fun signOut() {
-        auth.signOut()
+        auth?.signOut()
     }
 
     suspend fun recordPlayTimeBatch(entries: List<PlayerPlayTimeDelta>) {
-        val user = auth.currentUser ?: return
+        val user = auth?.currentUser ?: return
         val validEntries = entries
             .filter { entry ->
                 !entry.gamePath.isNullOrBlank() &&

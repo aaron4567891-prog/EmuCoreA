@@ -22,6 +22,7 @@ object AppAnalytics {
     private var firebaseAnalytics: FirebaseAnalytics? = null
 
     fun initialize(context: Context) {
+        if (!BuildConfig.GOOGLE_SERVICES_ENABLED) return
         if (ready.get()) return
 
         runCatching {

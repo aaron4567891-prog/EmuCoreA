@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import com.sbro.emucorea.BuildConfig
 import com.sbro.emucorea.R
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.AuthorizationResult
@@ -22,6 +23,7 @@ object DriveAuthorization {
     const val SCOPE = "https://www.googleapis.com/auth/drive.file"
 
     suspend fun chooseAccount(activity: Activity): String {
+        if (!BuildConfig.GOOGLE_SERVICES_ENABLED) throw DriveBackupException("configuration")
         // Static reference also keeps the generated OAuth resource in minified release builds.
         val clientId = activity.getString(R.string.default_web_client_id)
         if (clientId.isBlank()) throw DriveBackupException("configuration")
@@ -32,11 +34,13 @@ object DriveAuthorization {
         return GoogleIdTokenCredential.createFrom(result.credential.data).id
     }
 
-    suspend fun authorize(context: Context, email: String): AuthorizationResult =
-        Identity.getAuthorizationClient(context).authorize(
+    suspend fun authorize(context: Context, email: String): AuthorizationResult {
+        if (!BuildConfig.GOOGLE_SERVICES_ENABLED) throw DriveBackupException("configuration")
+        return Identity.getAuthorizationClient(context).authorize(
             AuthorizationRequest.builder().setAccount(Account(email, "com.google"))
                 .setRequestedScopes(listOf(Scope(SCOPE))).build()
         ).awaitDrive()
+    }
 
     suspend fun token(context: Context, email: String): String {
         val result = try { authorize(context, email) }

@@ -11,10 +11,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.sbro.emucorea.R
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -157,23 +155,24 @@ object EmuCoreAAchievementCatalog {
 
 class EmuAchievementRepository(context: Context) {
     private val appContext = context.applicationContext
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseServices.auth
+    private val firestore by lazy { FirebaseServices.firestore() }
 
     suspend fun evaluate(profile: PlayerProfile): List<EmuAchievementState> {
-        if (auth.currentUser?.uid != profile.uid) return loadPublic(profile.uid, profile)
+        if (auth == null) return emptyList()
+        if (auth?.currentUser?.uid != profile.uid) return loadPublic(profile.uid, profile)
         return evaluateAndSync(profile.toAchievementSnapshot())
     }
 
     suspend fun evaluateCurrentProfile(): List<EmuAchievementState> {
-        val uid = auth.currentUser?.uid ?: return emptyList()
+        val uid = auth?.currentUser?.uid ?: return emptyList()
         val profile = firestore.collection(USERS).document(uid).get().await().toAchievementSnapshot()
             ?: return emptyList()
         return evaluateAndSync(profile)
     }
 
     private suspend fun evaluateAndSync(snapshot: AchievementSnapshot): List<EmuAchievementState> {
-        val uid = auth.currentUser?.uid ?: return emptyList()
+        val uid = auth?.currentUser?.uid ?: return emptyList()
         val unlockDocuments = runCatching {
             firestore.collection(UNLOCKS).whereEqualTo("uid", uid).get().await().documents
         }.onFailure { Log.w(TAG, "Unable to load achievement unlocks; using local progress", it) }

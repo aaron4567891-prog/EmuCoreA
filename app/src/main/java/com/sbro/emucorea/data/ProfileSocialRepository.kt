@@ -1,10 +1,8 @@
 package com.sbro.emucorea.data
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -32,11 +30,11 @@ data class ProfileFeedEvent(
 )
 
 class ProfileSocialRepository {
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseServices.auth
+    private val firestore by lazy { FirebaseServices.firestore() }
 
     fun observeFriendships(): Flow<List<ProfileFriendship>> = callbackFlow {
-        val uid = auth.currentUser?.uid
+        val uid = auth?.currentUser?.uid
         if (uid == null) {
             trySend(emptyList())
             close()
@@ -57,7 +55,7 @@ class ProfileSocialRepository {
     }
 
     fun observeFeed(profileUid: String): Flow<List<ProfileFeedEvent>> = callbackFlow {
-        if (auth.currentUser == null) {
+        if (auth?.currentUser == null) {
             trySend(emptyList())
             close()
             return@callbackFlow
@@ -77,7 +75,7 @@ class ProfileSocialRepository {
     }
 
     fun observeBlockedUids(): Flow<List<String>> = callbackFlow {
-        val uid = auth.currentUser?.uid
+        val uid = auth?.currentUser?.uid
         if (uid == null) {
             trySend(emptyList())
             close()
@@ -96,7 +94,7 @@ class ProfileSocialRepository {
     }
 
     suspend fun sendFriendRequest(otherUid: String) {
-        val uid = auth.currentUser?.uid ?: error("Sign in is required")
+        val uid = auth?.currentUser?.uid ?: error("Sign in is required")
         require(otherUid.isNotBlank() && otherUid != uid) { "Invalid player" }
         val members = listOf(uid, otherUid).sorted()
         val id = friendshipId(uid, otherUid)
@@ -122,7 +120,7 @@ class ProfileSocialRepository {
     }
 
     suspend fun block(otherUid: String) {
-        val uid = auth.currentUser?.uid ?: error("Sign in is required")
+        val uid = auth?.currentUser?.uid ?: error("Sign in is required")
         require(otherUid.isNotBlank() && otherUid != uid) { "Invalid player" }
         firestore.collection(USERS).document(uid).collection(BLOCKS).document(otherUid).set(
             mapOf("uid" to uid, "blockedUid" to otherUid, "createdAt" to FieldValue.serverTimestamp())
@@ -132,12 +130,12 @@ class ProfileSocialRepository {
     }
 
     suspend fun unblock(otherUid: String) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth?.currentUser?.uid ?: return
         firestore.collection(USERS).document(uid).collection(BLOCKS).document(otherUid).delete().await()
     }
 
     suspend fun isBlocked(otherUid: String): Boolean {
-        val uid = auth.currentUser?.uid ?: return false
+        val uid = auth?.currentUser?.uid ?: return false
         return firestore.collection(USERS).document(uid).collection(BLOCKS).document(otherUid).get().await().exists()
     }
 

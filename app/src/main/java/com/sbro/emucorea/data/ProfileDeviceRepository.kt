@@ -5,10 +5,8 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.sbro.emucorea.BuildConfig
 import com.sbro.emucorea.core.GpuHardwareProfiles
@@ -122,13 +120,13 @@ object ProfileDeviceInfoProvider {
 
 class ProfileDeviceRepository(context: Context) {
     private val appContext = context.applicationContext
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseServices.auth
+    private val firestore by lazy { FirebaseServices.firestore() }
 
     fun currentDevice(): PlayerDevice = ProfileDeviceInfoProvider.current(appContext)
 
     fun observeDevices(): Flow<List<PlayerDevice>> = callbackFlow {
-        val uid = auth.currentUser?.uid
+        val uid = auth?.currentUser?.uid
         if (uid == null) {
             trySend(emptyList())
             close()
@@ -148,7 +146,7 @@ class ProfileDeviceRepository(context: Context) {
     }
 
     suspend fun registerCurrentDevice(): PlayerDevice? {
-        val uid = auth.currentUser?.uid ?: return null
+        val uid = auth?.currentUser?.uid ?: return null
         val ref = firestore.collection(USERS).document(uid).collection(DEVICES)
         val local = currentDevice()
         val existing = ref.document(local.deviceId).get().await()
@@ -193,7 +191,7 @@ class ProfileDeviceRepository(context: Context) {
     }
 
     suspend fun deleteDevice(deviceId: String) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth?.currentUser?.uid ?: return
         // Prevent deleting the current device via manual call - UI should block this,
         // but guard here to avoid accidental removal of active session device
         val local = currentDevice()
@@ -204,7 +202,7 @@ class ProfileDeviceRepository(context: Context) {
     }
 
     suspend fun setPublic(deviceId: String, isPublic: Boolean) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth?.currentUser?.uid ?: return
         val deviceRef = firestore.collection(USERS).document(uid).collection(DEVICES).document(deviceId)
         val snapshot = deviceRef.get().await()
         val device = snapshot.toPlayerDevice() ?: return

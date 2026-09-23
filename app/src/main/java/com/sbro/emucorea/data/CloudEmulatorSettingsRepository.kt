@@ -2,10 +2,8 @@ package com.sbro.emucorea.data
 
 import android.content.Context
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.sbro.emucorea.BuildConfig
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONArray
@@ -32,13 +30,13 @@ data class CloudEmulatorProfile(
  */
 class CloudEmulatorSettingsRepository(context: Context) {
     private val appContext = context.applicationContext
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseServices.auth
+    private val firestore by lazy { FirebaseServices.firestore() }
     private val preferences = AppPreferences(appContext)
     private val perGameSettings = PerGameSettingsRepository(appContext)
 
     suspend fun loadProfiles(): List<CloudEmulatorProfile> {
-        val uid = auth.currentUser?.uid ?: return emptyList()
+        val uid = auth?.currentUser?.uid ?: return emptyList()
         return profileCollection(uid)
             .orderBy(FIELD_UPDATED_AT, com.google.firebase.firestore.Query.Direction.DESCENDING)
             .limit(MAX_PROFILES.toLong())
@@ -49,7 +47,7 @@ class CloudEmulatorSettingsRepository(context: Context) {
     }
 
     suspend fun saveCurrent(name: String, replaceProfileId: String? = null): CloudEmulatorProfile {
-        val uid = auth.currentUser?.uid ?: error("Sign in is required")
+        val uid = auth?.currentUser?.uid ?: error("Sign in is required")
         val normalizedName = name.trim().replace(Regex("\\s+"), " ").take(MAX_NAME_LENGTH)
         require(normalizedName.isNotEmpty()) { "Profile name is required" }
 
@@ -95,7 +93,7 @@ class CloudEmulatorSettingsRepository(context: Context) {
     }
 
     suspend fun restore(profileId: String) {
-        val uid = auth.currentUser?.uid ?: error("Sign in is required")
+        val uid = auth?.currentUser?.uid ?: error("Sign in is required")
         val snapshot = profileCollection(uid).document(profileId).get().await()
         require(snapshot.exists()) { "Cloud profile was not found" }
         val schemaVersion = snapshot.getLong("schemaVersion")?.toInt() ?: 0
@@ -110,7 +108,7 @@ class CloudEmulatorSettingsRepository(context: Context) {
     }
 
     suspend fun delete(profileId: String) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth?.currentUser?.uid ?: return
         profileCollection(uid).document(profileId).delete().await()
     }
 

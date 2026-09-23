@@ -4,8 +4,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.google.services)
+    alias(libs.plugins.google.services) apply false
     alias(libs.plugins.ksp)
+}
+
+// Personal/offline builds do not require the upstream Firebase project.
+val googleServicesEnabled = file("google-services.json").isFile
+if (googleServicesEnabled) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 val localProperties = Properties().apply {
@@ -47,6 +53,10 @@ android {
 
     defaultConfig {
         applicationId = "com.sbro.emucorea"
+        buildConfigField("boolean", "GOOGLE_SERVICES_ENABLED", googleServicesEnabled.toString())
+        if (!googleServicesEnabled) {
+            resValue("string", "default_web_client_id", "")
+        }
         minSdk = 26
         targetSdk = 37
         versionCode = 7
@@ -120,6 +130,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
+        resValues = true
         compose = true
         buildConfig = true
     }

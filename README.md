@@ -74,6 +74,15 @@ EmuCoreA version `0.0.1` currently targets Android with:
 - Android SDK 37 and Android NDK `29.0.14206865`
 - CMake `3.30.5`
 
+### Optional Google/Firebase configuration
+
+Personal builds work without `app/google-services.json`. Without that file,
+Firebase analytics, cloud profiles, cloud settings, and Google sign-in/Drive
+backup are unavailable. Local emulation and local saves remain available.
+To enable those services, provide a valid `app/google-services.json` for
+`com.sbro.emucorea` with the required OAuth client configuration, then rebuild.
+No placeholder credentials are generated.
+
 ### Debug Build
 
 ```powershell
