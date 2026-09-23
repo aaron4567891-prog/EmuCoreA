@@ -53,6 +53,48 @@ object CrashLogger {
         writeEntry("CTX", "$key = $value")
     }
 
+
+    /**
+     * Builds a shareable diagnostic report from the persistent crash/runtime log.
+     * The caller can write this text to any Storage Access Framework Uri selected
+     * by the user, so no broad storage permission is required.
+     */
+    fun buildDiagnosticReport(context: Context): String {
+        val appVersion = runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        }.getOrDefault("?")
+        val existingLog = runCatching { logFile?.takeIf(File::exists)?.readText() }
+            .getOrNull()
+            .orEmpty()
+
+        return buildString {
+            appendLine("EmuCoreA Diagnostic Report")
+            appendLine("Generated: ${dateFmt.format(Date())}")
+            appendLine("App version: $appVersion")
+            appendLine("Package: ${context.packageName}")
+            appendLine("Android: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
+            appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
+            appendLine("Product: ${Build.PRODUCT}")
+            appendLine("Hardware: ${Build.HARDWARE}")
+            appendLine("ABIs: ${Build.SUPPORTED_ABIS.joinToString()}")
+            appendLine()
+            appendLine("=== EmuCoreA runtime/crash log ===")
+            if (existingLog.isBlank()) appendLine("No runtime log entries were recorded.")
+            else append(existingLog)
+        }
+    }
+
+    /** Writes a diagnostic report to a Uri chosen with ACTION_CREATE_DOCUMENT. */
+    fun exportDiagnosticReport(context: Context, uri: android.net.Uri): Result<Unit> = runCatching {
+        context.contentResolver.openOutputStream(uri, "wt").use { stream ->
+            requireNotNull(stream) { "Unable to open the selected destination." }
+            stream.bufferedWriter(Charsets.UTF_8).use { writer ->
+                writer.write(buildDiagnosticReport(context))
+            }
+        }
+        logInfo(TAG, "Diagnostic report exported")
+    }
+
     // ─── Private helpers ──────────────────────────────────────────────────────
 
     private fun resolveLogFile(context: Context): File? {

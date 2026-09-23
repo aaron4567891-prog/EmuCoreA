@@ -182,6 +182,7 @@ import com.sbro.emucorea.R
 import com.sbro.emucorea.core.AndroidGyroscopeInput
 import com.sbro.emucorea.core.AudioDefaults
 import com.sbro.emucorea.core.DocumentPathResolver
+import com.sbro.emucorea.core.CrashLogger
 import com.sbro.emucorea.core.EmulatorBridge
 import com.sbro.emucorea.core.EmulatorStorage
 import com.sbro.emucorea.core.GamepadManager
@@ -387,6 +388,23 @@ fun SettingsScreen(
     val customFontPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? -> uri?.let(viewModel::installCustomFont) }
+
+    val diagnosticExportSuccessMessage = stringResource(R.string.settings_diagnostics_export_success)
+    val diagnosticExportFailureMessage = stringResource(R.string.settings_diagnostics_export_failed)
+    val diagnosticLogExporter = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri: Uri? ->
+        if (uri != null) {
+            CrashLogger.exportDiagnosticReport(context, uri)
+                .onSuccess {
+                    Toast.makeText(context, diagnosticExportSuccessMessage, Toast.LENGTH_SHORT).show()
+                }
+                .onFailure {
+                    CrashLogger.logError("Diagnostics", "Failed to export diagnostic report", it)
+                    Toast.makeText(context, diagnosticExportFailureMessage, Toast.LENGTH_LONG).show()
+                }
+        }
+    }
 
     val shaderPackPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -2125,6 +2143,18 @@ private fun SettingsContent(
                               value = listOf(uiState.coreName, uiState.coreVersion)
                                   .filter(String::isNotBlank).joinToString(" "),
                             onClick = { }
+                        )
+                        SettingsItem(
+                            icon = Icons.Rounded.BugReport,
+                            label = stringResource(R.string.settings_diagnostics_export),
+                            value = stringResource(R.string.settings_diagnostics_export_desc),
+                            onClick = {
+                                val timestamp = java.text.SimpleDateFormat(
+                                    "yyyy-MM-dd-HHmmss",
+                                    Locale.US
+                                ).format(java.util.Date())
+                                diagnosticLogExporter.launch("EmuCoreA-Diagnostics-$timestamp.txt")
+                            }
                         )
                         AboutNote(
                             title = stringResource(R.string.settings_about_app),
