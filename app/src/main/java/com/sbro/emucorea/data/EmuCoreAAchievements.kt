@@ -1,4 +1,4 @@
-﻿package com.sbro.emucorea.data
+package com.sbro.emucorea.data
 
 import android.Manifest
 import android.app.NotificationChannel

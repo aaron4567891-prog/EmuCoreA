@@ -1,4 +1,4 @@
-﻿package com.sbro.emucorea.ui.profile
+package com.sbro.emucorea.ui.profile
 
 import android.content.Context
 import android.content.Intent
@@ -90,7 +90,7 @@ object PlayerCardSharer {
 
         drawMetric(canvas, context.getString(R.string.profile_total_time), formatDuration(profile.totalPlayTimeMs), 130f, accent)
         drawMetric(canvas, context.getString(R.string.profile_games_played), profile.gamesPlayed.toString(), 470f, accent)
-        drawMetric(canvas, context.getString(R.string.profile_rank), rank?.let { "#${it.rank}" } ?: "вЂ”", 810f, accent)
+        drawMetric(canvas, context.getString(R.string.profile_rank), rank?.let { "#${it.rank}" } ?: "—", 810f, accent)
 
         textPaint.textSize = 25f
         textPaint.color = Color.rgb(145, 154, 175)

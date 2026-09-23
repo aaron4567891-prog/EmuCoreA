@@ -1,4 +1,4 @@
-﻿package com.sbro.emucorea.data.drive
+package com.sbro.emucorea.data.drive
 
 import android.content.Context
 import android.util.Log
