@@ -76,6 +76,7 @@ import com.sbro.emucorea.ui.settings.LanguageSettingsScreen
 import com.sbro.emucorea.ui.settings.ControlsLayoutEditorHostScreen
 import com.sbro.emucorea.ui.settings.PerGameSettingsManagerScreen
 import com.sbro.emucorea.ui.settings.SettingsScreen
+import com.sbro.emucorea.ui.profile.ProfileScreen
 import com.sbro.emucorea.ui.settings.SettingsViewModel
 import com.sbro.emucorea.ui.textures.TextureManagerScreen
 import com.sbro.emucorea.ui.theme.ThemeManagerScreen
@@ -169,6 +170,9 @@ data class GameDbBrowserRoute(val query: String? = null)
 
 @Serializable
 object AchievementsRoute
+
+@Serializable
+object ProfileRoute
 
 @Serializable
 object TextureManagerRoute
@@ -355,6 +359,11 @@ fun AppNavigation(
             launchSingleTop = true
         }
     }
+    val navigateProfile: () -> Unit = {
+        navController.navigate(ProfileRoute) {
+            launchSingleTop = true
+        }
+    }
     val navigateDiscord: () -> Unit = {
         navController.navigate(DiscordRoute) {
             launchSingleTop = true
@@ -422,6 +431,7 @@ fun AppNavigation(
 
             composable<HomeRoute> {
                 AdaptiveShell(
+                    isProUnlocked = settingsUiState.isProUnlocked,
                     selected = PrimaryDestination.Home,
                     onNavigateHub = navigateHub,
                     drawerEnabled = homeDrawerEnabled,
@@ -455,6 +465,7 @@ fun AppNavigation(
                     onNavigateTextureManager = navigateTextureManager,
                     onNavigateCheatManager = navigateCheatManager,
                     onNavigateAchievements = navigateAchievements,
+                    onNavigateProfile = navigateProfile,
                     onLaunchGame = launchGamePickerAction,
                     onLaunchBios = {
                         navController.navigate(EmulationRoute(bootBios = true)) {
@@ -522,6 +533,7 @@ fun AppNavigation(
 
             composable<CatalogSearchRoute> {
                 AdaptiveShell(
+                    isProUnlocked = settingsUiState.isProUnlocked,
                     selected = PrimaryDestination.Search,
                     onNavigateHub = navigateHub,
                     onNavigateHome = {
@@ -555,6 +567,7 @@ fun AppNavigation(
                     onNavigateTextureManager = navigateTextureManager,
                     onNavigateCheatManager = navigateCheatManager,
                     onNavigateAchievements = navigateAchievements,
+                    onNavigateProfile = navigateProfile,
                     onBackClick = { navController.popBackStack() },
                     onLaunchGame = launchGamePickerAction
                 ) {
@@ -589,6 +602,7 @@ fun AppNavigation(
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     AdaptiveShell(
+                        isProUnlocked = settingsUiState.isProUnlocked,
                         selected = PrimaryDestination.Hub,
                         onNavigateHome = {
                             navController.navigate(HomeRoute) {
@@ -626,6 +640,7 @@ fun AppNavigation(
                         onNavigateTextureManager = navigateTextureManager,
                         onNavigateCheatManager = navigateCheatManager,
                     onNavigateAchievements = navigateAchievements,
+                    onNavigateProfile = navigateProfile,
                         onBackClick = { navController.popBackStack() },
                         onLaunchGame = launchGamePickerAction,
                         onLaunchBios = {
@@ -700,6 +715,7 @@ fun AppNavigation(
 
             composable<SupportedFormatsRoute> {
                 AdaptiveShell(
+                    isProUnlocked = settingsUiState.isProUnlocked,
                     selected = PrimaryDestination.Formats,
                     onNavigateHub = navigateHub,
                     onNavigateHome = {
@@ -733,6 +749,7 @@ fun AppNavigation(
                     onNavigateTextureManager = navigateTextureManager,
                     onNavigateCheatManager = navigateCheatManager,
                     onNavigateAchievements = navigateAchievements,
+                    onNavigateProfile = navigateProfile,
                     onBackClick = { navController.popBackStack() },
                     onLaunchGame = launchGamePickerAction
                 ) {
@@ -744,6 +761,7 @@ fun AppNavigation(
 
             composable<DiscordRoute> {
                 AdaptiveShell(
+                    isProUnlocked = settingsUiState.isProUnlocked,
                     selected = PrimaryDestination.Discord,
                     onNavigateHub = navigateHub,
                     onNavigateHome = {
@@ -770,6 +788,7 @@ fun AppNavigation(
                     onNavigateTextureManager = navigateTextureManager,
                     onNavigateCheatManager = navigateCheatManager,
                     onNavigateAchievements = navigateAchievements,
+                    onNavigateProfile = navigateProfile,
                     onBackClick = { navController.popBackStack() },
                     onLaunchGame = launchGamePickerAction
                 ) {
@@ -780,6 +799,7 @@ fun AppNavigation(
             composable<SettingsRoute> { backStackEntry ->
                 val route = backStackEntry.toRoute<SettingsRoute>()
                 AdaptiveShell(
+                    isProUnlocked = settingsUiState.isProUnlocked,
                     selected = PrimaryDestination.Settings,
                     onNavigateHub = navigateHub,
                     onNavigateHome = {
@@ -813,6 +833,7 @@ fun AppNavigation(
                     onNavigateTextureManager = navigateTextureManager,
                     onNavigateCheatManager = navigateCheatManager,
                     onNavigateAchievements = navigateAchievements,
+                    onNavigateProfile = navigateProfile,
                     onBackClick = { navController.popBackStack() },
                     onLaunchGame = launchGamePickerAction
                 ) {
@@ -869,6 +890,8 @@ fun AppNavigation(
                 } else {
                     ThemeManagerScreen(
                         initialLibrary = settingsUiState.customThemeLibrary,
+                        isProUnlocked = settingsUiState.isProUnlocked,
+                        onPurchasePro = { activity?.let(settingsViewModel::purchasePro) },
                         onSave = { library ->
                             settingsViewModel.saveCustomThemeLibrary(library, activate = false)
                         },
@@ -893,6 +916,8 @@ fun AppNavigation(
                 } else {
                     TouchControlCreatorScreen(
                         initialLibrary = settingsUiState.customTouchControls,
+                        isProUnlocked = settingsUiState.isProUnlocked,
+                        onPurchasePro = { activity?.let(settingsViewModel::purchasePro) },
                         onSave = settingsViewModel::saveCustomTouchControls,
                         onBackClick = { navController.popBackStack() }
                     )
@@ -938,6 +963,7 @@ fun AppNavigation(
 
             composable<FeedbackRoute> {
                 AdaptiveShell(
+                    isProUnlocked = settingsUiState.isProUnlocked,
                     selected = PrimaryDestination.Feedback,
                     onNavigateHub = navigateHub,
                     onNavigateHome = {
@@ -975,6 +1001,7 @@ fun AppNavigation(
                     onNavigateTextureManager = navigateTextureManager,
                     onNavigateCheatManager = navigateCheatManager,
                     onNavigateAchievements = navigateAchievements,
+                    onNavigateProfile = navigateProfile,
                     onBackClick = { navController.popBackStack() },
                     onLaunchGame = launchGamePickerAction
                 ) {
@@ -1013,6 +1040,65 @@ fun AppNavigation(
                 AchievementsScreen(
                     onBackClick = { navController.popBackStack() }
                 )
+            }
+
+            composable<ProfileRoute> {
+                AdaptiveShell(
+                    selected = PrimaryDestination.Profile,
+                    isProUnlocked = settingsUiState.isProUnlocked,
+                    onNavigateHub = navigateHub,
+                    onNavigateHome = {
+                        navController.navigate(HomeRoute) {
+                            launchSingleTop = true
+                            popUpTo(HomeRoute) { inclusive = false }
+                        }
+                    },
+                    onNavigateSearch = {
+                        navController.navigate(CatalogSearchRoute) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateFormats = {
+                        navController.navigate(SupportedFormatsRoute) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateSettings = {
+                        navController.navigate(SettingsRoute()) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateAchievements = {
+                        navController.navigate(AchievementsRoute) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateProfile = { },
+                    onNavigateDiscord = navigateDiscord,
+                    onNavigateFeedback = navigateFeedback,
+                    onNavigateGameSettingsManager = navigateGameSettingsManager,
+                    onNavigateDataTransfer = navigateDataTransfer,
+                    onResetAllSettings = resetAllSettingsAndOpenOnboarding,
+                    onNavigateSaveManager = {
+                        navController.navigate(SaveManagerRoute()) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateMemoryCardManager = navigateMemoryCardManager,
+                    onNavigateTextureManager = navigateTextureManager,
+                    onNavigateCheatManager = navigateCheatManager,
+                    onBackClick = { navController.popBackStack() },
+                    onLaunchGame = launchGamePickerAction
+                ) {
+                    ProfileScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onOpenGameDetails = { catalogGameId ->
+                            navController.navigate(GameDetailRoute(catalogGameId = catalogGameId)) {
+                                launchSingleTop = true
+                            }
+                        }
+                    )
+                }
             }
 
             composable<CheatManagerRoute> {

@@ -1,11 +1,15 @@
 package com.sbro.emucorea.ui.home
 
+import android.app.Activity
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbro.emucorea.core.BiosValidator
 import com.sbro.emucorea.core.EmulatorBridge
+import com.sbro.emucorea.core.ProProductOffer
+import com.sbro.emucorea.core.ProPurchaseManager
+import com.sbro.emucorea.core.ProPurchaseTier
 import com.sbro.emucorea.core.SetupValidator
 import com.sbro.emucorea.core.StorageAccess
 import com.sbro.emucorea.data.AppPreferences
@@ -73,7 +77,17 @@ data class HomeUiState(
     val sortOption: HomeSortOption = HomeSortOption.TITLE_ASC,
     val libraryViewMode: HomeLibraryViewMode = HomeLibraryViewMode.GRID,
     val lastStandardLibraryViewMode: HomeLibraryViewMode = HomeLibraryViewMode.GRID,
-    val isCoverArtDisabled: Boolean = true
+    val isCoverArtDisabled: Boolean = true,
+    val showWelcomeDialog: Boolean = false,
+    val isProUnlocked: Boolean = false,
+    val proPrice: String? = null,
+    val proProducts: List<ProProductOffer> = emptyList(),
+    val ownedProProductIds: Set<String> = emptySet(),
+    val isProPurchaseStatusVerified: Boolean = false,
+    val isProProductLoading: Boolean = false,
+    val isProProductAvailable: Boolean = false,
+    val isProPurchaseInProgress: Boolean = false,
+    val proPurchaseMessageResId: Int? = null
 )
 
 private data class DeferredLibraryScan(
@@ -93,6 +107,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val customGameCoverRepository = CustomGameCoverRepository(application)
     private val preferences = AppPreferences(application)
     private val homeBackgroundRepository = HomeBackgroundRepository(application)
+    private val proPurchaseManager = ProPurchaseManager.getInstance(application)
     private var allGames: List<GameItem> = emptyList()
     private var recentEntries: List<RecentGameEntry> = emptyList()
     private var coverSyncJob: Job? = null
@@ -148,6 +163,26 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             preferences.homeBackgroundDim.collect { dim ->
                 _uiState.value = _uiState.value.copy(homeBackgroundDim = dim)
+            }
+        }
+        viewModelScope.launch {
+            preferences.welcomeDialogShown.distinctUntilChanged().collect { shown ->
+                _uiState.value = _uiState.value.copy(showWelcomeDialog = !shown)
+            }
+        }
+        viewModelScope.launch {
+            proPurchaseManager.state.collect { proState ->
+                _uiState.value = _uiState.value.copy(
+                    isProUnlocked = proState.isProUnlocked,
+                    proPrice = proState.productPrice,
+                    proProducts = proState.products,
+                    ownedProProductIds = proState.ownedProductIds,
+                    isProPurchaseStatusVerified = proState.isPurchaseStatusVerified,
+                    isProProductLoading = proState.isProductLoading,
+                    isProProductAvailable = proState.isProductAvailable,
+                    isProPurchaseInProgress = proState.isPurchaseInProgress,
+                    proPurchaseMessageResId = proState.messageResId
+                )
             }
         }
         viewModelScope.launch {
@@ -817,6 +852,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
             .lowercase(Locale.ROOT)
             .trim()
+    }
+
+    fun dismissWelcomeDialog() {
+        viewModelScope.launch { preferences.setWelcomeDialogShown(true) }
+    }
+
+    fun purchasePro(
+        activity: Activity,
+        tier: ProPurchaseTier = ProPurchaseTier.BASE
+    ) {
+        proPurchaseManager.purchase(activity, tier)
+    }
+
+    fun clearProPurchaseMessage() {
+        proPurchaseManager.clearMessage()
     }
 }
 

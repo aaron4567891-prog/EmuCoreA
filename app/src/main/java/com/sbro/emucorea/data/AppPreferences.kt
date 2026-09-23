@@ -112,6 +112,7 @@ data class SettingsSnapshot(
     val coverDownloadBaseUrl: String? = null,
     val coverArtStyle: Int = AppPreferences.COVER_ART_STYLE_3D,
     val setupComplete: Boolean = false,
+    val proUnlocked: Boolean = false,
     val enableFastBoot: Boolean = true,
     val eeCycleRate: Int = PerformanceProfiles.safeConfig.eeCycleRate,
     val eeCycleSkip: Int = PerformanceProfiles.safeConfig.eeCycleSkip,
@@ -306,6 +307,48 @@ class AppPreferences(private val context: Context) {
     private val localePrefs = context.getSharedPreferences("ui_locale", Context.MODE_PRIVATE)
 
     companion object {
+        /**
+         * Portable emulator/frontend settings that are safe to keep in a Firestore profile.
+         *
+         * Deliberately excludes library paths, BIOS/game locations, memory-card paths,
+         * custom GPU-driver paths, RetroAchievements credentials, networking identities,
+         * locale and manager UI.
+         */
+        internal val EMULATOR_CLOUD_KEYS = setOf(
+            "performanceProfile", "renderer", "upscaleMultiplier", "shaderChainEnabled",
+            "shaderChainPreset", "aspectRatio", "displayCropLeft", "displayCropTop",
+            "displayCropRight", "displayCropBottom", "audioVolume", "audioFastForwardVolume",
+            "audioMuted", "audioInterpolation", "audioSyncMode", "audioLightweightSpu2",
+            "audioBackend", "audioBufferMs", "audioOutputLatencyMs", "audioMinimalOutputLatency",
+            "autoProgressiveScan", "padVibration", "padVibrationStrength", "padVibrationFallback",
+            "showFps", "fpsOverlayMode", "fpsOverlayCorner", "fpsOverlayScale",
+            "fpsOverlayMetrics", "confirmSaveLoadActions", "backButtonExitsGame",
+            "compactControls", "keepScreenOn", "overlayScale", "overlayOpacity", "overlayShow",
+            "racingMode", "touchscreenRightStick", "touchscreenRightStickSensitivity",
+            "touchHaptics", "touchHapticsPreset", "touchHapticsStrength", "gyroMode",
+            "gyroSensitivity", "gyroSmoothing", "gyroInvertX", "gyroInvertY",
+            "gamepadStickDeadzone", "gamepadLeftStickSensitivity", "gamepadRightStickSensitivity",
+            "gamepadRightStickUpToR2", "gamepadRightStickDownToL2", "gamepadButtonHaptics",
+            "pressureModifierAmount", "enableFastBoot", "enableCheats", "enableIcacheEmulation",
+            "enableDisableStalls", "enablePreciseExceptions", "enableTurboCd", "enableCddaAudio",
+            "enableXaDecoding", "enableSpuReverb", "enableSpuThread", "spuTempo",
+            "hwDownloadMode", "frameSkip", "skipDuplicateFrames", "textureFiltering",
+            "trilinearFiltering", "blendingAccuracy", "texturePreloading",
+            "textureReplacementsEnabled", "textureReplacementsAsync", "textureReplacementsPrecache",
+            "textureDumpingEnabled", "enableFxaa", "sgsrMode", "casMode", "casSharpness",
+            "tvShader", "deinterlaceMode", "dithering", "antiBlur", "anisotropicFiltering",
+            "enableHwMipmapping", "cpuSpriteRenderSize", "cpuSpriteRenderLevel",
+            "softwareClutRender", "gpuTargetClutMode", "skipDrawStart", "skipDrawEnd",
+            "autoFlushHardware", "cpuFramebufferConversion", "disableDepthConversion",
+            "disableSafeFeatures", "disableRenderFixes", "preloadFrameData",
+            "disablePartialInvalidation", "textureInsideRt", "readTargetsOnClose",
+            "estimateTextureRegion", "gpuPaletteConversion", "halfPixelOffset", "nativeScaling",
+            "roundSprite", "bilinearUpscale", "textureOffsetX", "textureOffsetY", "alignSprite",
+            "mergeSprite", "forceEvenSpritePosition", "nativePaletteDraw", "enableAutoGamepad",
+            "hideOverlayOnGamepad", "orientationLock", "emulationAllowsBothOrientations",
+            "frameLimitEnabled", "rewindEnabled", "vSyncEnabled", "fastForwardSpeed"
+        )
+
         const val DEFAULT_LOCAL_LINK_PORT = 19072
         private const val CURRENT_OVERLAY_LAYOUT_VERSION = 17
         const val DEFAULT_NTSC_FRAMERATE = 59.94f
@@ -491,6 +534,8 @@ class AppPreferences(private val context: Context) {
         private val LEGACY_COVER_ART_STYLE = intPreferencesKey("cover_art_style")
         private val COVER_ART_STYLE = intPreferencesKey("psp_cover_art_style_v2")
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+        private val PRO_UNLOCKED = booleanPreferencesKey("pro_unlocked")
+        private val WELCOME_DIALOG_SHOWN = booleanPreferencesKey("welcome_dialog_shown")
         private val PERFORMANCE_PROFILE = intPreferencesKey("performance_profile")
         private val GPU_HARDWARE_PROFILE = intPreferencesKey("gpu_hardware_profile")
         private val LANGUAGE_TAG = stringPreferencesKey("language_tag")
@@ -719,8 +764,8 @@ class AppPreferences(private val context: Context) {
         return when (prefs[THEME_MODE]) {
             1 -> ThemeMode.LIGHT
             2 -> ThemeMode.DARK
-            3 -> ThemeMode.DARK
-            4 -> ThemeMode.CUSTOM
+            3 -> if (prefs[PRO_UNLOCKED] == true) ThemeMode.PRO else ThemeMode.SYSTEM
+            4 -> if (prefs[PRO_UNLOCKED] == true) ThemeMode.CUSTOM else ThemeMode.SYSTEM
             5 -> ThemeMode.NEON
             else -> ThemeMode.SYSTEM
         }
@@ -850,10 +895,12 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setThemeMode(mode: ThemeMode) {
         context.dataStore.edit { prefs ->
+            if (mode in setOf(ThemeMode.PRO, ThemeMode.CUSTOM) && prefs[PRO_UNLOCKED] != true) return@edit
             prefs[THEME_MODE] = when (mode) {
                 ThemeMode.SYSTEM -> 0
                 ThemeMode.LIGHT -> 1
                 ThemeMode.DARK -> 2
+                ThemeMode.PRO -> 3
                 ThemeMode.CUSTOM -> 4
                 ThemeMode.NEON -> 5
             }
@@ -862,6 +909,7 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setCustomTheme(config: CustomThemeConfig) {
         context.dataStore.edit { prefs ->
+            if (prefs[PRO_UNLOCKED] != true) return@edit
             val safeConfig = config.sanitized()
             val current = readCustomThemeLibrary(prefs)
             val activeId = current.activeThemeId ?: CustomThemeLibrary.LEGACY_THEME_ID
@@ -886,6 +934,7 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setCustomThemeLibrary(library: CustomThemeLibrary, activate: Boolean) {
         context.dataStore.edit { prefs ->
+            if (prefs[PRO_UNLOCKED] != true) return@edit
             val safe = library.sanitized()
             prefs[CUSTOM_THEME_LIBRARY_JSON] = safe.encode()
             val activeConfig = safe.activeTheme()?.config
@@ -905,6 +954,7 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setCustomTouchControls(library: CustomTouchControlLibrary) {
         context.dataStore.edit { prefs ->
+            if (prefs[PRO_UNLOCKED] != true) return@edit
             prefs[CUSTOM_TOUCH_CONTROLS_JSON] = library.sanitized().encode()
         }
     }
@@ -1514,6 +1564,33 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[ONBOARDING_COMPLETED] = completed }
     }
 
+    val proUnlocked: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[PRO_UNLOCKED] ?: false }
+        .distinctUntilChanged()
+
+    fun getProUnlockedSync(): Boolean {
+        return kotlinx.coroutines.runBlocking {
+            context.dataStore.data.map { prefs -> prefs[PRO_UNLOCKED] ?: false }.first()
+        }
+    }
+
+    suspend fun setProUnlocked(unlocked: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[PRO_UNLOCKED] = unlocked
+            if (!unlocked && prefs[THEME_MODE] in setOf(3, 4)) {
+                prefs[THEME_MODE] = 0
+            }
+        }
+    }
+
+    val welcomeDialogShown: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WELCOME_DIALOG_SHOWN] ?: false }
+        .distinctUntilChanged()
+
+    suspend fun setWelcomeDialogShown(shown: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WELCOME_DIALOG_SHOWN] = shown }
+    }
+
     val languageTag: Flow<String?> = context.dataStore.data.map { prefs ->
         prefs[LANGUAGE_TAG]
     }
@@ -1648,6 +1725,7 @@ class AppPreferences(private val context: Context) {
                 coverDownloadBaseUrl = prefs[COVER_DOWNLOAD_BASE_URL],
                 coverArtStyle = readCoverArtStyle(prefs),
                 setupComplete = prefs[ONBOARDING_COMPLETED] ?: false,
+                proUnlocked = prefs[PRO_UNLOCKED] ?: false,
                 enableFastBoot = prefs[ENABLE_FAST_BOOT] ?: true,
                 eeCycleRate = prefs[EE_CYCLE_RATE] ?: profileConfig.eeCycleRate,
                 eeCycleSkip = prefs[EE_CYCLE_SKIP] ?: profileConfig.eeCycleSkip,
@@ -4179,6 +4257,23 @@ class AppPreferences(private val context: Context) {
             put("memoryCardSlot1", prefs[MEMORY_CARD_SLOT1])
             put("memoryCardSlot2", prefs[MEMORY_CARD_SLOT2])
         }
+    }
+
+    suspend fun exportEmulatorCloudJson(): JSONObject {
+        val complete = exportJson()
+        return JSONObject().apply {
+            EMULATOR_CLOUD_KEYS.forEach { key ->
+                if (complete.has(key) && !complete.isNull(key)) put(key, complete.get(key))
+            }
+        }
+    }
+
+    suspend fun importEmulatorCloudJson(cloud: JSONObject) {
+        val merged = exportJson()
+        EMULATOR_CLOUD_KEYS.forEach { key ->
+            if (cloud.has(key) && !cloud.isNull(key)) merged.put(key, cloud.get(key))
+        }
+        importJson(merged)
     }
 
     suspend fun importJson(json: JSONObject) {
